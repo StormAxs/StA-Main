@@ -2167,6 +2167,8 @@ if(CLIENT)
     components/background.h
     components/binds.cpp
     components/binds.h
+          components/bindwheel.cpp
+          components/bindwheel.h
     components/broadcast.cpp
     components/broadcast.h
     components/camera.cpp
@@ -2221,12 +2223,16 @@ if(CLIENT)
     components/nameplates.h
     components/particles.cpp
     components/particles.h
+          components/parser.cpp
+          components/parser.h
     components/players.cpp
     components/players.h
     components/race_demo.cpp
     components/race_demo.h
     components/scoreboard.cpp
     components/scoreboard.h
+          components/skinprofiles.cpp
+          components/skinprofiles.h
     components/skins.cpp
     components/skins.h
     components/sounds.cpp
@@ -2237,6 +2243,8 @@ if(CLIENT)
     components/statboard.h
     components/tooltips.cpp
     components/tooltips.h
+          components/verify.cpp
+          components/verify.h
     components/voting.cpp
     components/voting.h
     gameclient.cpp

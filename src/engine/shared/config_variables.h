@@ -677,6 +677,15 @@ MACRO_CONFIG_INT(ClVideoRecorderFPS, cl_video_recorder_fps, 60, 1, 1000, CFGFLAG
 /*
  * Add config variables for mods below this comment to avoid merge conflicts.
  */
+
+MACRO_CONFIG_INT(ClShowFrozenText, sc_frozen_tees_text, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show how many tees in your team are currently frozen. (0 - off, 1 - show alive, 2 - show frozen)")
+MACRO_CONFIG_INT(ClShowFrozenHud, sc_frozen_tees_hud, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show frozen tee HUD")
+MACRO_CONFIG_INT(ClShowFrozenHudSkins, sc_frozen_tees_hud_skins, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use ninja skin, or darkened skin for frozen tees on hud")
+
+MACRO_CONFIG_INT(ClFrozenHudTeeSize, sc_frozen_tees_size, 15, 8, 20, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of tees in frozen tee hud. (Default : 15)")
+MACRO_CONFIG_INT(ClFrozenMaxRows, sc_frozen_tees_max_rows, 1, 1, 6, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Maximum number of rows in frozen tee HUD display")
+MACRO_CONFIG_INT(ClFrozenHudTeamOnly, sc_frozen_tees_only_inteam, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Only render frozen tee HUD display while in team")
+
 MACRO_CONFIG_COL(ScPlayerOwnColor, sc_player_own_color, 6684927, CFGFLAG_CLIENT | CFGFLAG_SAVE, "You'r color in TAB list")
 MACRO_CONFIG_COL(ScLocalConsoleColor, sc_local_console_color, 51, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Local console color")
 MACRO_CONFIG_COL(ScRemoteConsoleColor, sc_remote_console_color, 21837, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Remote console color")

@@ -33,7 +33,6 @@ public:
 	char m_##Name[Len]; // Flawfinder: ignore
 #include "config_variables.h"
 
-#include "sta_variables.h"
 #undef MACRO_CONFIG_INT
 #undef MACRO_CONFIG_COL
 #undef MACRO_CONFIG_STR
