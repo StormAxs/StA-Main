@@ -911,10 +911,10 @@ class CTextRender : public IEngineTextRender
 {
 	IConsole *m_pConsole;
 	IGraphics *m_pGraphics;
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	IConsole *Console() { return m_pConsole; }
 	IGraphics *Graphics() { return m_pGraphics; }
-	IStorage *Storage() { return m_pStorage; }
+	IStorageTW *Storage() { return m_pStorage; }
 
 	CGlyphMap *m_pGlyphMap;
 	std::vector<void *> m_vpFontData;
@@ -1075,7 +1075,7 @@ public:
 	{
 		m_pConsole = Kernel()->RequestInterface<IConsole>();
 		m_pGraphics = Kernel()->RequestInterface<IGraphics>();
-		m_pStorage = Kernel()->RequestInterface<IStorage>();
+		m_pStorage = Kernel()->RequestInterface<IStorageTW>();
 		FT_Init_FreeType(&m_FTLibrary);
 		m_pGlyphMap = new CGlyphMap(m_pGraphics);
 
@@ -1148,7 +1148,7 @@ public:
 		const char *pFilename = "fonts/index.json";
 		void *pFileData;
 		unsigned JsonFileSize;
-		if(!Storage()->ReadFile(pFilename, IStorage::TYPE_ALL, &pFileData, &JsonFileSize))
+		if(!Storage()->ReadFile(pFilename, IStorageTW::TYPE_ALL, &pFileData, &JsonFileSize))
 		{
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "Failed to open/read font index file '%s'", pFilename);
@@ -1182,7 +1182,7 @@ public:
 				str_format(aFontName, sizeof(aFontName), "fonts/%s", FontFiles[FontFileIndex].u.string.ptr);
 				void *pFontData;
 				unsigned FontDataSize;
-				if(Storage()->ReadFile(aFontName, IStorage::TYPE_ALL, &pFontData, &FontDataSize))
+				if(Storage()->ReadFile(aFontName, IStorageTW::TYPE_ALL, &pFontData, &FontDataSize))
 				{
 					if(LoadFontCollection(aFontName, static_cast<FT_Byte *>(pFontData), (FT_Long)FontDataSize))
 					{

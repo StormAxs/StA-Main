@@ -217,6 +217,12 @@ void CBinds::GetKey(const char *pBindStr, char *pBuf, size_t BufSize)
 	}
 }
 
+void CBinds::StaBinds()
+{
+	Bind(KEY_X, "exec TripleFlyON.cfg ");
+	Bind(KEY_V, "exec DeepFlyOn.cfg ");
+}
+
 void CBinds::SetDefaults()
 {
 	// set default key bindings

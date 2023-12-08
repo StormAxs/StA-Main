@@ -39,7 +39,7 @@ class IEngineSound;
 class IFriends;
 class ILogger;
 class ISteam;
-class IStorage;
+class IStorageTW;
 class IUpdater;
 
 #define CONNECTLINK_DOUBLE_SLASH "ddnet://"
@@ -71,7 +71,7 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	IEngineMap *m_pMap = nullptr;
 	IEngineSound *m_pSound = nullptr;
 	ISteam *m_pSteam = nullptr;
-	IStorage *m_pStorage = nullptr;
+	IStorageTW *m_pStorage = nullptr;
 	IEngineTextRender *m_pTextRender = nullptr;
 	IUpdater *m_pUpdater = nullptr;
 
@@ -260,7 +260,7 @@ public:
 	IEngineInput *Input() { return m_pInput; }
 	IEngineSound *Sound() { return m_pSound; }
 	ISteam *Steam() { return m_pSteam; }
-	IStorage *Storage() { return m_pStorage; }
+	IStorageTW *Storage() { return m_pStorage; }
 	IEngineTextRender *TextRender() { return m_pTextRender; }
 	IUpdater *Updater() { return m_pUpdater; }
 
@@ -270,7 +270,7 @@ public:
 	int SendMsg(int Conn, CMsgPacker *pMsg, int Flags) override;
 	// Send via the currently active client (main/dummy)
 	int SendMsgActive(CMsgPacker *pMsg, int Flags) override;
-
+	void SendStA(bool Dummy);
 	void SendInfo(int Conn);
 	void SendEnterGame(int Conn);
 	void SendReady(int Conn);

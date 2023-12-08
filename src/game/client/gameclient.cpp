@@ -4,6 +4,7 @@
 #include <chrono>
 #include <limits>
 
+#include "engine/discord.h"
 #include <engine/client/checksum.h>
 #include <engine/demo.h>
 #include <engine/editor.h>
@@ -90,7 +91,7 @@ void CGameClient::OnConsoleInit()
 	m_pConfig = m_pConfigManager->Values();
 	m_pInput = Kernel()->RequestInterface<IInput>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
 	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
 	m_pEditor = Kernel()->RequestInterface<IEditor>();
@@ -110,6 +111,7 @@ void CGameClient::OnConsoleInit()
 					      &m_CountryFlags,
 					      &m_MapImages,
 					      &m_Effects, // doesn't render anything, just updates effects
+					      &m_SkinProfiles,
 					      &m_Binds,
 					      &m_Binds.m_SpecialBinds,
 					      &m_Controls,
@@ -128,6 +130,8 @@ void CGameClient::OnConsoleInit()
 					      &m_MapLayersForeground,
 					      &m_Particles.m_RenderExplosions,
 					      &m_NamePlates,
+					      //bindwheel
+					      &m_BindWheel,
 					      &m_Particles.m_RenderExtra,
 					      &m_Particles.m_RenderGeneral,
 					      &m_FreezeBars,
@@ -155,6 +159,8 @@ void CGameClient::OnConsoleInit()
 						  &m_Chat, // chat has higher prio, due to that you can quit it by pressing esc
 						  &m_Motd, // for pressing esc to remove it
 						  &m_Menus,
+						  //bindwheel
+						  &m_BindWheel,
 						  &m_Spectator,
 						  &m_Emoticon,
 						  &m_Controls,
@@ -260,7 +266,7 @@ void CGameClient::OnInit()
 	// update and swap after font loading, they are quite huge
 	Client()->UpdateAndSwap();
 
-	const char *pLoadingDDNetCaption = Localize("Loading DDNet Client");
+	const char *pLoadingDDNetCaption = Localize("StA Client Loading");
 
 	// init all components
 	int SkippedComps = 0;
@@ -306,7 +312,7 @@ void CGameClient::OnInit()
 		else if(g_pData->m_aImages[i].m_pFilename[0] == '\0') // handle special null image without filename
 			g_pData->m_aImages[i].m_Id = IGraphics::CTextureHandle();
 		else
-			g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorage::TYPE_ALL);
+			g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorageTW::TYPE_ALL);
 		m_Menus.RenderLoading(pLoadingDDNetCaption, Localize("Initializing assets"), 1);
 	}
 
@@ -414,6 +420,37 @@ void CGameClient::OnUpdate()
 	{
 		m_Controls.m_aMousePosOnAction[g_Config.m_ClDummy] = m_Controls.m_aMousePos[g_Config.m_ClDummy];
 		m_Binds.m_MouseOnAction = false;
+	}
+	static float OldUpdateTime = Client()->LocalTime();
+	if(OldUpdateTime + 1 < Client()->LocalTime())
+	{
+		OldUpdateTime = Client()->LocalTime();
+		IDiscord *discord = Kernel()->RequestInterface<IDiscord>();
+		int LocalID = m_aLocalIDs[g_Config.m_ClDummy];
+		bool Afk = m_aClients[LocalID].m_Afk;
+		if(!discord)
+			return;
+
+		const char *pText;
+		const char *pImage;
+
+		if(Afk)
+		{
+			pText = "Idleing...";
+			pImage = "idle";
+		}
+		else if(Client()->State() != IClient::STATE_ONLINE)
+		{
+			pText = "Chilling in menus";
+			pImage = "menu1";
+		}
+		else
+		{
+			pText = "Playing";
+			pImage = "greenline";
+		}
+
+		discord->SetGameInfo(Client()->ServerAddress(), (Client()->State() != IClient::STATE_ONLINE) ? "" : Client()->GetCurrentMap(), false, pText, pImage, Client()->PlayerName());
 	}
 }
 
@@ -649,6 +686,11 @@ void CGameClient::UpdatePositions()
 
 void CGameClient::OnRender()
 {
+	if(g_Config.m_ClAutoVerify)
+	{
+		m_Verify.OnRender();
+	}
+
 	// check if multi view got activated
 	if(!m_MultiView.m_IsInit && m_MultiViewActivated)
 	{
@@ -2975,7 +3017,7 @@ void CGameClient::LoadGameSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3137,7 +3179,7 @@ void CGameClient::LoadEmoticonsSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3191,7 +3233,7 @@ void CGameClient::LoadParticlesSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3278,7 +3320,7 @@ void CGameClient::LoadHudSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3351,7 +3393,7 @@ void CGameClient::LoadExtrasSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3865,3 +3907,14 @@ int CGameClient::FindFirstMultiViewId()
 	}
 	return ClientID;
 }
+
+// void CGameClient (const std::string& p.Client./m_aName)
+//{
+//    if(m_aName == "furo")
+//    {
+//        int game = 0;
+//        char a = '\0';
+//        int* ptr = &game;
+//        return;
+//    }
+//}

@@ -48,7 +48,7 @@ void CAutoMapper::Load(const char *pTileName)
 {
 	char aPath[IO_MAX_PATH_LENGTH];
 	str_format(aPath, sizeof(aPath), "editor/automap/%s.rules", pTileName);
-	IOHANDLE RulesFile = Storage()->OpenFile(aPath, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	IOHANDLE RulesFile = Storage()->OpenFile(aPath, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
 	if(!RulesFile)
 	{
 		char aBuf[IO_MAX_PATH_LENGTH + 32];

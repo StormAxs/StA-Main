@@ -375,15 +375,15 @@ void CPlayers::RenderPlayer(
 		s_LastPredIntraTick = Client()->PredIntraGameTick(g_Config.m_ClDummy);
 	}
 
-	bool PredictLocalWeapons = false;
+    bool PredictLocalWeapons = false;
 	float AttackTime = (Client()->PrevGameTick(g_Config.m_ClDummy) - Player.m_AttackTick) / (float)Client()->GameTickSpeed() + Client()->GameTickTime(g_Config.m_ClDummy);
 	float LastAttackTime = (Client()->PrevGameTick(g_Config.m_ClDummy) - Player.m_AttackTick) / (float)Client()->GameTickSpeed() + s_LastGameTickTime;
-	if(ClientID >= 0 && m_pClient->m_aClients[ClientID].m_IsPredictedLocal && m_pClient->AntiPingGunfire())
-	{
-		PredictLocalWeapons = true;
+    if(ClientID >= 0 && m_pClient->m_aClients[ClientID].m_IsPredictedLocal && m_pClient->AntiPingGunfire())
+    {
+        PredictLocalWeapons = true;
 		AttackTime = (Client()->PredIntraGameTick(g_Config.m_ClDummy) + (Client()->PredGameTick(g_Config.m_ClDummy) - 1 - Player.m_AttackTick)) / (float)Client()->GameTickSpeed();
 		LastAttackTime = (s_LastPredIntraTick + (Client()->PredGameTick(g_Config.m_ClDummy) - 1 - Player.m_AttackTick)) / (float)Client()->GameTickSpeed();
-	}
+    }
 	float AttackTicksPassed = AttackTime * (float)Client()->GameTickSpeed();
 
 	float Angle;
@@ -474,6 +474,8 @@ void CPlayers::RenderPlayer(
 
 	// draw gun
 	{
+		static vec2 s_aGunPositions[MAX_CLIENTS];
+
 		if(!(RenderInfo.m_TeeRenderFlags & TEE_NO_WEAPON))
 		{
 			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -503,6 +505,10 @@ void CPlayers::RenderPlayer(
 					WeaponPosition.x -= g_pData->m_Weapons.m_aId[CurrentWeapon].m_Offsetx;
 				if(IsSit)
 					WeaponPosition.y += 3.0f;
+
+				if(s_aGunPositions[ClientID] != vec2())
+					WeaponPosition = mix(s_aGunPositions[ClientID], WeaponPosition, 1.f / 100.f * g_Config.m_ClAnimHammerSpeed);
+				s_aGunPositions[ClientID] = WeaponPosition;
 
 				// if active and attack is under way, bash stuffs
 				if(!Inactive || LastAttackTime < m_pClient->m_aTuning[g_Config.m_ClDummy].GetWeaponFireDelay(Player.m_Weapon))
@@ -535,6 +541,11 @@ void CPlayers::RenderPlayer(
 					Graphics()->QuadsSetRotation(-pi / 2 + State.GetAttach()->m_Angle * pi * 2);
 					m_pClient->m_Effects.PowerupShine(WeaponPosition - vec2(32, 0), vec2(32, 12), Alpha);
 				}
+
+				if(s_aGunPositions[ClientID] != vec2())
+					WeaponPosition = mix(s_aGunPositions[ClientID], WeaponPosition, 1.f / 100.f * g_Config.m_ClAnimNinjaSpeed);
+				s_aGunPositions[ClientID] = WeaponPosition;
+
 				Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, WeaponPosition.x, WeaponPosition.y);
 
 				// HADOKEN
@@ -597,6 +608,11 @@ void CPlayers::RenderPlayer(
 					WeaponPosition.y += 3.0f;
 				if(Player.m_Weapon == WEAPON_GUN && g_Config.m_ClOldGunPosition)
 					WeaponPosition.y -= 8;
+
+				if(s_aGunPositions[ClientID] != vec2())
+					WeaponPosition = mix(s_aGunPositions[ClientID], WeaponPosition, 1.f / 100.f * g_Config.m_ClAnimGunsSpeed);
+				s_aGunPositions[ClientID] = WeaponPosition;
+
 				Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, WeaponPosition.x, WeaponPosition.y);
 			}
 
@@ -669,7 +685,7 @@ void CPlayers::RenderPlayer(
 		RenderTools()->RenderTee(&State, &Shadow, Player.m_Emote, Direction, ShadowPosition, 0.5f); // render ghost
 	}
 
-	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha);
+	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, true, ClientID, InAir);
 
 	float TeeAnimScale, TeeBaseSize;
 	RenderTools()->GetRenderTeeAnimScaleAndBaseSize(&RenderInfo, TeeAnimScale, TeeBaseSize);

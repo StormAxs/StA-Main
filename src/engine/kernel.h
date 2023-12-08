@@ -35,8 +35,8 @@ private:
 class IKernel
 {
 	// hide the implementation
-	virtual void RegisterInterfaceImpl(const char *pInterfaceName, IInterface *pInterface, bool Destroy) = 0;
-	virtual void ReregisterInterfaceImpl(const char *pInterfaceName, IInterface *pInterface) = 0;
+	virtual bool RegisterInterfaceImpl(const char *pInterfaceName, IInterface *pInterface, bool Destroy) = 0;
+	virtual bool ReregisterInterfaceImpl(const char *pInterfaceName, IInterface *pInterface) = 0;
 	virtual IInterface *RequestInterfaceImpl(const char *pInterfaceName) = 0;
 
 public:
@@ -46,14 +46,14 @@ public:
 
 	// templated access to handle pointer conversions and interface names
 	template<class TINTERFACE>
-	void RegisterInterface(TINTERFACE *pInterface, bool Destroy = true)
+	bool RegisterInterface(TINTERFACE *pInterface, bool Destroy = true)
 	{
-		RegisterInterfaceImpl(TINTERFACE::InterfaceName(), pInterface, Destroy);
+		return RegisterInterfaceImpl(TINTERFACE::InterfaceName(), pInterface, Destroy);
 	}
 	template<class TINTERFACE>
-	void ReregisterInterface(TINTERFACE *pInterface)
+	bool ReregisterInterface(TINTERFACE *pInterface)
 	{
-		ReregisterInterfaceImpl(TINTERFACE::InterfaceName(), pInterface);
+		return ReregisterInterfaceImpl(TINTERFACE::InterfaceName(), pInterface);
 	}
 
 	// Usage example:

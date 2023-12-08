@@ -34,6 +34,8 @@
 #include <engine/storage.h>
 
 #include <chrono>
+#include <thread>
+#include "parser.h"
 
 using namespace FontIcons;
 using namespace std::chrono_literals;
@@ -252,6 +254,10 @@ void CMenus::RenderPlayers(CUIRect MainView)
 	ButtonBar.VSplitLeft(Width, &Button, &ButtonBar);
 	RenderTools()->RenderIcon(IMAGE_GUIICONS, SPRITE_GUIICON_FRIEND, &Button);
 
+	Options.HSplitTop(34.0f, &ButtonBar, &Options);
+	ButtonBar.VSplitRight(310.0f, &Player, &ButtonBar);
+	UI()->DoLabel(&Player, Localize("Blacklist"), 10.0f, TEXTALIGN_MR);
+
 	int TotalPlayers = 0;
 	for(const auto &pInfoByName : m_pClient->m_Snap.m_apInfoByName)
 	{
@@ -270,7 +276,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 	s_ListBox.DoStart(24.0f, TotalPlayers, 1, 3, -1, &Options);
 
 	// options
-	static char s_aPlayerIDs[MAX_CLIENTS][3] = {{0}};
+	static char s_aPlayerIDs[MAX_CLIENTS][4] = {{0}};
 
 	for(int i = 0, Count = 0; i < MAX_CLIENTS; ++i)
 	{
@@ -299,6 +305,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 		Player.VSplitLeft(28.0f, &Button, &Player);
 
 		CTeeRenderInfo TeeInfo = CurrentClient.m_RenderInfo;
+
 		TeeInfo.m_Size = Button.h;
 
 		const CAnimState *pIdleState = CAnimState::GetIdle();
@@ -317,6 +324,21 @@ void CMenus::RenderPlayers(CUIRect MainView)
 
 		m_pClient->m_CountryFlags.Render(CurrentClient.m_Country, ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f),
 			Button2.x, Button2.y + Button2.h / 2.0f - 0.75f * Button2.h / 2.0f, 1.5f * Button2.h, 0.75f * Button2.h);
+
+		//blacklisting hahxd
+		Row.VSplitLeft(5.0f, &Row, nullptr);
+		//  Row.VSplitLeft(Width, &Button, &Row);
+		Button.VSplitRight((Width - Button.h) / 4.0f, nullptr, &Button);
+		Button.VSplitRight(Button.h, nullptr, &Button);
+
+		if(DoButton_CheckBox(&s_aPlayerIDs[Index][3], Localize(""), CurrentClient.m_Foe, &Button))
+		{
+			CurrentClient.m_Foe ^= 1;
+			if(CurrentClient.m_Foe)
+				Client()->Foes()->AddFriend(CurrentClient.m_aName, CurrentClient.m_aClan);
+			else
+				Client()->Foes()->RemoveFriend(CurrentClient.m_aName, CurrentClient.m_aClan);
+		}
 
 		// ignore chat button
 		Row.HMargin(2.0f, &Row);
@@ -618,7 +640,6 @@ bool CMenus::RenderServerControlKick(CUIRect MainView, bool FilterSpectators)
 void CMenus::RenderServerControl(CUIRect MainView)
 {
 	static int s_ControlPage = 0;
-
 	// render background
 	CUIRect Bottom, RconExtension, TabBar, Button;
 	MainView.HSplitTop(20.0f, &Bottom, &MainView);
@@ -810,6 +831,178 @@ void CMenus::RenderServerControl(CUIRect MainView)
 	}
 }
 
+void CMenus::RenderStats(CUIRect MainView)
+{
+
+	CUIRect Bottom, TabBar, Button;
+	MainView.HSplitTop(20.0f, &Bottom, &MainView);
+	Bottom.Draw(ms_ColorTabbarActive, 10, 0.0f);
+	MainView.HSplitTop(20.0f, &TabBar, &MainView);
+	MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B,10.0f);
+	MainView.Margin(10.0f, &MainView);
+
+	static int s_StatsPage = 0;
+
+	TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
+	static CButtonContainer s_Button0;
+	if(DoButton_MenuTab(&s_Button0, Localize("DDStats"), s_StatsPage == 0, &Button, 0))
+		s_StatsPage = 0;
+
+	TabBar.VSplitRight(TabBar.w ,&TabBar, &Button);
+	static CButtonContainer s_Button1;
+	if(DoButton_MenuTab(&s_Button1, Localize("Map Tracking"), s_StatsPage == 1, &Button, 0))
+		s_StatsPage = 1;
+
+	if(s_StatsPage == 0)
+	{
+			static bool wasExecuted = false;
+			static CJsonFetcher jsonFetcher;
+
+			if(s_StatsPage == 0 && !wasExecuted)
+			{
+				jsonFetcher.Webgrab(Client()->PlayerName());
+				wasExecuted = true;
+			}
+
+
+
+
+			int points = jsonFetcher.GetPoints();
+			std::string PlayerName = jsonFetcher.GetPlayerName();
+
+		float FontSize_BodyLeft = 25.0f;
+		float FontSize_HeadLeft = 40.0f;
+
+		CUIRect WB, StALogo, RT1, RT2, CP, LF, rank, MP1, MP2, LP, PointsS, Left, View;
+	/*	WB = welcome back
+		StALogo = UI LOGO
+	   	RT = Render Tee
+	     	CP = Current Points
+		LF = Last finish
+	     	rank = rank 1's
+	       	MP = Most played
+	       	LP = Last played
+	       	PointsS = Points Stats
+				     */
+		WB.x = 0;
+		WB.y = 0;
+		WB.w = MainView.w * 0.75f;
+		WB.h = MainView.h * 0.15f;
+
+		StALogo.x = 0;
+		StALogo.y = WB.h;
+		StALogo.w = 50.0f;
+		StALogo.h = 50.0f;
+
+		CP.x = WB.w;
+		CP.y = StALogo.y;
+		CP.w = MainView.w - WB.w;
+		CP.h = StALogo.h;
+
+		LP.x = CP.x;
+		LP.y = CP.y + CP.h;
+		LP.w = CP.w;
+		LP.h = MainView.h - LP.y;
+
+
+		CUIRect PointRect = MainView;
+		char playerName[32];
+		str_format(playerName, sizeof(playerName), "%s", PlayerName.c_str());
+
+		//where are these used?
+		//no idea
+		float x = 0.0f;
+		float y = 0.0f;
+		//SPLITING ACTUALLY I FUCKING HATE IT
+		MainView.HSplitTop(MainView.h / 3, &WB, &MainView);
+		WB.VSplitRight(WB.w / 2 - 50 , &WB, &StALogo);
+		WB.HSplitTop(WB.h / 2 + 30, &WB, &CP);
+		WB.Margin(1.0f, &WB);
+		CP.VSplitLeft(120.0f, &RT1, &CP);
+		MainView.HSplitTop(MainView.h /2, &LF, &PointsS);
+		LF.VSplitRight(LF.w / 3 - 70, &LF, &LP);
+		LF.HSplitTop(LF.h / 2 - 30.0f, &LF, &rank);
+		LF.VSplitLeft(120.0f, &RT2, &LF);
+		rank.VSplitLeft(240.0f, &MP1, &rank);
+		MP1.HSplitTop(MP1.h ,nullptr ,&MP2);
+		PointsS.VSplitLeft(240.0f, &MP2, &PointsS);
+
+		//rendering margin
+		PointsS.Margin(1.0f, &PointsS);
+		rank.Margin(1.0f, &rank);
+		LP.Margin(1.0f, &LP);
+		CP.Margin(1.0f, &CP);
+		StALogo.Margin(1.5f, &StALogo);
+		LF.Margin(1.0f, &LF);
+		MP1.VMargin(1.0f, &MP1);
+		MP2.VMargin(1.0f, &MP2);
+		//RT1.HMargin(1.0f, &RT1);
+
+char playerPoints[32];
+
+
+std::string modifiedPlayerName = std::string("  Welcome Back, ") + playerName;
+UI()->DoLabel(&WB, modifiedPlayerName.c_str(), 30.0f, TEXTALIGN_ML);
+
+str_format(playerPoints, sizeof(playerPoints), "%d", points);
+std::string modifiedPoints = std::string(" Your current points:") + playerPoints;
+UI()->DoLabel(&CP, modifiedPoints.c_str(), FontSize_BodyLeft, TEXTALIGN_ML);
+
+const float LineMargin = 22.0f;
+char *pSkinName = g_Config.m_ClPlayerSkin;
+int *pUseCustomColor = &g_Config.m_ClPlayerUseCustomColor;
+unsigned *pColorBody = &g_Config.m_ClPlayerColorBody;
+unsigned *pColorFeet = &g_Config.m_ClPlayerColorFeet;
+int CurrentFlag = m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry;
+
+CTeeRenderInfo OwnSkinInfo;
+const CSkin *pSkin = m_pClient->m_Skins.Find(pSkinName);
+OwnSkinInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
+OwnSkinInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
+OwnSkinInfo.m_SkinMetrics = pSkin->m_Metrics;
+OwnSkinInfo.m_CustomColoredSkin = *pUseCustomColor;
+if(*pUseCustomColor)
+{
+				OwnSkinInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(*pColorBody).UnclampLighting());
+				OwnSkinInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(*pColorFeet).UnclampLighting());
+}
+else
+{
+				OwnSkinInfo.m_ColorBody = ColorRGBA(1.0f, 1.0f, 1.0f);
+				OwnSkinInfo.m_ColorFeet = ColorRGBA(1.0f, 1.0f, 1.0f);
+}
+OwnSkinInfo.m_Size = 90.0f;
+
+const CAnimState *pIdleState = CAnimState::GetIdle();
+vec2 OffsetToMid;
+RenderTools()->GetRenderTeeOffsetToRenderedTee(pIdleState, &OwnSkinInfo, OffsetToMid);
+vec2 TeeRenderPos(RT1.x + 60.0f, (RT1.y + 7.0f) + RT2.h);
+int Emote = m_Dummy ? g_Config.m_ClDummyDefaultEyes : g_Config.m_ClPlayerDefaultEyes;
+RenderTools()->RenderTee(pIdleState, &OwnSkinInfo, Emote, vec2(1, 0), TeeRenderPos);
+
+
+
+		StALogo.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		WB.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		CP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		LF.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		LP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		rank.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		//RT1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+		//RT2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+
+
+
+	}
+	else if(s_StatsPage == 1)
+	{
+
+	}
+}
+
 void CMenus::RenderInGameNetwork(CUIRect MainView)
 {
 	MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
@@ -898,7 +1091,7 @@ void CMenus::GhostlistPopulate()
 {
 	m_vGhosts.clear();
 	m_GhostPopulateStartTime = time_get_nanoseconds();
-	Storage()->ListDirectoryInfo(IStorage::TYPE_ALL, m_pClient->m_Ghost.GetGhostDir(), GhostlistFetchCallback, this);
+	Storage()->ListDirectoryInfo(IStorageTW::TYPE_ALL, m_pClient->m_Ghost.GetGhostDir(), GhostlistFetchCallback, this);
 	std::sort(m_vGhosts.begin(), m_vGhosts.end());
 
 	CGhostItem *pOwnGhost = 0;
@@ -963,7 +1156,7 @@ void CMenus::UpdateOwnGhost(CGhostItem Item)
 void CMenus::DeleteGhostItem(int Index)
 {
 	if(m_vGhosts[Index].HasFile())
-		Storage()->RemoveFile(m_vGhosts[Index].m_aFilename, IStorage::TYPE_SAVE);
+		Storage()->RemoveFile(m_vGhosts[Index].m_aFilename, IStorageTW::TYPE_SAVE);
 	m_vGhosts.erase(m_vGhosts.begin() + Index);
 }
 
@@ -1126,8 +1319,8 @@ void CMenus::RenderGhost(CUIRect MainView)
 	if(DoButton_Menu(&s_DirectoryButton, Localize("Ghosts directory"), 0, &Button))
 	{
 		char aBuf[IO_MAX_PATH_LENGTH];
-		Storage()->GetCompletePath(IStorage::TYPE_SAVE, "ghosts", aBuf, sizeof(aBuf));
-		Storage()->CreateFolder("ghosts", IStorage::TYPE_SAVE);
+		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, "ghosts", aBuf, sizeof(aBuf));
+		Storage()->CreateFolder("ghosts", IStorageTW::TYPE_SAVE);
 		if(!open_file(aBuf))
 		{
 			dbg_msg("menus", "couldn't open file '%s'", aBuf);

@@ -18,7 +18,7 @@ public:
 		int m_Ping;
 	};
 
-	CServerBrowserPingCache(IConsole *pConsole, IStorage *pStorage);
+	CServerBrowserPingCache(IConsole *pConsole, IStorageTW *pStorage);
 	~CServerBrowserPingCache() override = default;
 
 	void Load() override;
@@ -37,7 +37,7 @@ private:
 	std::unordered_map<NETADDR, int> m_Entries;
 };
 
-CServerBrowserPingCache::CServerBrowserPingCache(IConsole *pConsole, IStorage *pStorage) :
+CServerBrowserPingCache::CServerBrowserPingCache(IConsole *pConsole, IStorageTW *pStorage) :
 	m_pConsole(pConsole)
 {
 	m_pDisk = SqliteOpen(pConsole, pStorage, "ddnet-cache.sqlite3");
@@ -161,7 +161,7 @@ int CServerBrowserPingCache::GetPing(const NETADDR *pAddrs, int NumAddrs) const
 	return Ping;
 }
 
-IServerBrowserPingCache *CreateServerBrowserPingCache(IConsole *pConsole, IStorage *pStorage)
+IServerBrowserPingCache *CreateServerBrowserPingCache(IConsole *pConsole, IStorageTW *pStorage)
 {
 	return new CServerBrowserPingCache(pConsole, pStorage);
 }

@@ -56,7 +56,7 @@ class CUnpacker;
 class IAntibot;
 class IGameController;
 class IEngine;
-class IStorage;
+class IStorageTW;
 struct CAntibotRoundData;
 struct CScoreRandomMapResult;
 
@@ -82,7 +82,7 @@ class CGameContext : public IGameServer
 	CConfig *m_pConfig;
 	IConsole *m_pConsole;
 	IEngine *m_pEngine;
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	IAntibot *m_pAntibot;
 	CLayers m_Layers;
 	CCollision m_Collision;
@@ -161,7 +161,7 @@ public:
 	CConfig *Config() { return m_pConfig; }
 	IConsole *Console() { return m_pConsole; }
 	IEngine *Engine() { return m_pEngine; }
-	IStorage *Storage() { return m_pStorage; }
+	IStorageTW *Storage() { return m_pStorage; }
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
 	CTuningParams *TuningList() { return &m_aTuningList[0]; }

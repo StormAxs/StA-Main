@@ -14,7 +14,7 @@ class CEngine : public IEngine
 {
 public:
 	IConsole *m_pConsole;
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	bool m_Logging;
 
 	std::shared_ptr<CFutureLogger> m_pFutureLogger;
@@ -37,8 +37,8 @@ public:
 			char aFilenameSent[IO_MAX_PATH_LENGTH], aFilenameRecv[IO_MAX_PATH_LENGTH];
 			str_format(aFilenameSent, sizeof(aFilenameSent), "dumps/network_sent_%s.txt", aBuf);
 			str_format(aFilenameRecv, sizeof(aFilenameRecv), "dumps/network_recv_%s.txt", aBuf);
-			CNetBase::OpenLog(pEngine->m_pStorage->OpenFile(aFilenameSent, IOFLAG_WRITE, IStorage::TYPE_SAVE),
-				pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorage::TYPE_SAVE));
+			CNetBase::OpenLog(pEngine->m_pStorage->OpenFile(aFilenameSent, IOFLAG_WRITE, IStorageTW::TYPE_SAVE),
+				pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorageTW::TYPE_SAVE));
 			pEngine->m_Logging = true;
 		}
 	}
@@ -83,13 +83,13 @@ public:
 	void Init() override
 	{
 		m_pConsole = Kernel()->RequestInterface<IConsole>();
-		m_pStorage = Kernel()->RequestInterface<IStorage>();
+		m_pStorage = Kernel()->RequestInterface<IStorageTW>();
 
 		if(!m_pConsole || !m_pStorage)
 			return;
 
 		char aFullPath[IO_MAX_PATH_LENGTH];
-		m_pStorage->GetCompletePath(IStorage::TYPE_SAVE, "dumps/", aFullPath, sizeof(aFullPath));
+		m_pStorage->GetCompletePath(IStorageTW::TYPE_SAVE, "dumps/", aFullPath, sizeof(aFullPath));
 		m_pConsole->Register("dbg_lognetwork", "", CFGFLAG_SERVER | CFGFLAG_CLIENT, Con_DbgLognetwork, this, "Log the network");
 	}
 

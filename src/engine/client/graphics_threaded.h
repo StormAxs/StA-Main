@@ -690,7 +690,7 @@ public:
 
 	virtual ~IGraphicsBackend() = default;
 
-	virtual int Init(const char *pName, int *pScreen, int *pWidth, int *pHeight, int *pRefreshRate, int *pFsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight, int *pCurrentWidth, int *pCurrentHeight, class IStorage *pStorage) = 0;
+	virtual int Init(const char *pName, int *pScreen, int *pWidth, int *pHeight, int *pRefreshRate, int *pFsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight, int *pCurrentWidth, int *pCurrentHeight, class IStorageTW *pStorage) = 0;
 	virtual int Shutdown() = 0;
 
 	virtual uint64_t TextureMemoryUsage() const = 0;
@@ -779,7 +779,7 @@ class CGraphics_Threaded : public IEngineGraphics
 	unsigned m_CurrentCommandBuffer;
 
 	//
-	class IStorage *m_pStorage;
+	class IStorageTW *m_pStorage;
 	class IConsole *m_pConsole;
 	class IEngine *m_pEngine;
 

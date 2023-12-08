@@ -110,43 +110,47 @@ int main(int argc, const char **argv)
 	pServer->SetLoggers(pFutureFileLogger, std::move(pStdoutLogger));
 
 	IKernel *pKernel = IKernel::Create();
-	pKernel->RegisterInterface(pServer);
 
 	// create the components
 	IEngine *pEngine = CreateEngine(GAME_NAME, pFutureConsoleLogger, 2 * std::thread::hardware_concurrency() + 2);
-	pKernel->RegisterInterface(pEngine);
-
-	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_SERVER, argc, argv);
-	pKernel->RegisterInterface(pStorage);
+	IEngineMap *pEngineMap = CreateEngineMap();
+	IGameServer *pGameServer = CreateGameServer();
+	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER | CFGFLAG_ECON).release();
+	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_SERVER, argc, argv);
+	IConfigManager *pConfigManager = CreateConfigManager();
+	IEngineAntibot *pEngineAntibot = CreateEngineAntibot();
 
 	pFutureAssertionLogger->Set(CreateAssertionLogger(pStorage, GAME_NAME));
-
 #if defined(CONF_EXCEPTION_HANDLING)
 	char aBuf[IO_MAX_PATH_LENGTH];
 	char aBufName[IO_MAX_PATH_LENGTH];
 	char aDate[64];
 	str_timestamp(aDate, sizeof(aDate));
 	str_format(aBufName, sizeof(aBufName), "dumps/" GAME_NAME "-Server_%s_crash_log_%s_%d_%s.RTP", CONF_PLATFORM_STRING, aDate, pid(), GIT_SHORTREV_HASH != nullptr ? GIT_SHORTREV_HASH : "");
-	pStorage->GetCompletePath(IStorage::TYPE_SAVE, aBufName, aBuf, sizeof(aBuf));
+	pStorage->GetCompletePath(IStorageTW::TYPE_SAVE, aBufName, aBuf, sizeof(aBuf));
 	set_exception_handler_log_file(aBuf);
 #endif
 
-	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER | CFGFLAG_ECON).release();
-	pKernel->RegisterInterface(pConsole);
+	{
+		bool RegisterFail = false;
 
-	IConfigManager *pConfigManager = CreateConfigManager();
-	pKernel->RegisterInterface(pConfigManager);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngineMap); // register as both
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap *>(pEngineMap), false);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngineAntibot);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IAntibot *>(pEngineAntibot), false);
 
-	IEngineMap *pEngineMap = CreateEngineMap();
-	pKernel->RegisterInterface(pEngineMap); // IEngineMap
-	pKernel->RegisterInterface(static_cast<IMap *>(pEngineMap), false);
-
-	IEngineAntibot *pEngineAntibot = CreateEngineAntibot();
-	pKernel->RegisterInterface(pEngineAntibot); // IEngineAntibot
-	pKernel->RegisterInterface(static_cast<IAntibot *>(pEngineAntibot), false);
-
-	IGameServer *pGameServer = CreateGameServer();
-	pKernel->RegisterInterface(pGameServer);
+		if(RegisterFail)
+		{
+			delete pKernel;
+			return -1;
+		}
+	}
 
 	pEngine->Init();
 	pConsole->Init();
@@ -156,7 +160,7 @@ int main(int argc, const char **argv)
 	pServer->RegisterCommands();
 
 	// execute autoexec file
-	if(pStorage->FileExists(AUTOEXEC_SERVER_FILE, IStorage::TYPE_ALL))
+	if(pStorage->FileExists(AUTOEXEC_SERVER_FILE, IStorageTW::TYPE_ALL))
 	{
 		pConsole->ExecuteFile(AUTOEXEC_SERVER_FILE);
 	}
@@ -175,7 +179,7 @@ int main(int argc, const char **argv)
 	const int Mode = g_Config.m_Logappend ? IOFLAG_APPEND : IOFLAG_WRITE;
 	if(g_Config.m_Logfile[0])
 	{
-		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, Mode, IStorage::TYPE_SAVE_OR_ABSOLUTE);
+		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, Mode, IStorageTW::TYPE_SAVE_OR_ABSOLUTE);
 		if(Logfile)
 		{
 			pFutureFileLogger->Set(log_logger_file(Logfile));

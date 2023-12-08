@@ -202,7 +202,7 @@ int CSound::Init()
 {
 	m_SoundEnabled = false;
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
 
 	if(!g_Config.m_SndEnable)
 		return 0;

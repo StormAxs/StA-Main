@@ -98,7 +98,7 @@ struct CDatafile
 	char *m_pData;
 };
 
-bool CDataFileReader::Open(class IStorage *pStorage, const char *pFilename, int StorageType)
+bool CDataFileReader::Open(class IStorageTW *pStorage, const char *pFilename, int StorageType)
 {
 	log_trace("datafile", "loading. filename='%s'", pFilename);
 
@@ -631,7 +631,7 @@ CDataFileWriter::~CDataFileWriter()
 	}
 }
 
-bool CDataFileWriter::Open(class IStorage *pStorage, const char *pFilename, int StorageType)
+bool CDataFileWriter::Open(class IStorageTW *pStorage, const char *pFilename, int StorageType)
 {
 	dbg_assert(!m_File, "File already open");
 	m_File = pStorage->OpenFile(pFilename, IOFLAG_WRITE, StorageType);

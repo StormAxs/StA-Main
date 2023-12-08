@@ -237,7 +237,7 @@ bool CEditor::CallbackAddTileart(const char *pFilepath, int StorageType, void *p
 		return false;
 	}
 
-	IStorage::StripPathAndExtension(pFilepath, pEditor->m_aTileartFilename, sizeof(pEditor->m_aTileartFilename));
+	IStorageTW::StripPathAndExtension(pFilepath, pEditor->m_aTileartFilename, sizeof(pEditor->m_aTileartFilename));
 	if(pEditor->m_TileartImageInfo.m_Width * pEditor->m_TileartImageInfo.m_Height > 10'000)
 	{
 		pEditor->m_PopupEventType = CEditor::POPEVENT_PIXELART_BIG_IMAGE;

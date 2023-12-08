@@ -451,6 +451,7 @@ protected:
 	void RenderServerInfo(CUIRect MainView);
 	void RenderServerInfoMotd(CUIRect Motd);
 	void RenderServerControl(CUIRect MainView);
+	void RenderStats(CUIRect MainView);
 	bool RenderServerControlKick(CUIRect MainView, bool FilterSpectators);
 	bool RenderServerControlServer(CUIRect MainView);
 	void RenderIngameHint();
@@ -574,7 +575,7 @@ protected:
 	bool RenderLanguageSelection(CUIRect MainView);
 	void RenderThemeSelection(CUIRect MainView);
 	void RenderSettingsGeneral(CUIRect MainView);
-	void RenderSettingsPlayer(CUIRect MainView);
+	int RenderSettingsPlayer(CUIRect MainView);
 	void RenderSettingsDummyPlayer(CUIRect MainView);
 	void RenderSettingsTee(CUIRect MainView);
 	void RenderSettingsControls(CUIRect MainView);
@@ -628,12 +629,13 @@ public:
 		PAGE_GAME,
 		PAGE_PLAYERS,
 		PAGE_SERVER_INFO,
+		PAGE_STATS,
 		PAGE_CALLVOTE,
 		PAGE_INTERNET,
 		PAGE_LAN,
 		PAGE_FAVORITES,
 		PAGE_DDNET_LEGACY, // removed, redirects to PAGE_INTERNET
-		PAGE_KOG_LEGACY, // removed, redirects to PAGE_INTERNET
+		PAGE_KOG_LEGACY, // removed, redirects to PAGE_INTERNET //fuckers ;c
 		PAGE_DEMOS,
 		PAGE_SETTINGS,
 		PAGE_SYSTEM,
@@ -652,6 +654,8 @@ public:
 		SETTINGS_SOUND,
 		SETTINGS_DDNET,
 		SETTINGS_ASSETS,
+		SETTINGS_STA,
+		SETTINGS_PROFILES,
 
 		SETTINGS_LENGTH,
 
@@ -763,8 +767,10 @@ private:
 	void RenderGhost(CUIRect MainView);
 
 	// found in menus_settings.cpp
+	void RenderSettingsProfiles(CUIRect MainView);
 	void RenderSettingsDDNet(CUIRect MainView);
 	void RenderSettingsAppearance(CUIRect MainView);
+	void RenderSettingsStA(CUIRect MainView);
 	ColorHSLA RenderHSLScrollbars(CUIRect *pRect, unsigned int *pColor, bool Alpha = false, bool ClampedLight = false);
 
 	CServerProcess m_ServerProcess;

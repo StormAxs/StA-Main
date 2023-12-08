@@ -72,14 +72,14 @@ int CMap::NumItems() const
 
 bool CMap::Load(const char *pMapName)
 {
-	IStorage *pStorage = Kernel()->RequestInterface<IStorage>();
+	IStorageTW *pStorage = Kernel()->RequestInterface<IStorageTW>();
 	if(!pStorage)
 		return false;
 
 	// Ensure current datafile is not left in an inconsistent state if loading fails,
 	// by loading the new datafile separately first.
 	CDataFileReader NewDataFile;
-	if(!NewDataFile.Open(pStorage, pMapName, IStorage::TYPE_ALL))
+	if(!NewDataFile.Open(pStorage, pMapName, IStorageTW::TYPE_ALL))
 		return false;
 
 	// Check version

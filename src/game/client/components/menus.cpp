@@ -69,7 +69,7 @@ CMenus::CMenus()
 	m_ShowStart = true;
 
 	str_copy(m_aCurrentDemoFolder, "demos");
-	m_DemolistStorageType = IStorage::TYPE_ALL;
+	m_DemolistStorageType = IStorageTW::TYPE_ALL;
 
 	m_DemoPlayerState = DEMOPLAYER_NONE;
 	m_Dummy = false;
@@ -583,7 +583,7 @@ int CMenus::RenderMenubar(CUIRect r)
 		{
 			Box.VSplitLeft(100.0f, &Button, &Box);
 			static CButtonContainer s_NewsButton;
-			if(DoButton_MenuTab(&s_NewsButton, Localize("News"), m_ActivePage == PAGE_NEWS, &Button, IGraphics::CORNER_T, &m_aAnimatorsBigPage[BIG_TAB_NEWS]))
+			if(DoButton_MenuTab(&s_NewsButton, Localize("Hall of fame"), m_ActivePage == PAGE_NEWS, &Button, IGraphics::CORNER_T, &m_aAnimatorsBigPage[BIG_TAB_NEWS]))
 			{
 				NewPage = PAGE_NEWS;
 			}
@@ -670,12 +670,18 @@ int CMenus::RenderMenubar(CUIRect r)
 		}
 
 		Box.VSplitLeft(100.0f, &Button, &Box);
-		Box.VSplitLeft(4.0f, 0, &Box);
 		static CButtonContainer s_CallVoteButton;
-		if(DoButton_MenuTab(&s_CallVoteButton, Localize("Call vote"), m_ActivePage == PAGE_CALLVOTE, &Button, IGraphics::CORNER_TR))
+		if(DoButton_MenuTab(&s_CallVoteButton, Localize("Call vote"), m_ActivePage == PAGE_CALLVOTE, &Button, 0))
 		{
 			NewPage = PAGE_CALLVOTE;
 			m_ControlPageOpening = true;
+		}
+		Box.VSplitLeft(90.0f, &Button, &Box);
+		Box.VSplitLeft(4.0f, 0, &Box);
+		static CButtonContainer s_StatsButton;
+		if(DoButton_MenuTab(&s_StatsButton, Localize("Stats"), m_ActivePage == PAGE_STATS, &Button, IGraphics::CORNER_TR))
+		{
+			NewPage = PAGE_STATS;
 		}
 	}
 
@@ -853,7 +859,7 @@ void CMenus::OnInit()
 	Console()->Chain("cl_asset_hud", ConchainAssetHud, this);
 	Console()->Chain("cl_asset_extras", ConchainAssetExtras, this);
 
-	m_TextureBlob = Graphics()->LoadTexture("blob.png", IStorage::TYPE_ALL);
+	m_TextureBlob = Graphics()->LoadTexture("blob.png", IStorageTW::TYPE_ALL);
 
 	// setup load amount
 	const int NumMenuImages = 5;
@@ -866,11 +872,11 @@ void CMenus::OnInit()
 
 	// load menu images
 	m_vMenuImages.clear();
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "menuimages", MenuImageScan, this);
+	Storage()->ListDirectory(IStorageTW::TYPE_ALL, "menuimages", MenuImageScan, this);
 
 	// load community icons
 	m_vCommunityIcons.clear();
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "communityicons", CommunityIconScan, this);
+	Storage()->ListDirectory(IStorageTW::TYPE_ALL, "communityicons", CommunityIconScan, this);
 }
 
 void CMenus::OnConsoleInit()
@@ -1058,6 +1064,10 @@ int CMenus::Render()
 				else if(m_GamePage == PAGE_CALLVOTE)
 				{
 					RenderServerControl(MainView);
+				}
+				else if(m_GamePage == PAGE_STATS)
+				{
+					RenderStats(MainView);
 				}
 				else if(m_GamePage == PAGE_SETTINGS)
 				{
@@ -1561,11 +1571,11 @@ int CMenus::Render()
 				str_format(aVideoPath, sizeof(aVideoPath), "videos/%s", m_DemoRenderInput.GetString());
 				if(!str_endswith(aVideoPath, ".mp4"))
 					str_append(aVideoPath, ".mp4");
-				if(Storage()->FolderExists(aVideoPath, IStorage::TYPE_SAVE))
+				if(Storage()->FolderExists(aVideoPath, IStorageTW::TYPE_SAVE))
 				{
 					PopupMessage(Localize("Error"), Localize("A folder with this name already exists"), Localize("Ok"), POPUP_RENDER_DEMO);
 				}
-				else if(Storage()->FileExists(aVideoPath, IStorage::TYPE_SAVE))
+				else if(Storage()->FileExists(aVideoPath, IStorageTW::TYPE_SAVE))
 				{
 					char aMessage[128 + IO_MAX_PATH_LENGTH];
 					str_format(aMessage, sizeof(aMessage), Localize("File '%s' already exists, do you want to overwrite it?"), m_DemoRenderInput.GetString());
@@ -2196,7 +2206,7 @@ int CMenus::MenuImageScan(const char *pName, int IsDir, int DirType, void *pUser
 	str_truncate(MenuImage.m_aName, sizeof(MenuImage.m_aName), pName, str_length(pName) - str_length(pExtension));
 	pSelf->m_vMenuImages.push_back(MenuImage);
 
-	pSelf->RenderLoading(Localize("Loading DDNet Client"), Localize("Loading menu images"), 1);
+	pSelf->RenderLoading(Localize("Loading StormA Client"), Localize("Loading menu images"), 1);
 
 	return 0;
 }

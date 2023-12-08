@@ -8,12 +8,12 @@ int main(int argc, const char **argv)
 {
 	CCmdlineFix CmdlineFix(&argc, &argv);
 
-	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_BASIC, argc, argv);
+	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_BASIC, argc, argv);
 	if(!pStorage || argc != 3)
 		return -1;
 
 	CDataFileReader Reader;
-	if(!Reader.Open(pStorage, argv[1], IStorage::TYPE_ABSOLUTE))
+	if(!Reader.Open(pStorage, argv[1], IStorageTW::TYPE_ABSOLUTE))
 		return -1;
 
 	CDataFileWriter Writer;

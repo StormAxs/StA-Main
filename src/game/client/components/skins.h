@@ -23,7 +23,7 @@ public:
 		virtual int OnCompletion(int State) override;
 
 	public:
-		CGetPngFile(CSkins *pSkins, const char *pUrl, IStorage *pStorage, const char *pDest);
+		CGetPngFile(CSkins *pSkins, const char *pUrl, IStorageTW *pStorage, const char *pDest);
 		CImageInfo m_Info;
 	};
 

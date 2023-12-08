@@ -13,7 +13,7 @@ const char *Localize(const char *pStr, const char *pContext)
 	return pNewStr ? pNewStr : pStr;
 }
 
-void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole)
+void CLocalizationDatabase::LoadIndexfile(IStorageTW *pStorage, IConsole *pConsole)
 {
 	m_vLanguages.clear();
 
@@ -21,7 +21,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 	m_vLanguages.emplace_back("English", "", 826, vEnglishLanguageCodes);
 
 	const char *pFilename = "languages/index.txt";
-	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
 	if(!File)
 	{
 		char aBuf[64 + IO_MAX_PATH_LENGTH];
@@ -185,7 +185,7 @@ void CLocalizationDatabase::SelectDefaultLanguage(IConsole *pConsole, char *pFil
 	}
 }
 
-bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, IConsole *pConsole)
+bool CLocalizationDatabase::Load(const char *pFilename, IStorageTW *pStorage, IConsole *pConsole)
 {
 	// empty string means unload
 	if(pFilename[0] == 0)
@@ -195,7 +195,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 		return true;
 	}
 
-	IOHANDLE IoHandle = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	IOHANDLE IoHandle = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
 	if(!IoHandle)
 		return false;
 

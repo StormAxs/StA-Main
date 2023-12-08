@@ -78,7 +78,7 @@ int main(int argc, const char **argv)
 	CCmdlineFix CmdlineFix(&argc, &argv);
 	log_set_global_logger_default();
 
-	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_BASIC, argc, argv);
+	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_BASIC, argc, argv);
 	if(!pStorage || argc <= 1 || argc > 3)
 	{
 		dbg_msg("map_optimize", "Invalid parameters or other unknown error.");
@@ -97,19 +97,19 @@ int main(int argc, const char **argv)
 	{
 		fs_makedir("out");
 		char aBuff[IO_MAX_PATH_LENGTH];
-		IStorage::StripPathAndExtension(argv[1], aBuff, sizeof(aBuff));
+		IStorageTW::StripPathAndExtension(argv[1], aBuff, sizeof(aBuff));
 		str_format(aFileName, sizeof(aFileName), "out/%s.map", aBuff);
 	}
 
 	CDataFileReader Reader;
-	if(!Reader.Open(pStorage, argv[1], IStorage::TYPE_ABSOLUTE))
+	if(!Reader.Open(pStorage, argv[1], IStorageTW::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_optimize", "Failed to open source file.");
 		return -1;
 	}
 
 	CDataFileWriter Writer;
-	if(!Writer.Open(pStorage, aFileName, IStorage::TYPE_ABSOLUTE))
+	if(!Writer.Open(pStorage, aFileName, IStorageTW::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_optimize", "Failed to open target file.");
 		return -1;

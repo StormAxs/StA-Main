@@ -58,7 +58,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuFile(void *pContext, CUIRect Vie
 			pEditor->m_PopupEventActivated = true;
 		}
 		else
-			pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CEditor::CallbackOpenMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CEditor::CallbackOpenMap, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -82,7 +82,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuFile(void *pContext, CUIRect Vie
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_AppendButton, "Append", 0, &Slot, 0, "Opens a map and adds everything from that map to the current one (ctrl+a)"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", false, CEditor::CallbackAppendMap, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", false, CEditor::CallbackAppendMap, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -97,7 +97,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuFile(void *pContext, CUIRect Vie
 			pEditor->m_PopupEventActivated = true;
 		}
 		else
-			pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", false, CEditor::CallbackSaveMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", false, CEditor::CallbackSaveMap, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -105,7 +105,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuFile(void *pContext, CUIRect Vie
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_SaveAsButton, "Save As", 0, &Slot, 0, "Saves the current map under a new name (ctrl+shift+s)"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CEditor::CallbackSaveMap, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CEditor::CallbackSaveMap, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -113,7 +113,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuFile(void *pContext, CUIRect Vie
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_SaveCopyButton, "Save Copy", 0, &Slot, 0, "Saves a copy of the current map under a new name (ctrl+shift+alt+s)"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CEditor::CallbackSaveCopyMap, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CEditor::CallbackSaveCopyMap, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -208,7 +208,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuTools(void *pContext, CUIRect Vi
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_TileartButton, "Add tileart", 0, &Slot, 0, "Generate tileart from image"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Add tileart", "Open", "mapres", false, CallbackAddTileart, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_IMG, "Add tileart", "Open", "mapres", false, CallbackAddTileart, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -239,7 +239,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupMenuSettings(void *pContext, CUIRect
 	if(pEditor->DoButton_MenuItem(&s_EntitiesButtonID, aButtonText, 0, &Slot, 0, "Choose game layer entities image for different gametypes"))
 	{
 		pEditor->m_vSelectEntitiesFiles.clear();
-		pEditor->Storage()->ListDirectory(IStorage::TYPE_ALL, "editor/entities", EntitiesListdirCallback, pEditor);
+		pEditor->Storage()->ListDirectory(IStorageTW::TYPE_ALL, "editor/entities", EntitiesListdirCallback, pEditor);
 		std::sort(pEditor->m_vSelectEntitiesFiles.begin(), pEditor->m_vSelectEntitiesFiles.end());
 
 		static SPopupMenuId s_PopupEntitiesId;
@@ -1639,7 +1639,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupImage(void *pContext, CUIRect View, 
 		str_format(aFilename, sizeof(aFilename), "%s.png", pImg->m_aName);
 		s_SelectionPopupContext.Reset();
 		std::set<std::string> EntriesSet;
-		pEditor->Storage()->FindFiles(aFilename, "mapres", IStorage::TYPE_ALL, &EntriesSet);
+		pEditor->Storage()->FindFiles(aFilename, "mapres", IStorageTW::TYPE_ALL, &EntriesSet);
 		for(const auto &Entry : EntriesSet)
 			s_SelectionPopupContext.m_vEntries.push_back(Entry);
 		if(s_SelectionPopupContext.m_vEntries.empty())
@@ -1659,7 +1659,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupImage(void *pContext, CUIRect View, 
 	if(s_SelectionPopupContext.m_pSelection != nullptr)
 	{
 		const bool WasExternal = pImg->m_External;
-		const bool Result = pEditor->ReplaceImage(s_SelectionPopupContext.m_pSelection->c_str(), IStorage::TYPE_ALL, false);
+		const bool Result = pEditor->ReplaceImage(s_SelectionPopupContext.m_pSelection->c_str(), IStorageTW::TYPE_ALL, false);
 		pImg->m_External = WasExternal;
 		s_SelectionPopupContext.Reset();
 		return Result ? CUI::POPUP_CLOSE_CURRENT : CUI::POPUP_KEEP_OPEN;
@@ -1669,7 +1669,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupImage(void *pContext, CUIRect View, 
 	View.HSplitTop(RowHeight, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_ReplaceButton, "Replace", 0, &Slot, 0, "Replaces the image with a new one"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Replace Image", "Replace", "mapres", false, ReplaceImageCallback, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_IMG, "Replace Image", "Replace", "mapres", false, ReplaceImageCallback, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -1688,7 +1688,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupImage(void *pContext, CUIRect View, 
 		View.HSplitTop(RowHeight, &Slot, &View);
 		if(pEditor->DoButton_MenuItem(&s_ExportButton, "Export", 0, &Slot, 0, "Export the image"))
 		{
-			pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_IMG, "Save image", "Save", "mapres", false, CallbackSaveImage, pEditor);
+			pEditor->InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_IMG, "Save image", "Save", "mapres", false, CallbackSaveImage, pEditor);
 			pEditor->m_FileDialogFileNameInput.Set(pImg->m_aName);
 			return CUI::POPUP_CLOSE_CURRENT;
 		}
@@ -1738,7 +1738,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupSound(void *pContext, CUIRect View, 
 		str_format(aFilename, sizeof(aFilename), "%s.opus", pSound->m_aName);
 		s_SelectionPopupContext.Reset();
 		std::set<std::string> EntriesSet;
-		pEditor->Storage()->FindFiles(aFilename, "mapres", IStorage::TYPE_ALL, &EntriesSet);
+		pEditor->Storage()->FindFiles(aFilename, "mapres", IStorageTW::TYPE_ALL, &EntriesSet);
 		for(const auto &Entry : EntriesSet)
 			s_SelectionPopupContext.m_vEntries.push_back(Entry);
 		if(s_SelectionPopupContext.m_vEntries.empty())
@@ -1757,7 +1757,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupSound(void *pContext, CUIRect View, 
 	}
 	if(s_SelectionPopupContext.m_pSelection != nullptr)
 	{
-		const bool Result = pEditor->ReplaceSound(s_SelectionPopupContext.m_pSelection->c_str(), IStorage::TYPE_ALL, false);
+		const bool Result = pEditor->ReplaceSound(s_SelectionPopupContext.m_pSelection->c_str(), IStorageTW::TYPE_ALL, false);
 		s_SelectionPopupContext.Reset();
 		return Result ? CUI::POPUP_CLOSE_CURRENT : CUI::POPUP_KEEP_OPEN;
 	}
@@ -1766,7 +1766,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupSound(void *pContext, CUIRect View, 
 	View.HSplitTop(RowHeight, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_ReplaceButton, "Replace", 0, &Slot, 0, "Replaces the sound with a new one"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_SOUND, "Replace sound", "Replace", "mapres", false, ReplaceSoundCallback, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_SOUND, "Replace sound", "Replace", "mapres", false, ReplaceSoundCallback, pEditor);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
 
@@ -1783,7 +1783,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupSound(void *pContext, CUIRect View, 
 	View.HSplitTop(RowHeight, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_ExportButton, "Export", 0, &Slot, 0, "Export sound"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_SOUND, "Save sound", "Save", "mapres", false, CallbackSaveSound, pEditor);
+		pEditor->InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_SOUND, "Save sound", "Save", "mapres", false, CallbackSaveSound, pEditor);
 		pEditor->m_FileDialogFileNameInput.Set(pSound->m_aName);
 		return CUI::POPUP_CLOSE_CURRENT;
 	}
@@ -1827,9 +1827,9 @@ CUI::EPopupMenuFunctionResult CEditor::PopupNewFolder(void *pContext, CUIRect Vi
 		{
 			char aBuf[IO_MAX_PATH_LENGTH];
 			str_format(aBuf, sizeof(aBuf), "%s/%s", pEditor->m_pFileDialogPath, pEditor->m_FileDialogNewFolderNameInput.GetString());
-			if(pEditor->Storage()->CreateFolder(aBuf, IStorage::TYPE_SAVE))
+			if(pEditor->Storage()->CreateFolder(aBuf, IStorageTW::TYPE_SAVE))
 			{
-				pEditor->FilelistPopulate(IStorage::TYPE_SAVE);
+				pEditor->FilelistPopulate(IStorageTW::TYPE_SAVE);
 				return CUI::POPUP_CLOSE_CURRENT;
 			}
 			else
@@ -2050,7 +2050,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupEvent(void *pContext, CUIRect View, 
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_LOAD)
 		{
-			pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CEditor::CallbackOpenMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CEditor::CallbackOpenMap, pEditor);
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_LOADCURRENT)
 		{
@@ -2058,7 +2058,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupEvent(void *pContext, CUIRect View, 
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_LOADDROP)
 		{
-			int Result = pEditor->Load(pEditor->m_aFileNamePending, IStorage::TYPE_ALL_OR_ABSOLUTE);
+			int Result = pEditor->Load(pEditor->m_aFileNamePending, IStorageTW::TYPE_ALL_OR_ABSOLUTE);
 			if(!Result)
 				dbg_msg("editor", "editing passed map file '%s' failed", pEditor->m_aFileNamePending);
 			pEditor->m_aFileNamePending[0] = 0;
@@ -2070,22 +2070,22 @@ CUI::EPopupMenuFunctionResult CEditor::PopupEvent(void *pContext, CUIRect View, 
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_SAVE)
 		{
-			CallbackSaveMap(pEditor->m_aFileSaveName, IStorage::TYPE_SAVE, pEditor);
+			CallbackSaveMap(pEditor->m_aFileSaveName, IStorageTW::TYPE_SAVE, pEditor);
 			return CUI::POPUP_CLOSE_CURRENT;
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_SAVE_COPY)
 		{
-			CallbackSaveCopyMap(pEditor->m_aFileSaveName, IStorage::TYPE_SAVE, pEditor);
+			CallbackSaveCopyMap(pEditor->m_aFileSaveName, IStorageTW::TYPE_SAVE, pEditor);
 			return CUI::POPUP_CLOSE_CURRENT;
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_SAVE_IMG)
 		{
-			CallbackSaveImage(pEditor->m_aFileSaveName, IStorage::TYPE_SAVE, pEditor);
+			CallbackSaveImage(pEditor->m_aFileSaveName, IStorageTW::TYPE_SAVE, pEditor);
 			return CUI::POPUP_CLOSE_CURRENT;
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_SAVE_SOUND)
 		{
-			CallbackSaveSound(pEditor->m_aFileSaveName, IStorage::TYPE_SAVE, pEditor);
+			CallbackSaveSound(pEditor->m_aFileSaveName, IStorageTW::TYPE_SAVE, pEditor);
 			return CUI::POPUP_CLOSE_CURRENT;
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_PLACE_BORDER_TILES)
@@ -2637,7 +2637,7 @@ CUI::EPopupMenuFunctionResult CEditor::PopupEntities(void *pContext, CUIRect Vie
 
 				char aBuf[IO_MAX_PATH_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "editor/entities/%s.png", pName);
-				pEditor->m_EntitiesTexture = pEditor->Graphics()->LoadTexture(aBuf, IStorage::TYPE_ALL, pEditor->GetTextureUsageFlag());
+				pEditor->m_EntitiesTexture = pEditor->Graphics()->LoadTexture(aBuf, IStorageTW::TYPE_ALL, pEditor->GetTextureUsageFlag());
 				return CUI::POPUP_CLOSE_CURRENT;
 			}
 		}

@@ -917,7 +917,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 
 	std::array<VkSampler, SUPPORTED_SAMPLER_TYPE_COUNT> m_aSamplers;
 
-	class IStorage *m_pStorage;
+	class IStorageTW *m_pStorage;
 
 	struct SDelayedBufferCleanupItem
 	{
@@ -4536,7 +4536,7 @@ public:
 		{
 			void *pShaderBuff;
 			unsigned FileSize;
-			if(!m_pStorage->ReadFile(pFileName, IStorage::TYPE_ALL, &pShaderBuff, &FileSize))
+			if(!m_pStorage->ReadFile(pFileName, IStorageTW::TYPE_ALL, &pShaderBuff, &FileSize))
 				return false;
 
 			std::vector<uint8_t> vShaderBuff;

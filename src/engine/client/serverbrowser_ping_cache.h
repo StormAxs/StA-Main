@@ -3,7 +3,7 @@
 #include <base/system.h>
 
 class IConsole;
-class IStorage;
+class IStorageTW;
 
 class IServerBrowserPingCache
 {
@@ -18,5 +18,5 @@ public:
 	virtual int GetPing(const NETADDR *pAddrs, int NumAddrs) const = 0;
 };
 
-IServerBrowserPingCache *CreateServerBrowserPingCache(IConsole *pConsole, IStorage *pStorage);
+IServerBrowserPingCache *CreateServerBrowserPingCache(IConsole *pConsole, IStorageTW *pStorage);
 #endif // ENGINE_CLIENT_SERVERBROWSER_PING_CACHE_H

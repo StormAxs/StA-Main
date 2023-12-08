@@ -72,7 +72,7 @@ class CSound : public IEngineSound
 	int m_MixingRate = 48000;
 
 	class IEngineGraphics *m_pGraphics = nullptr;
-	IStorage *m_pStorage = nullptr;
+	IStorageTW *m_pStorage = nullptr;
 
 	int *m_pMixBuffer = nullptr;
 
@@ -91,8 +91,8 @@ public:
 
 	bool IsSoundEnabled() override { return m_SoundEnabled; }
 
-	int LoadOpus(const char *pFilename, int StorageType = IStorage::TYPE_ALL) override;
-	int LoadWV(const char *pFilename, int StorageType = IStorage::TYPE_ALL) override;
+	int LoadOpus(const char *pFilename, int StorageType = IStorageTW::TYPE_ALL) override;
+	int LoadWV(const char *pFilename, int StorageType = IStorageTW::TYPE_ALL) override;
 	int LoadOpusFromMem(const void *pData, unsigned DataSize, bool FromEditor) override;
 	int LoadWVFromMem(const void *pData, unsigned DataSize, bool FromEditor) override;
 	void UnloadSample(int SampleID) override REQUIRES(!m_SoundLock);

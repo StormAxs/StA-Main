@@ -40,7 +40,7 @@ public:
 		return *this;
 	}
 
-	bool Open(class IStorage *pStorage, const char *pFilename, int StorageType);
+	bool Open(class IStorageTW *pStorage, const char *pFilename, int StorageType);
 	bool Close();
 	bool IsOpen() const { return m_pDataFile != nullptr; }
 	IOHANDLE File() const;
@@ -121,7 +121,7 @@ public:
 	}
 	~CDataFileWriter();
 
-	bool Open(class IStorage *pStorage, const char *pFilename, int StorageType = IStorage::TYPE_SAVE);
+	bool Open(class IStorageTW *pStorage, const char *pFilename, int StorageType = IStorageTW::TYPE_SAVE);
 	int AddItem(int Type, int ID, size_t Size, const void *pData);
 	int AddData(size_t Size, const void *pData, int CompressionLevel = Z_DEFAULT_COMPRESSION);
 	int AddDataSwapped(size_t Size, const void *pData);

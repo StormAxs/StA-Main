@@ -25,18 +25,18 @@ int CSkins::CGetPngFile::OnCompletion(int State)
 {
 	State = CHttpRequest::OnCompletion(State);
 
-	if(State != HTTP_ERROR && State != HTTP_ABORTED && !m_pSkins->LoadSkinPNG(m_Info, Dest(), Dest(), IStorage::TYPE_SAVE))
+	if(State != HTTP_ERROR && State != HTTP_ABORTED && !m_pSkins->LoadSkinPNG(m_Info, Dest(), Dest(), IStorageTW::TYPE_SAVE))
 	{
 		State = HTTP_ERROR;
 	}
 	return State;
 }
 
-CSkins::CGetPngFile::CGetPngFile(CSkins *pSkins, const char *pUrl, IStorage *pStorage, const char *pDest) :
+CSkins::CGetPngFile::CGetPngFile(CSkins *pSkins, const char *pUrl, IStorageTW *pStorage, const char *pDest) :
 	CHttpRequest(pUrl),
 	m_pSkins(pSkins)
 {
-	WriteToFile(pStorage, pDest, IStorage::TYPE_SAVE);
+	WriteToFile(pStorage, pDest, IStorageTW::TYPE_SAVE);
 	Timeout(CTimeout{0, 0, 0, 0});
 	LogProgress(HTTPLOG::NONE);
 }
@@ -306,7 +306,7 @@ void CSkins::OnInit()
 
 	// load skins;
 	Refresh([this](int SkinCounter) {
-		GameClient()->m_Menus.RenderLoading(Localize("Loading DDNet Client"), Localize("Loading skin files"), 0);
+		GameClient()->m_Menus.RenderLoading(Localize("Rendering u'r skins..."), Localize("Loading skin files"), 0);
 	});
 }
 
@@ -340,7 +340,7 @@ void CSkins::Refresh(TSkinLoadedCBFunc &&SkinLoadedFunc)
 	SSkinScanUser SkinScanUser;
 	SkinScanUser.m_pThis = this;
 	SkinScanUser.m_SkinLoadedFunc = SkinLoadedFunc;
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "skins", SkinScan, &SkinScanUser);
+	Storage()->ListDirectory(IStorageTW::TYPE_ALL, "skins", SkinScan, &SkinScanUser);
 	if(m_Skins.empty())
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "gameclient", "failed to load skins. folder='skins/'");
@@ -416,7 +416,7 @@ const CSkin *CSkins::FindImpl(const char *pName)
 		{
 			char aPath[IO_MAX_PATH_LENGTH];
 			str_format(aPath, sizeof(aPath), "downloadedskins/%s.png", SkinDownloadIt->second->GetName());
-			Storage()->RenameFile(SkinDownloadIt->second->m_aPath, aPath, IStorage::TYPE_SAVE);
+			Storage()->RenameFile(SkinDownloadIt->second->m_aPath, aPath, IStorageTW::TYPE_SAVE);
 			const auto *pSkin = LoadSkin(SkinDownloadIt->second->GetName(), SkinDownloadIt->second->m_pTask->m_Info);
 			SkinDownloadIt->second->m_pTask = nullptr;
 			--m_DownloadingSkins;
@@ -437,7 +437,7 @@ const CSkin *CSkins::FindImpl(const char *pName)
 	EscapeUrl(aEscapedName, sizeof(aEscapedName), pName);
 	str_format(aUrl, sizeof(aUrl), "%s%s.png", g_Config.m_ClDownloadCommunitySkins != 0 ? g_Config.m_ClSkinCommunityDownloadUrl : g_Config.m_ClSkinDownloadUrl, aEscapedName);
 	char aBuf[IO_MAX_PATH_LENGTH];
-	str_format(Skin.m_aPath, sizeof(Skin.m_aPath), "downloadedskins/%s", IStorage::FormatTmpPath(aBuf, sizeof(aBuf), pName));
+	str_format(Skin.m_aPath, sizeof(Skin.m_aPath), "downloadedskins/%s", IStorageTW::FormatTmpPath(aBuf, sizeof(aBuf), pName));
 	Skin.m_pTask = std::make_shared<CGetPngFile>(this, aUrl, Storage(), Skin.m_aPath);
 	m_pClient->Engine()->AddJob(Skin.m_pTask);
 	auto &&pDownloadSkin = std::make_unique<CDownloadSkin>(std::move(Skin));

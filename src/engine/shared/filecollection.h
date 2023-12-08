@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-class IStorage;
+class IStorageTW;
 
 class CFileCollection
 {
@@ -25,7 +25,7 @@ class CFileCollection
 	char m_aFileExt[32];
 	int m_FileExtLength;
 	char m_aPath[IO_MAX_PATH_LENGTH];
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	int64_t m_Remove; // Timestamp we want to remove
 
 	bool IsFilenameValid(const char *pFilename);
@@ -34,7 +34,7 @@ class CFileCollection
 	int64_t GetTimestamp(const char *pFilename);
 
 public:
-	void Init(IStorage *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries);
+	void Init(IStorageTW *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries);
 	void AddEntry(int64_t Timestamp);
 
 	static int FilelistCallback(const char *pFilename, int IsDir, int StorageType, void *pUser);

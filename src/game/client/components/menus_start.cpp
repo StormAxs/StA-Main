@@ -100,7 +100,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, 0); // little space
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
 	static CButtonContainer s_NewsButton;
-	if(DoButton_Menu(&s_NewsButton, Localize("News"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, vec4(0.0f, 0.0f, 0.0f, 0.5f), g_Config.m_UiUnreadNews ? vec4(0.0f, 1.0f, 0.0f, 0.25f) : vec4(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_N))
+	if(DoButton_Menu(&s_NewsButton, Localize("Hall of fame"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, vec4(0.0f, 0.0f, 0.0f, 0.5f), g_Config.m_UiUnreadNews ? vec4(0.0f, 1.0f, 0.0f, 0.25f) : vec4(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_N))
 		NewPage = PAGE_NEWS;
 
 	CUIRect Menu;

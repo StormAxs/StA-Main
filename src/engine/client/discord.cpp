@@ -1,8 +1,7 @@
 #include <engine/discord.h>
-
 // Hack for universal binary builds on macOS: Ignore arm64 until Discord
 // releases a native arm64 SDK for macOS.
-
+#include "game/client/component.h"
 #if defined(CONF_DISCORD) && !(defined(CONF_ARCH_ARM64) && defined(CONF_PLATFORM_MACOS))
 #include <discord_game_sdk.h>
 
@@ -32,6 +31,8 @@ class CDiscord : public IDiscord
 	IDiscordActivityEvents m_ActivityEvents;
 	IDiscordActivityManager *m_pActivityManager;
 
+	int m_StartTime;
+
 public:
 	bool Init(FDiscordCreate pfnDiscordCreate)
 	{
@@ -42,7 +43,7 @@ public:
 		DiscordCreateParams Params;
 		DiscordCreateParamsSetDefault(&Params);
 
-		Params.client_id = 752165779117441075; // DDNet
+		Params.client_id = 1089816029913436171; // DDNet
 		Params.flags = EDiscordCreateFlags::DiscordCreateFlags_NoRequireDiscord;
 		Params.event_data = this;
 		Params.activity_events = &m_ActivityEvents;
@@ -54,24 +55,34 @@ public:
 		}
 
 		m_pActivityManager = m_pCore->get_activity_manager(m_pCore);
+		m_StartTime = time_timestamp();
 		return false;
 	}
 	void Update() override
 	{
 		m_pCore->run_callbacks(m_pCore);
 	}
+	void Start() override
+	{
+		m_StartTime = time_timestamp();
+	}
+
 	void ClearGameInfo() override
 	{
 		m_pActivityManager->clear_activity(m_pActivityManager, 0, 0);
 	}
-	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr) override
-	{
+
+	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText , const char *pImage, const char *pPlayerName) override {
 		DiscordActivity Activity;
 		mem_zero(&Activity, sizeof(DiscordActivity));
-		str_copy(Activity.assets.large_image, "ddnet_logo", sizeof(Activity.assets.large_image));
-		str_copy(Activity.assets.large_text, "DDNet logo", sizeof(Activity.assets.large_text));
-		Activity.timestamps.start = time_timestamp();
-		str_copy(Activity.details, pMapName, sizeof(Activity.details));
+		str_copy(Activity.assets.large_image, "150e4e96-9c83-4309-b692-b212c08e1934",
+			sizeof(Activity.assets.large_image));
+		str_copy(Activity.assets.large_text, "StA-Client", sizeof(Activity.assets.large_text));
+		str_copy(Activity.assets.small_image, pImage, sizeof(Activity.assets.large_image));
+		str_copy(Activity.assets.small_text, pText, sizeof(Activity.assets.large_text));
+		Activity.timestamps.start = m_StartTime;
+		str_copy(Activity.state, pPlayerName);
+		str_copy(Activity.state, pMapName, sizeof(Activity.state));
 		m_pActivityManager->update_activity(m_pActivityManager, &Activity, 0, 0);
 	}
 };
@@ -100,9 +111,10 @@ IDiscord *CreateDiscordImpl()
 
 class CDiscordStub : public IDiscord
 {
+	void Start() override {}
 	void Update() override {}
 	void ClearGameInfo() override {}
-	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr) override {}
+	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText, const char *pImage, const char *pPlayerName) override {}
 };
 
 IDiscord *CreateDiscord()

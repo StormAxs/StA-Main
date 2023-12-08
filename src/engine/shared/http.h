@@ -9,7 +9,7 @@
 #include <atomic>
 
 typedef struct _json_value json_value;
-class IStorage;
+class IStorageTW;
 
 enum
 {
@@ -110,7 +110,7 @@ public:
 	void MaxResponseSize(int64_t MaxResponseSize) { m_MaxResponseSize = MaxResponseSize; }
 	void LogProgress(HTTPLOG LogProgress) { m_LogProgress = LogProgress; }
 	void IpResolve(IPRESOLVE IpResolve) { m_IpResolve = IpResolve; }
-	void WriteToFile(IStorage *pStorage, const char *pDest, int StorageType);
+	void WriteToFile(IStorageTW *pStorage, const char *pDest, int StorageType);
 	void ExpectSha256(const SHA256_DIGEST &Sha256) { m_ExpectedSha256 = Sha256; }
 	void Head() { m_Type = REQUEST::HEAD; }
 	void Post(const unsigned char *pData, size_t DataLength)
@@ -175,7 +175,7 @@ inline std::unique_ptr<CHttpRequest> HttpGet(const char *pUrl)
 	return std::make_unique<CHttpRequest>(pUrl);
 }
 
-inline std::unique_ptr<CHttpRequest> HttpGetFile(const char *pUrl, IStorage *pStorage, const char *pOutputFile, int StorageType)
+inline std::unique_ptr<CHttpRequest> HttpGetFile(const char *pUrl, IStorageTW *pStorage, const char *pOutputFile, int StorageType)
 {
 	std::unique_ptr<CHttpRequest> pResult = HttpGet(pUrl);
 	pResult->WriteToFile(pStorage, pOutputFile, StorageType);
@@ -199,7 +199,7 @@ inline std::unique_ptr<CHttpRequest> HttpPostJson(const char *pUrl, const char *
 	return pResult;
 }
 
-bool HttpInit(IStorage *pStorage);
+bool HttpInit(IStorageTW *pStorage);
 void EscapeUrl(char *pBuf, int Size, const char *pStr);
 bool HttpHasIpresolveBug();
 #endif // ENGINE_SHARED_HTTP_H

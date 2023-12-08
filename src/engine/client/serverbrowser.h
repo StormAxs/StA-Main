@@ -20,7 +20,7 @@ class IFavorites;
 class IFriends;
 class IServerBrowserHttp;
 class IServerBrowserPingCache;
-class IStorage;
+class IStorageTW;
 
 class CCommunityServer
 {
@@ -142,7 +142,7 @@ private:
 	IEngine *m_pEngine = nullptr;
 	IFriends *m_pFriends = nullptr;
 	IFavorites *m_pFavorites = nullptr;
-	IStorage *m_pStorage = nullptr;
+	IStorageTW *m_pStorage = nullptr;
 	char m_aNetVersion[128];
 
 	bool m_RefreshingHttp = false;

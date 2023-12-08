@@ -146,13 +146,18 @@ void CNamePlates::RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pP
 				Graphics()->MapScreen(ScreenX0, ScreenY0, ScreenX1, ScreenY1);
 			}
 		}
+		ColorRGBA TColor;
+		if(g_Config.m_ScShowFrozenNameplaterColor == 1)
+			if(GameClient()->m_aClients[ClientID].m_FreezeEnd)
+			{
+				TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScFrozenTeeColor));
+			}
 
 		float tw = m_aNamePlates[ClientID].m_NameTextWidth;
 		if(g_Config.m_ClNameplatesTeamcolors && m_pClient->m_Teams.Team(ClientID))
 			rgb = m_pClient->GetDDTeamColor(m_pClient->m_Teams.Team(ClientID), 0.75f);
-
-		ColorRGBA TColor;
 		ColorRGBA TOutlineColor;
+
 
 		if(OtherTeam && !ForceAlpha)
 		{
@@ -164,12 +169,34 @@ void CNamePlates::RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pP
 			TOutlineColor = ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f * a);
 			TColor = ColorRGBA(rgb.r, rgb.g, rgb.b, a);
 		}
+
+        if(g_Config.m_ScShowFrozenNameplaterColor == 1)
+            if (GameClient()->m_aClients[ClientID].m_FreezeEnd) {
+                TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScFrozenTeeColor));
+            }
+
 		if(g_Config.m_ClNameplatesTeamcolors && m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS)
 		{
 			if(m_pClient->m_aClients[ClientID].m_Team == TEAM_RED)
 				TColor = ColorRGBA(1.0f, 0.5f, 0.5f, a);
 			else if(m_pClient->m_aClients[ClientID].m_Team == TEAM_BLUE)
 				TColor = ColorRGBA(0.7f, 0.7f, 1.0f, a);
+		}
+
+		if(g_Config.m_ScShowBlacklistNameplaterColor == 1)
+		{
+			if(GameClient()->m_aClients[ClientID].m_Foe)
+			{
+				TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScBlacklistPColor));
+			}
+		}
+
+		if(g_Config.m_ScShowFriendsNameplatesColor == 1)
+		{
+			if(GameClient()->m_aClients[ClientID].m_Friend)
+			{
+				TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScFriendColor));
+			}
 		}
 
 		TOutlineColor.a *= Alpha;

@@ -99,7 +99,7 @@ void CMenuBackground::LoadThemeIcon(CTheme &Theme)
 {
 	char aIconPath[IO_MAX_PATH_LENGTH];
 	str_format(aIconPath, sizeof(aIconPath), "themes/%s.png", Theme.m_Name.empty() ? "none" : Theme.m_Name.c_str());
-	Theme.m_IconTexture = Graphics()->LoadTexture(aIconPath, IStorage::TYPE_ALL);
+	Theme.m_IconTexture = Graphics()->LoadTexture(aIconPath, IStorageTW::TYPE_ALL);
 
 	char aBuf[32 + IO_MAX_PATH_LENGTH];
 	if(Theme.m_IconTexture.IsNullTexture())
@@ -394,7 +394,7 @@ std::vector<CTheme> &CMenuBackground::GetThemes()
 		LoadThemeIcon(m_vThemes.back());
 
 		m_ThemeScanStartTime = time_get_nanoseconds();
-		Storage()->ListDirectory(IStorage::TYPE_ALL, "themes", ThemeScan, this);
+		Storage()->ListDirectory(IStorageTW::TYPE_ALL, "themes", ThemeScan, this);
 
 		std::sort(m_vThemes.begin() + PREDEFINED_THEMES_COUNT, m_vThemes.end());
 	}

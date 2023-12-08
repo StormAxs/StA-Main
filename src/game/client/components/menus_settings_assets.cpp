@@ -46,7 +46,7 @@ void CMenus::LoadEntities(SCustomEntities *pEntitiesItem, void *pUser)
 		for(int i = 0; i < MAP_IMAGE_MOD_TYPE_COUNT; ++i)
 		{
 			str_format(aPath, sizeof(aPath), "editor/entities_clear/%s.png", gs_apModEntitiesNames[i]);
-			pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL);
+			pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 			if(!pEntitiesItem->m_RenderTexture.IsValid() || pEntitiesItem->m_RenderTexture.IsNullTexture())
 				pEntitiesItem->m_RenderTexture = pEntitiesItem->m_aImages[i].m_Texture;
 		}
@@ -56,11 +56,11 @@ void CMenus::LoadEntities(SCustomEntities *pEntitiesItem, void *pUser)
 		for(int i = 0; i < MAP_IMAGE_MOD_TYPE_COUNT; ++i)
 		{
 			str_format(aPath, sizeof(aPath), "assets/entities/%s/%s.png", pEntitiesItem->m_aName, gs_apModEntitiesNames[i]);
-			pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL);
+			pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 			if(pEntitiesItem->m_aImages[i].m_Texture.IsNullTexture())
 			{
 				str_format(aPath, sizeof(aPath), "assets/entities/%s.png", pEntitiesItem->m_aName);
-				pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL);
+				pEntitiesItem->m_aImages[i].m_Texture = pThis->Graphics()->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 			}
 			if(!pEntitiesItem->m_RenderTexture.IsValid() || pEntitiesItem->m_RenderTexture.IsNullTexture())
 				pEntitiesItem->m_RenderTexture = pEntitiesItem->m_aImages[i].m_Texture;
@@ -115,16 +115,16 @@ static void LoadAsset(TName *pAssetItem, const char *pAssetName, IGraphics *pGra
 	if(str_comp(pAssetItem->m_aName, "default") == 0)
 	{
 		str_format(aPath, sizeof(aPath), "%s.png", pAssetName);
-		pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorage::TYPE_ALL);
+		pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 	}
 	else
 	{
 		str_format(aPath, sizeof(aPath), "assets/%s/%s.png", pAssetName, pAssetItem->m_aName);
-		pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorage::TYPE_ALL);
+		pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 		if(pAssetItem->m_RenderTexture.IsNullTexture())
 		{
 			str_format(aPath, sizeof(aPath), "assets/%s/%s/%s.png", pAssetName, pAssetItem->m_aName, pAssetName);
-			pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorage::TYPE_ALL);
+			pAssetItem->m_RenderTexture = pGraphics->LoadTexture(aPath, IStorageTW::TYPE_ALL);
 		}
 	}
 }
@@ -315,7 +315,7 @@ void CMenus::ClearCustomItems(int CurTab)
 }
 
 template<typename TName, typename TCaller>
-void InitAssetList(std::vector<TName> &vAssetList, const char *pAssetPath, const char *pAssetName, FS_LISTDIR_CALLBACK pfnCallback, IGraphics *pGraphics, IStorage *pStorage, TCaller Caller)
+void InitAssetList(std::vector<TName> &vAssetList, const char *pAssetPath, const char *pAssetName, FS_LISTDIR_CALLBACK pfnCallback, IGraphics *pGraphics, IStorageTW *pStorage, TCaller Caller)
 {
 	if(vAssetList.empty())
 	{
@@ -325,7 +325,7 @@ void InitAssetList(std::vector<TName> &vAssetList, const char *pAssetPath, const
 		vAssetList.push_back(AssetItem);
 
 		// load assets
-		pStorage->ListDirectory(IStorage::TYPE_ALL, pAssetPath, pfnCallback, Caller);
+		pStorage->ListDirectory(IStorageTW::TYPE_ALL, pAssetPath, pfnCallback, Caller);
 		std::sort(vAssetList.begin(), vAssetList.end());
 	}
 	if(vAssetList.size() != gs_aCustomListSize[s_CurCustomTab])
@@ -394,7 +394,7 @@ void CMenus::RenderSettingsCustom(CUIRect MainView)
 			m_vEntitiesList.push_back(EntitiesItem);
 
 			// load entities
-			Storage()->ListDirectory(IStorage::TYPE_ALL, "assets/entities", EntitiesScan, &User);
+			Storage()->ListDirectory(IStorageTW::TYPE_ALL, "assets/entities", EntitiesScan, &User);
 			std::sort(m_vEntitiesList.begin(), m_vEntitiesList.end());
 		}
 		if(m_vEntitiesList.size() != gs_aCustomListSize[s_CurCustomTab])
@@ -646,9 +646,9 @@ void CMenus::RenderSettingsCustom(CUIRect MainView)
 			str_copy(aBufFull, "assets/hud");
 		else if(s_CurCustomTab == ASSETS_TAB_EXTRAS)
 			str_copy(aBufFull, "assets/extras");
-		Storage()->GetCompletePath(IStorage::TYPE_SAVE, aBufFull, aBuf, sizeof(aBuf));
-		Storage()->CreateFolder("assets", IStorage::TYPE_SAVE);
-		Storage()->CreateFolder(aBufFull, IStorage::TYPE_SAVE);
+		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, aBufFull, aBuf, sizeof(aBuf));
+		Storage()->CreateFolder("assets", IStorageTW::TYPE_SAVE);
+		Storage()->CreateFolder(aBufFull, IStorageTW::TYPE_SAVE);
 		if(!open_file(aBuf))
 		{
 			dbg_msg("menus", "couldn't open file '%s'", aBuf);

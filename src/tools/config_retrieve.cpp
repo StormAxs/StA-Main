@@ -3,10 +3,10 @@
 #include <engine/storage.h>
 #include <game/mapitems.h>
 
-void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
+void Process(IStorageTW *pStorage, const char *pMapName, const char *pConfigName)
 {
 	CDataFileReader Reader;
-	if(!Reader.Open(pStorage, pMapName, IStorage::TYPE_ABSOLUTE))
+	if(!Reader.Open(pStorage, pMapName, IStorageTW::TYPE_ABSOLUTE))
 	{
 		dbg_msg("config_retrieve", "error opening map '%s'", pMapName);
 		return;
@@ -28,7 +28,7 @@ void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
 			break;
 
 		ConfigFound = true;
-		IOHANDLE Config = pStorage->OpenFile(pConfigName, IOFLAG_WRITE, IStorage::TYPE_ABSOLUTE);
+		IOHANDLE Config = pStorage->OpenFile(pConfigName, IOFLAG_WRITE, IStorageTW::TYPE_ABSOLUTE);
 		if(!Config)
 		{
 			dbg_msg("config_retrieve", "error opening config for writing '%s'", pConfigName);

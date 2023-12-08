@@ -20,7 +20,7 @@ extern "C" {
 
 class CGraphics_Threaded;
 class ISound;
-class IStorage;
+class IStorageTW;
 
 extern CLock g_WriteLock;
 
@@ -45,7 +45,7 @@ struct OutputStream
 class CVideo : public IVideo
 {
 public:
-	CVideo(CGraphics_Threaded *pGraphics, ISound *pSound, IStorage *pStorage, int Width, int Height, const char *pName);
+	CVideo(CGraphics_Threaded *pGraphics, ISound *pSound, IStorageTW *pStorage, int Width, int Height, const char *pName);
 	~CVideo();
 
 	void Start() override REQUIRES(!g_WriteLock);
@@ -83,7 +83,7 @@ private:
 	bool AddStream(OutputStream *pStream, AVFormatContext *pOC, const AVCodec **ppCodec, enum AVCodecID CodecId);
 
 	CGraphics_Threaded *m_pGraphics;
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	ISound *m_pSound;
 
 	int m_Width;

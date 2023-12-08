@@ -586,11 +586,16 @@ void CGameConsole::OnRender()
 	Graphics()->QuadsEnd();
 
 	// do background
+	ColorRGBA ScLocalConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScLocalConsoleColor));
+	ScLocalConsoleColor.a = g_Config.m_ClLocalConsolaAlpha / 100.0f;
+	ColorRGBA ScRemoteConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScRemoteConsoleColor));
+	ScRemoteConsoleColor.a = g_Config.m_ClRemoteConsolaAlpha / 100.0f;
+
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BG].m_Id);
 	Graphics()->QuadsBegin();
-	Graphics()->SetColor(0.2f, 0.2f, 0.2f, 0.9f);
+	Graphics()->SetColor(ScLocalConsoleColor);
 	if(m_ConsoleType == CONSOLETYPE_REMOTE)
-		Graphics()->SetColor(0.4f, 0.2f, 0.2f, 0.9f);
+		Graphics()->SetColor(ScRemoteConsoleColor);
 	Graphics()->QuadsSetSubset(0, -ConsoleHeight * 0.075f, Screen.w * 0.075f * 0.5f, 0);
 	QuadItem = IGraphics::CQuadItem(0, 0, Screen.w, ConsoleHeight);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -933,7 +938,7 @@ void CGameConsole::Dump(int Type)
 	char aFilename[IO_MAX_PATH_LENGTH];
 	str_timestamp(aBuf, sizeof(aBuf));
 	str_format(aFilename, sizeof(aFilename), "dumps/%s_dump_%s.txt", pConsole->m_pName, aBuf);
-	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
 	if(File)
 	{
 		pConsole->PumpBacklogPending();

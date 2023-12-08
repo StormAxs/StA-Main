@@ -89,7 +89,7 @@ class CServerBan : public CNetBan
 public:
 	class CServer *Server() const { return m_pServer; }
 
-	void InitServerBan(class IConsole *pConsole, class IStorage *pStorage, class CServer *pServer);
+	void InitServerBan(class IConsole *pConsole, class IStorageTW *pStorage, class CServer *pServer);
 
 	int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason) override;
 	int BanRange(const CNetRange *pRange, int Seconds, const char *pReason) override;
@@ -106,7 +106,7 @@ class CServer : public IServer
 	class IGameServer *m_pGameServer;
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
-	class IStorage *m_pStorage;
+	class IStorageTW *m_pStorage;
 	class IEngineAntibot *m_pAntibot;
 	class IRegister *m_pRegister;
 
@@ -132,7 +132,7 @@ public:
 	class CConfig *Config() { return m_pConfig; }
 	const CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }
-	class IStorage *Storage() { return m_pStorage; }
+	class IStorageTW *Storage() { return m_pStorage; }
 	class IEngineAntibot *Antibot() { return m_pAntibot; }
 	class CDbConnectionPool *DbPool() { return m_pConnectionPool; }
 

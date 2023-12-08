@@ -8,6 +8,9 @@
 #define GAME_VERSION "0.6.4, " GAME_RELEASE_VERSION
 #define GAME_NETVERSION "0.6 626fce9a778df4d4"
 #define DDNET_VERSION_NUMBER 17040
+#define GAME_STA_VERSION 001
+#define STA_VERSION "0.0.1"
 extern const char *GIT_SHORTREV_HASH;
 #define GAME_NAME "DDNet"
+#define STA_BUILD_DATE __DATE__ ", " __TIME__
 #endif

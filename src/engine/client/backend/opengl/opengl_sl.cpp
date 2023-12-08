@@ -19,11 +19,11 @@
 #include <GLES3/gl3.h>
 #endif
 
-bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char *pFile, int Type)
+bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorageTW *pStorage, const char *pFile, int Type)
 {
 	if(m_IsLoaded)
 		return true;
-	IOHANDLE f = pStorage->OpenFile(pFile, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	IOHANDLE f = pStorage->OpenFile(pFile, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
 
 	std::vector<std::string> vLines;
 	if(f)

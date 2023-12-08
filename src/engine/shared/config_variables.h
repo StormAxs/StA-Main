@@ -449,7 +449,7 @@ MACRO_CONFIG_INT(SvEyeEmoteChangeDelay, sv_eye_emote_change_delay, 1, 0, 9999, C
 MACRO_CONFIG_INT(SvChatDelay, sv_chat_delay, 1, 0, 9999, CFGFLAG_SERVER, "The time in seconds between chat messages")
 MACRO_CONFIG_INT(SvTeamChangeDelay, sv_team_change_delay, 3, 0, 9999, CFGFLAG_SERVER, "The time in seconds between team changes (spectator/in game)")
 MACRO_CONFIG_INT(SvInfoChangeDelay, sv_info_change_delay, 5, 0, 9999, CFGFLAG_SERVER, "The time in seconds between info changes (name/skin/color), to avoid ranbow mod set this to a very high time")
-MACRO_CONFIG_INT(SvVoteTime, sv_vote_time, 25, 1, 60, CFGFLAG_SERVER, "The time in seconds a vote lasts")
+MACRO_CONFIG_INT(SvVoteTime, sv_vote_time, 25, 1, 9999, CFGFLAG_SERVER, "The time in seconds a vote lasts")
 MACRO_CONFIG_INT(SvVoteMapTimeDelay, sv_vote_map_delay, 0, 0, 9999, CFGFLAG_SERVER, "The minimum time in seconds between map votes")
 MACRO_CONFIG_INT(SvVoteDelay, sv_vote_delay, 3, 0, 9999, CFGFLAG_SERVER, "The time in seconds between any vote")
 MACRO_CONFIG_INT(SvVoteKickDelay, sv_vote_kick_delay, 0, 0, 9999, CFGFLAG_SERVER, "The minimum time in seconds between kick votes")
@@ -622,8 +622,6 @@ MACRO_CONFIG_COL(ClHookCollColorTeeColl, cl_hook_coll_color_tee_coll, 2817919, C
 MACRO_CONFIG_INT(ClChatTeamColors, cl_chat_teamcolors, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show names in chat in team colors")
 MACRO_CONFIG_INT(ClChatReset, cl_chat_reset, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Reset chat when pressing escape")
 MACRO_CONFIG_INT(ClChatOld, cl_chat_old, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Old chat style: No tee, no background")
-MACRO_CONFIG_INT(ClChatFontSize, cl_chat_size, 60, 10, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat font size")
-MACRO_CONFIG_INT(ClChatWidth, cl_chat_width, 200, 140, 400, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat width")
 
 MACRO_CONFIG_INT(ClShowDirection, cl_show_direction, 1, 0, 3, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show key presses (1 = other players', 2 = also your own, 3 = only your own")
 MACRO_CONFIG_INT(ClOldGunPosition, cl_old_gun_position, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Tees hold gun a bit higher like in TW 0.6.1 and older")
@@ -670,12 +668,47 @@ MACRO_CONFIG_STR(GfxBackend, gfx_backend, 256, "Vulkan", CFGFLAG_SAVE | CFGFLAG_
 #else
 MACRO_CONFIG_STR(GfxBackend, gfx_backend, 256, "OpenGL", CFGFLAG_SAVE | CFGFLAG_CLIENT, "The backend to use (e.g. OpenGL or Vulkan)")
 #endif
+//sta
 MACRO_CONFIG_INT(GfxRenderThreadCount, gfx_render_thread_count, 3, 0, 0, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Number of threads the backend can use for rendering. (note: the value can be ignored by the backend)")
 
 MACRO_CONFIG_INT(GfxDriverIsBlocked, gfx_driver_is_blocked, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "If 1, the current driver is in a blocked error state.")
 
 MACRO_CONFIG_INT(ClVideoRecorderFPS, cl_video_recorder_fps, 60, 1, 1000, CFGFLAG_SAVE | CFGFLAG_CLIENT, "At which FPS the videorecorder should record demos.")
-
 /*
  * Add config variables for mods below this comment to avoid merge conflicts.
  */
+MACRO_CONFIG_COL(ScPlayerOwnColor, sc_player_own_color, 6684927, CFGFLAG_CLIENT | CFGFLAG_SAVE, "You'r color in TAB list")
+MACRO_CONFIG_COL(ScLocalConsoleColor, sc_local_console_color, 51, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Local console color")
+MACRO_CONFIG_COL(ScRemoteConsoleColor, sc_remote_console_color, 21837, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Remote console color")
+MACRO_CONFIG_INT(ClLocalConsolaAlpha, cl_local_console_alpha, 90, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Opacity of local console")
+MACRO_CONFIG_INT(ClRemoteConsolaAlpha, cl_remote_console_alpha, 90, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Opacity of remote console")
+
+MACRO_CONFIG_COL(ScBlacklistPColor, sc_blacklist_p_color, 65457, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Blacklist players color")
+MACRO_CONFIG_COL(ScFriendColor, sc_friend_color, 7995321, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friends color")
+MACRO_CONFIG_COL(ScFrozenTeeColor, sc_frozen_tee_color, 172, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Frozen tee color")
+
+
+MACRO_CONFIG_INT(ClApplyProfileSkin, sc_passet_skin, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply skin in profiles")
+MACRO_CONFIG_INT(ClApplyProfileName, sc_passet_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply name in profiles")
+MACRO_CONFIG_INT(ClApplyProfileClan, sc_passet_clan, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply clan in profiles")
+MACRO_CONFIG_INT(ClApplyProfileFlag, sc_passet_flag, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply flag in profiles")
+MACRO_CONFIG_INT(ClApplyProfileColors, sc_passet_colors, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply colors in profiles")
+MACRO_CONFIG_INT(ClApplyProfileEmote, sc_passet_emote, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply emote in profiles")
+//autolog
+MACRO_CONFIG_INT(ClAutoVerify, sc_auto_verify, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto verify")
+//chat size
+MACRO_CONFIG_INT(ClChatSize, sc_chat_size, 100, 10, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat sizer")
+//Chat pos
+MACRO_CONFIG_INT(ClChatPos, sc_chat_pos, 1, 1, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Position")
+//Anim
+MACRO_CONFIG_INT(ClAnimFeetSpeed, cl_anim_feet_speed, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of animation for feet")
+MACRO_CONFIG_INT(ClAnimHammerSpeed, cl_anim_hammer_speed, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of animation for hammer")
+MACRO_CONFIG_INT(ClAnimNinjaSpeed, cl_anim_ninja_speed, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of animation for ninja")
+MACRO_CONFIG_INT(ClAnimGunsSpeed, cl_anim_guns_speed, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of animation for guns(shotgun, gun, grenade, laser)")
+//nameplates rendr.
+MACRO_CONFIG_INT(ScShowFriendsNameplatesColor, sc_show_friends_nameplates_color, 0, 1, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friend's Nameplates Color")
+MACRO_CONFIG_INT(ScShowBlacklistNameplaterColor, sc_show_blacklist_nameplates_color, 0, 1, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Foe's Nameplates Color")
+MACRO_CONFIG_INT(ScShowFrozenNameplaterColor, sc_show_frozen_nameplates_color, 0, 1, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Frozen tee Nameplates Color")
+
+MACRO_CONFIG_INT(ClChatFontSize, cl_chat_size, 60, 10, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat font size")
+MACRO_CONFIG_INT(ClChatWidth, cl_chat_width, 200, 140, 400, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat width")

@@ -1368,30 +1368,27 @@ void CUI::RenderPopupMenus()
 	for(size_t i = 0; i < m_vPopupMenus.size(); ++i)
 	{
 		const SPopupMenu &PopupMenu = m_vPopupMenus[i];
-		const SPopupMenuId *pID = PopupMenu.m_pID;
 		const bool Inside = MouseInside(&PopupMenu.m_Rect);
 		const bool Active = i == m_vPopupMenus.size() - 1;
 
 		if(Active)
-			SetHotItem(pID);
+			SetHotItem(PopupMenu.m_pID);
 
-		if(CheckActiveItem(pID))
+		if(CheckActiveItem(PopupMenu.m_pID))
 		{
 			if(!MouseButton(0))
 			{
 				if(!Inside)
 				{
-					ClosePopupMenu(pID);
-					--i;
-					continue;
+					ClosePopupMenu(PopupMenu.m_pID);
 				}
 				SetActiveItem(nullptr);
 			}
 		}
-		else if(HotItem() == pID)
+		else if(HotItem() == PopupMenu.m_pID)
 		{
 			if(MouseButton(0))
-				SetActiveItem(pID);
+				SetActiveItem(PopupMenu.m_pID);
 		}
 
 		CUIRect PopupRect = PopupMenu.m_Rect;
@@ -1400,11 +1397,9 @@ void CUI::RenderPopupMenus()
 		PopupRect.Draw(PopupMenu.m_Props.m_BackgroundColor, PopupMenu.m_Props.m_Corners, 3.0f);
 		PopupRect.Margin(SPopupMenu::POPUP_MARGIN, &PopupRect);
 
-		// The popup render function can open/close popups, which may resize the vector and thus
-		// invalidate the variable PopupMenu. We therefore store pID in a separate variable.
 		EPopupMenuFunctionResult Result = PopupMenu.m_pfnFunc(PopupMenu.m_pContext, PopupRect, Active);
 		if(Result != POPUP_KEEP_OPEN || (Active && ConsumeHotkey(HOTKEY_ESCAPE)))
-			ClosePopupMenu(pID, Result == POPUP_CLOSE_CURRENT_AND_DESCENDANTS);
+			ClosePopupMenu(PopupMenu.m_pID, Result == POPUP_CLOSE_CURRENT_AND_DESCENDANTS);
 	}
 }
 

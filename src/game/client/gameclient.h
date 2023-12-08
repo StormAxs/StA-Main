@@ -20,6 +20,7 @@
 // components
 #include "components/background.h"
 #include "components/binds.h"
+#include "components/bindwheel.h"
 #include "components/broadcast.h"
 #include "components/camera.h"
 #include "components/chat.h"
@@ -47,11 +48,13 @@
 #include "components/players.h"
 #include "components/race_demo.h"
 #include "components/scoreboard.h"
+#include "components/skinprofiles.h"
 #include "components/skins.h"
 #include "components/sounds.h"
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/tooltips.h"
+#include "components/verify.h"
 #include "components/voting.h"
 
 class CGameInfo
@@ -115,9 +118,12 @@ public:
 	CCamera m_Camera;
 	CChat m_Chat;
 	CMotd m_Motd;
+	CBindWheel m_BindWheel;
+	CVerify m_Verify;
 	CBroadcast m_Broadcast;
 	CGameConsole m_GameConsole;
 	CBinds m_Binds;
+	CSkinProfiles m_SkinProfiles;
 	CParticles m_Particles;
 	CMenus m_Menus;
 	CSkins m_Skins;
@@ -167,7 +173,7 @@ private:
 	class IConfigManager *m_pConfigManager;
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
-	class IStorage *m_pStorage;
+	class IStorageTW *m_pStorage;
 	class IDemoPlayer *m_pDemoPlayer;
 	class IFavorites *m_pFavorites;
 	class IServerBrowser *m_pServerBrowser;
@@ -184,6 +190,8 @@ private:
 
 	void ProcessEvents();
 	void UpdatePositions();
+
+	//  void ShutdownOnName(const std::string& m_aName);
 
 	int m_EditorMovementDelay = 5;
 	void UpdateEditorIngameMoved();
@@ -230,7 +238,7 @@ public:
 	class CUI *UI() { return &m_UI; }
 	class ISound *Sound() const { return m_pSound; }
 	class IInput *Input() const { return m_pInput; }
-	class IStorage *Storage() const { return m_pStorage; }
+	class IStorageTW *Storage() const { return m_pStorage; }
 	class IConfigManager *ConfigManager() const { return m_pConfigManager; }
 	class CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }
@@ -349,8 +357,8 @@ public:
 		int m_ColorBody;
 		int m_ColorFeet;
 
-		char m_aName[MAX_NAME_LENGTH];
 		char m_aClan[MAX_CLAN_LENGTH];
+		char m_aName[MAX_NAME_LENGTH];
 		int m_Country;
 		char m_aSkinName[64];
 		int m_SkinColor;

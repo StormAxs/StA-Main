@@ -4,7 +4,6 @@
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
-
 #include <game/generated/protocol.h>
 
 #include <game/client/animstate.h>
@@ -13,6 +12,7 @@
 #include <game/client/components/statboard.h>
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
+
 #include <game/localization.h>
 
 #include "scoreboard.h"
@@ -315,6 +315,20 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 
 	int OldDDTeam = -1;
 
+	int m_aTeamsCount[64];
+	mem_zero(m_aTeamsCount, sizeof(int) * 64);
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		const CNetObj_PlayerInfo *pInfo = m_pClient->m_Snap.m_apInfoByDDTeamScore[i];
+		if(!pInfo)
+			continue;
+
+		int DDTeam = m_pClient->m_Teams.Team(pInfo->m_ClientID);
+		if(DDTeam != -1 && DDTeam < TEAM_SUPER)
+			m_aTeamsCount[DDTeam]++;
+	}m_aTeamsCount, sizeof(int) * 64;
+
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
 		// make sure that we render the correct team
@@ -370,7 +384,7 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 					if(DDTeam == TEAM_SUPER)
 						str_copy(aBuf, Localize("Super"));
 					else
-						str_from_int(DDTeam, aBuf);
+						str_format(aBuf, sizeof(aBuf), "%d | %d", DDTeam, m_aTeamsCount[DDTeam]);
 					TextRender()->SetCursor(&Cursor, x - 10.0f, y + Spacing + FontSize - (FontSize / 1.5f), FontSize / 1.5f, TEXTFLAG_RENDER | TEXTFLAG_STOP_AT_END);
 					Cursor.m_LineWidth = NameLength + 3;
 				}
@@ -379,7 +393,7 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 					if(DDTeam == TEAM_SUPER)
 						str_copy(aBuf, Localize("Super"));
 					else
-						str_format(aBuf, sizeof(aBuf), Localize("Team %d"), DDTeam);
+						str_format(aBuf, sizeof(aBuf), Localize("Team %d | Players: %d"), DDTeam, m_aTeamsCount[DDTeam]);
 					tw = TextRender()->TextWidth(FontSize, aBuf, -1, -1.0f);
 					TextRender()->SetCursor(&Cursor, ScoreOffset + w / 2.0f - tw / 2.0f, y + LineHeight, FontSize / 1.5f, TEXTFLAG_RENDER | TEXTFLAG_STOP_AT_END);
 					Cursor.m_LineWidth = NameLength + 3;
@@ -387,7 +401,6 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 				TextRender()->TextEx(&Cursor, aBuf, -1);
 			}
 		}
-
 		OldDDTeam = DDTeam;
 
 		// background so it's easy to find the local player or the followed one in spectator mode
@@ -438,6 +451,15 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		vec2 TeeRenderPos(TeeOffset + TeeLength / 2, y + LineHeight / 2.0f + OffsetToMid.y);
 
 		RenderTools()->RenderTee(pIdleState, &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), TeeRenderPos);
+		// Own color
+		if(str_comp(m_pClient->m_aClients[pInfo->m_ClientID].m_aName,
+			   m_pClient->m_aClients[GameClient()->m_aLocalIDs[g_Config.m_ClDummy]].m_aName) == 0)
+		{
+			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ScPlayerOwnColor));
+			TextRender()->TextColor(Color);
+		}
+		else
+			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// name
 		TextRender()->SetCursor(&Cursor, NameOffset, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
@@ -451,13 +473,10 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		{
 			char aId[64] = "";
 			if(pInfo->m_ClientID < 10)
-			{
 				str_format(aId, sizeof(aId), " %d: %s", pInfo->m_ClientID, m_pClient->m_aClients[pInfo->m_ClientID].m_aName);
-			}
 			else
-			{
 				str_format(aId, sizeof(aId), "%d: %s", pInfo->m_ClientID, m_pClient->m_aClients[pInfo->m_ClientID].m_aName);
-			}
+
 			Cursor.m_LineWidth = NameLength;
 			TextRender()->TextEx(&Cursor, aId, -1);
 		}

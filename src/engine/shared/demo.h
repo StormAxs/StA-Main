@@ -41,7 +41,7 @@ public:
 	CDemoRecorder() {}
 	~CDemoRecorder() override;
 
-	int Start(class IStorage *pStorage, class IConsole *pConsole, const char *pFilename, const char *pNetversion, const char *pMap, const SHA256_DIGEST &Sha256, unsigned MapCrc, const char *pType, unsigned MapSize, unsigned char *pMapData, IOHANDLE MapFile = nullptr, DEMOFUNC_FILTER pfnFilter = nullptr, void *pUser = nullptr);
+	int Start(class IStorageTW *pStorage, class IConsole *pConsole, const char *pFilename, const char *pNetversion, const char *pMap, const SHA256_DIGEST &Sha256, unsigned MapCrc, const char *pType, unsigned MapSize, unsigned char *pMapData, IOHANDLE MapFile = nullptr, DEMOFUNC_FILTER pfnFilter = nullptr, void *pUser = nullptr);
 	int Stop() override;
 
 	void AddDemoMarker();
@@ -147,9 +147,9 @@ public:
 
 	void SetListener(IListener *pListener);
 
-	int Load(class IStorage *pStorage, class IConsole *pConsole, const char *pFilename, int StorageType);
-	unsigned char *GetMapData(class IStorage *pStorage);
-	bool ExtractMap(class IStorage *pStorage);
+	int Load(class IStorageTW *pStorage, class IConsole *pConsole, const char *pFilename, int StorageType);
+	unsigned char *GetMapData(class IStorageTW *pStorage);
+	bool ExtractMap(class IStorageTW *pStorage);
 	int Play();
 	void Pause() override;
 	void Unpause() override;
@@ -163,7 +163,7 @@ public:
 	int SetPos(int WantedTick) override;
 	const CInfo *BaseInfo() const override { return &m_Info.m_Info; }
 	void GetDemoName(char *pBuffer, size_t BufferSize) const override;
-	bool GetDemoInfo(class IStorage *pStorage, class IConsole *pConsole, const char *pFilename, int StorageType, CDemoHeader *pDemoHeader, CTimelineMarkers *pTimelineMarkers, CMapInfo *pMapInfo, IOHANDLE *pFile = nullptr, char *pErrorMessage = nullptr, size_t ErrorMessageSize = 0) const override;
+	bool GetDemoInfo(class IStorageTW *pStorage, class IConsole *pConsole, const char *pFilename, int StorageType, CDemoHeader *pDemoHeader, CTimelineMarkers *pTimelineMarkers, CMapInfo *pMapInfo, IOHANDLE *pFile = nullptr, char *pErrorMessage = nullptr, size_t ErrorMessageSize = 0) const override;
 	const char *Filename() { return m_aFilename; }
 	const char *ErrorMessage() { return m_aErrorMessage; }
 
@@ -177,12 +177,12 @@ public:
 class CDemoEditor : public IDemoEditor
 {
 	IConsole *m_pConsole;
-	IStorage *m_pStorage;
+	IStorageTW *m_pStorage;
 	class CSnapshotDelta *m_pSnapshotDelta;
 	const char *m_pNetVersion;
 
 public:
-	virtual void Init(const char *pNetVersion, class CSnapshotDelta *pSnapshotDelta, class IConsole *pConsole, class IStorage *pStorage);
+	virtual void Init(const char *pNetVersion, class CSnapshotDelta *pSnapshotDelta, class IConsole *pConsole, class IStorageTW *pStorage);
 	void Slice(const char *pDemo, const char *pDst, int StartTick, int EndTick, DEMOFUNC_FILTER pfnFilter, void *pUser) override;
 };
 

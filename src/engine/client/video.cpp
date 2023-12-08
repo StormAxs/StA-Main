@@ -34,7 +34,7 @@ using namespace std::chrono_literals;
 const size_t FORMAT_GL_NCHANNELS = 4;
 CLock g_WriteLock;
 
-CVideo::CVideo(CGraphics_Threaded *pGraphics, ISound *pSound, IStorage *pStorage, int Width, int Height, const char *pName) :
+CVideo::CVideo(CGraphics_Threaded *pGraphics, ISound *pSound, IStorageTW *pStorage, int Width, int Height, const char *pName) :
 	m_pGraphics(pGraphics),
 	m_pStorage(pStorage),
 	m_pSound(pSound)
@@ -87,7 +87,7 @@ void CVideo::Start()
 		str_format(aBuf, sizeof(aBuf), "videos/%s.mp4", aDate);
 
 	char aWholePath[1024];
-	IOHANDLE File = m_pStorage->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_SAVE, aWholePath, sizeof(aWholePath));
+	IOHANDLE File = m_pStorage->OpenFile(aBuf, IOFLAG_WRITE, IStorageTW::TYPE_SAVE, aWholePath, sizeof(aWholePath));
 
 	if(File)
 	{

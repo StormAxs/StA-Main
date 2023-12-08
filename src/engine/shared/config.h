@@ -18,7 +18,7 @@
 #define AUTOEXEC_FILE "autoexec.cfg"
 #define AUTOEXEC_CLIENT_FILE "autoexec_client.cfg"
 #define AUTOEXEC_SERVER_FILE "autoexec_server.cfg"
-
+#define TCONFIG_FILE "settings_sta.cfg"
 class CConfig
 {
 public:
@@ -32,6 +32,8 @@ public:
 	static constexpr const char *ms_p##Name = Def; \
 	char m_##Name[Len]; // Flawfinder: ignore
 #include "config_variables.h"
+
+#include "sta_variables.h"
 #undef MACRO_CONFIG_INT
 #undef MACRO_CONFIG_COL
 #undef MACRO_CONFIG_STR
@@ -61,7 +63,7 @@ enum
 class CConfigManager : public IConfigManager
 {
 	IConsole *m_pConsole;
-	class IStorage *m_pStorage;
+	class IStorageTW *m_pStorage;
 
 	IOHANDLE m_ConfigFile;
 	bool m_Failed;

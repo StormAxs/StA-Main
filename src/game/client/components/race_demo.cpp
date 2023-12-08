@@ -179,10 +179,10 @@ void CRaceDemo::StopRecord(int Time)
 			char aNewFilename[512];
 			GetPath(aNewFilename, sizeof(aNewFilename), m_Time);
 
-			Storage()->RenameFile(m_aTmpFilename, aNewFilename, IStorage::TYPE_SAVE);
+			Storage()->RenameFile(m_aTmpFilename, aNewFilename, IStorageTW::TYPE_SAVE);
 		}
 		else // no new record
-			Storage()->RemoveFile(m_aTmpFilename, IStorage::TYPE_SAVE);
+			Storage()->RemoveFile(m_aTmpFilename, IStorageTW::TYPE_SAVE);
 
 		m_aTmpFilename[0] = '\0';
 	}
@@ -247,7 +247,7 @@ bool CRaceDemo::CheckDemo(int Time)
 	SRaceDemoFetchUser User;
 	User.m_pParam = &Param;
 	User.m_pThis = this;
-	Storage()->ListDirectoryInfo(IStorage::TYPE_SAVE, ms_pRaceDemoDir, RaceDemolistFetchCallback, &User);
+	Storage()->ListDirectoryInfo(IStorageTW::TYPE_SAVE, ms_pRaceDemoDir, RaceDemolistFetchCallback, &User);
 
 	// loop through demo files
 	for(auto &Demo : vDemos)
@@ -258,7 +258,7 @@ bool CRaceDemo::CheckDemo(int Time)
 		// delete old demo
 		char aFilename[IO_MAX_PATH_LENGTH];
 		str_format(aFilename, sizeof(aFilename), "%s/%s.demo", ms_pRaceDemoDir, Demo.m_aName);
-		Storage()->RemoveFile(aFilename, IStorage::TYPE_SAVE);
+		Storage()->RemoveFile(aFilename, IStorageTW::TYPE_SAVE);
 	}
 
 	return true;

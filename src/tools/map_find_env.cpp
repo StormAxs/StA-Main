@@ -15,9 +15,9 @@ struct EnvelopedQuad
 
 bool OpenMap(const char pMapName[64], CDataFileReader &InputMap)
 {
-	IStorage *pStorage = CreateLocalStorage();
+	IStorageTW *pStorage = CreateLocalStorage();
 
-	if(!InputMap.Open(pStorage, pMapName, IStorage::TYPE_ABSOLUTE))
+	if(!InputMap.Open(pStorage, pMapName, IStorageTW::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_find_env", "ERROR: unable to open map '%s'", pMapName);
 		return false;

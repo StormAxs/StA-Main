@@ -52,6 +52,7 @@ public:
 
 	void Bind(int KeyID, const char *pStr, bool FreeOnly = false, int ModifierCombination = MODIFIER_NONE);
 	void SetDefaults();
+	void StaBinds();
 	void UnbindAll();
 	const char *Get(int KeyID, int ModifierCombination);
 	void GetKey(const char *pBindStr, char *pBuf, size_t BufSize);

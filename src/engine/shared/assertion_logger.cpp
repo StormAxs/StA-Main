@@ -77,9 +77,9 @@ CAssertionLogger::CAssertionLogger(const char *pAssertLogPath, const char *pGame
 	str_copy(m_aGameName, pGameName);
 }
 
-std::unique_ptr<ILogger> CreateAssertionLogger(IStorage *pStorage, const char *pGameName)
+std::unique_ptr<ILogger> CreateAssertionLogger(IStorageTW *pStorage, const char *pGameName)
 {
 	char aAssertLogPath[IO_MAX_PATH_LENGTH];
-	pStorage->GetCompletePath(IStorage::TYPE_SAVE, "dumps/", aAssertLogPath, sizeof(aAssertLogPath));
+	pStorage->GetCompletePath(IStorageTW::TYPE_SAVE, "dumps/", aAssertLogPath, sizeof(aAssertLogPath));
 	return std::make_unique<CAssertionLogger>(aAssertLogPath, pGameName);
 }

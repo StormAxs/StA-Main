@@ -469,13 +469,13 @@ static const char *DEFAULT_SERVERLIST_URLS[] = {
 	"https://master4.ddnet.org/ddnet/15/servers.json",
 };
 
-IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IConsole *pConsole, IStorage *pStorage, const char *pPreviousBestUrl)
+IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IConsole *pConsole, IStorageTW *pStorage, const char *pPreviousBestUrl)
 {
 	char aaUrls[CChooseMaster::MAX_URLS][256];
 	const char *apUrls[CChooseMaster::MAX_URLS] = {0};
 	const char **ppUrls = apUrls;
 	int NumUrls = 0;
-	IOHANDLE File = pStorage->OpenFile("ddnet-serverlist-urls.cfg", IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile("ddnet-serverlist-urls.cfg", IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
 	if(File)
 	{
 		CLineReader Lines;

@@ -262,12 +262,14 @@ void CRenderTools::GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, cons
 	TeeOffsetToMid.y = -MidOfRendered;
 }
 
-void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha)
+void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha, bool Ext, int ClientID, bool InAir)
 {
 	vec2 Direction = Dir;
 	vec2 Position = Pos;
 
 	const CSkin::SSkinTextures *pSkinTextures = pInfo->m_CustomColoredSkin ? &pInfo->m_ColorableRenderSkin : &pInfo->m_OriginalRenderSkin;
+
+	static vec2 s_aFootPositions[MAX_CLIENTS][2];
 
 	// first pass we draw the outline
 	// second pass we draw the filling
@@ -358,15 +360,22 @@ void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInf
 
 			Graphics()->SetColor(pInfo->m_ColorFeet.r * ColorScale, pInfo->m_ColorFeet.g * ColorScale, pInfo->m_ColorFeet.b * ColorScale, Alpha);
 
+			vec2 FootPos = vec2(Position.x + pFoot->m_X * AnimScale, Position.y + pFoot->m_Y * AnimScale);
+			if(Ext)
+			{
+				if(s_aFootPositions[ClientID][f] != vec2())
+					FootPos = mix(s_aFootPositions[ClientID][f], FootPos, 1.f / 100.f * g_Config.m_ClAnimFeetSpeed);
+				s_aFootPositions[ClientID][f] = FootPos;
+			}
+
 			Graphics()->TextureSet(OutLine == 1 ? pSkinTextures->m_FeetOutline : pSkinTextures->m_Feet);
-			Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, QuadOffset, Position.x + pFoot->m_X * AnimScale, Position.y + pFoot->m_Y * AnimScale, w / 64.f, h / 32.f);
+			Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, QuadOffset, FootPos.x, FootPos.y, w / 64.f, h / 32.f);
 		}
 	}
 
 	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
 	Graphics()->QuadsSetRotation(0);
 }
-
 void CRenderTools::CalcScreenParams(float Aspect, float Zoom, float *pWidth, float *pHeight)
 {
 	const float Amount = 1150 * 1000;

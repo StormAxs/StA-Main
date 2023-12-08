@@ -74,6 +74,6 @@ IEngine *CEditorObject::Engine() { return m_pEditor->Engine(); }
 IGraphics *CEditorObject::Graphics() { return m_pEditor->Graphics(); }
 ISound *CEditorObject::Sound() { return m_pEditor->Sound(); }
 ITextRender *CEditorObject::TextRender() { return m_pEditor->TextRender(); }
-IStorage *CEditorObject::Storage() { return m_pEditor->Storage(); }
+IStorageTW *CEditorObject::Storage() { return m_pEditor->Storage(); }
 CUI *CEditorObject::UI() { return m_pEditor->UI(); }
 CRenderTools *CEditorObject::RenderTools() { return m_pEditor->RenderTools(); }
