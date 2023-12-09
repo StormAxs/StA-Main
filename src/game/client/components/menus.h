@@ -245,6 +245,8 @@ protected:
 	CLineInputBuffered<64> m_FilterInput;
 	bool m_ControlPageOpening;
 
+	// for stats
+	CLineInputBuffered<MAX_NAME_LENGTH> m_StatsPlayerInput;
 	// demo
 	enum
 	{

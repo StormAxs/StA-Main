@@ -1,30 +1,29 @@
-#ifndef DDNET_PARSER_H
-#define DDNET_PARSER_H
+#ifndef GAME_CLIENT_COMPONENTS_STATS_H
+#define GAME_CLIENT_COMPONENTS_STATS_H
 
-#include <curl/curl.h>
-#include <engine/external/json-parser/json.h>
-// #include <engine/shared/config.h>
+	#include "engine/shared/protocol.h"
+	#include <engine/shared/http.h>
+	#include <engine/shared/jobs.h>
+	#include <game/client/component.h>
+	static constexpr const char *STATS_URL = "https://ddstats.qwik.space/player/json?player=";
 
-#include <base/math.h>
-#include <base/system.h>
-#include <iostream>
-#include <sstream>
+	class CStatsPlayer
+	{
+	public:
+		std::shared_ptr<CHttpRequest> m_pGetStats;
+		char aPlayer[MAX_NAME_LENGTH];
+		int Points;
+		bool StatsParsed = false;
+	};
 
-class CJsonFetcher
-{
-public:
-	std::string m_PlayerName;
-	int m_Points;
+	class CStats : public CComponent
+		       {
+	private:
+		  public:
+				CStats();
+		int Sizeof() const override { return sizeof(*this); }
+		void FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer);
+		void ParseJSON(CStatsPlayer *pStatsDest);
+	};
 
-	void Webgrab(const char *PlayerName);
-	std::string FetchJsonData(const std::string &url);
-	json_value *ParseJsonData(const std::string &jsonData);
-	void FreeJsonData(json_value *parsedJson);
-	static size_t WriteCallBack(const void *contents, size_t size, size_t nmemb, std::string *output);
-	//getter functions
-	std::string GetPlayerName();
-	int GetPoints();
-};
-
-
-#endif // DDNET_PARSER_H
+	#endif // GAME_CLIENT_COMPONENTS_STATS_H

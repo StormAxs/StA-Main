@@ -56,6 +56,7 @@
 #include "components/tooltips.h"
 #include "components/verify.h"
 #include "components/voting.h"
+#include "components/parser.h"
 
 class CGameInfo
 {
@@ -135,6 +136,7 @@ public:
 	CEffects m_Effects;
 	CScoreboard m_Scoreboard;
 	CStatboard m_Statboard;
+	CStats m_Stats;
 	CSounds m_Sounds;
 	CEmoticon m_Emoticon;
 	CDamageInd m_DamageInd;

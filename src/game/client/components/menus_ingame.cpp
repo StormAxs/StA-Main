@@ -833,12 +833,11 @@ void CMenus::RenderServerControl(CUIRect MainView)
 
 void CMenus::RenderStats(CUIRect MainView)
 {
-
 	CUIRect Bottom, TabBar, Button;
 	MainView.HSplitTop(20.0f, &Bottom, &MainView);
 	Bottom.Draw(ms_ColorTabbarActive, 10, 0.0f);
 	MainView.HSplitTop(20.0f, &TabBar, &MainView);
-	MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B,10.0f);
+	MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
 	MainView.Margin(10.0f, &MainView);
 
 	static int s_StatsPage = 0;
@@ -848,42 +847,19 @@ void CMenus::RenderStats(CUIRect MainView)
 	if(DoButton_MenuTab(&s_Button0, Localize("DDStats"), s_StatsPage == 0, &Button, 0))
 		s_StatsPage = 0;
 
-	TabBar.VSplitRight(TabBar.w ,&TabBar, &Button);
+	TabBar.VSplitRight(TabBar.w, &TabBar, &Button);
 	static CButtonContainer s_Button1;
 	if(DoButton_MenuTab(&s_Button1, Localize("Map Tracking"), s_StatsPage == 1, &Button, 0))
 		s_StatsPage = 1;
 
 	if(s_StatsPage == 0)
 	{
-			static bool wasExecuted = false;
-			static CJsonFetcher jsonFetcher;
-
-			if(s_StatsPage == 0 && !wasExecuted)
-			{
-				jsonFetcher.Webgrab(Client()->PlayerName());
-				wasExecuted = true;
-			}
-
-
-
-
-			int points = jsonFetcher.GetPoints();
-			std::string PlayerName = jsonFetcher.GetPlayerName();
 
 		float FontSize_BodyLeft = 25.0f;
 		float FontSize_HeadLeft = 40.0f;
 
-		CUIRect WB, StALogo, RT1, RT2, CP, LF, rank, MP1, MP2, LP, PointsS, Left, View;
-	/*	WB = welcome back
-		StALogo = UI LOGO
-	   	RT = Render Tee
-	     	CP = Current Points
-		LF = Last finish
-	     	rank = rank 1's
-	       	MP = Most played
-	       	LP = Last played
-	       	PointsS = Points Stats
-				     */
+		CUIRect WB, StALogo, RT1, RT2, CP, LF, rank, MP1, MP2, LP, PointsS, button, text;
+
 		WB.x = 0;
 		WB.y = 0;
 		WB.w = MainView.w * 0.75f;
@@ -904,30 +880,23 @@ void CMenus::RenderStats(CUIRect MainView)
 		LP.w = CP.w;
 		LP.h = MainView.h - LP.y;
 
-
 		CUIRect PointRect = MainView;
-		char playerName[32];
-		str_format(playerName, sizeof(playerName), "%s", PlayerName.c_str());
 
-		//where are these used?
-		//no idea
-		float x = 0.0f;
-		float y = 0.0f;
-		//SPLITING ACTUALLY I FUCKING HATE IT
+
 		MainView.HSplitTop(MainView.h / 3, &WB, &MainView);
-		WB.VSplitRight(WB.w / 2 - 50 , &WB, &StALogo);
+		WB.VSplitRight(WB.w / 2 - 50, &WB, &StALogo);
 		WB.HSplitTop(WB.h / 2 + 30, &WB, &CP);
 		WB.Margin(1.0f, &WB);
 		CP.VSplitLeft(120.0f, &RT1, &CP);
-		MainView.HSplitTop(MainView.h /2, &LF, &PointsS);
+		MainView.HSplitTop(MainView.h / 2, &LF, &PointsS);
 		LF.VSplitRight(LF.w / 3 - 70, &LF, &LP);
 		LF.HSplitTop(LF.h / 2 - 30.0f, &LF, &rank);
 		LF.VSplitLeft(120.0f, &RT2, &LF);
 		rank.VSplitLeft(240.0f, &MP1, &rank);
-		MP1.HSplitTop(MP1.h ,nullptr ,&MP2);
+		MP1.HSplitTop(MP1.h, nullptr, &MP2);
 		PointsS.VSplitLeft(240.0f, &MP2, &PointsS);
 
-		//rendering margin
+		// rendering margin
 		PointsS.Margin(1.0f, &PointsS);
 		rank.Margin(1.0f, &rank);
 		LP.Margin(1.0f, &LP);
@@ -936,51 +905,39 @@ void CMenus::RenderStats(CUIRect MainView)
 		LF.Margin(1.0f, &LF);
 		MP1.VMargin(1.0f, &MP1);
 		MP2.VMargin(1.0f, &MP2);
-		//RT1.HMargin(1.0f, &RT1);
-
-char playerPoints[32];
 
 
-std::string modifiedPlayerName = std::string("  Welcome Back, ") + playerName;
-UI()->DoLabel(&WB, modifiedPlayerName.c_str(), 30.0f, TEXTALIGN_ML);
+		const float LineMargin = 22.0f;
+		char *pSkinName = g_Config.m_ClPlayerSkin;
+		int *pUseCustomColor = &g_Config.m_ClPlayerUseCustomColor;
+		unsigned *pColorBody = &g_Config.m_ClPlayerColorBody;
+		unsigned *pColorFeet = &g_Config.m_ClPlayerColorFeet;
+		int CurrentFlag = m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry;
 
-str_format(playerPoints, sizeof(playerPoints), "%d", points);
-std::string modifiedPoints = std::string(" Your current points:") + playerPoints;
-UI()->DoLabel(&CP, modifiedPoints.c_str(), FontSize_BodyLeft, TEXTALIGN_ML);
+		CTeeRenderInfo OwnSkinInfo;
+		const CSkin *pSkin = m_pClient->m_Skins.Find(pSkinName);
+		OwnSkinInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
+		OwnSkinInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
+		OwnSkinInfo.m_SkinMetrics = pSkin->m_Metrics;
+		OwnSkinInfo.m_CustomColoredSkin = *pUseCustomColor;
+		if(*pUseCustomColor)
+		{
+			OwnSkinInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(*pColorBody).UnclampLighting());
+			OwnSkinInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(*pColorFeet).UnclampLighting());
+		}
+		else
+		{
+			OwnSkinInfo.m_ColorBody = ColorRGBA(1.0f, 1.0f, 1.0f);
+			OwnSkinInfo.m_ColorFeet = ColorRGBA(1.0f, 1.0f, 1.0f);
+		}
+		OwnSkinInfo.m_Size = 90.0f;
 
-const float LineMargin = 22.0f;
-char *pSkinName = g_Config.m_ClPlayerSkin;
-int *pUseCustomColor = &g_Config.m_ClPlayerUseCustomColor;
-unsigned *pColorBody = &g_Config.m_ClPlayerColorBody;
-unsigned *pColorFeet = &g_Config.m_ClPlayerColorFeet;
-int CurrentFlag = m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry;
-
-CTeeRenderInfo OwnSkinInfo;
-const CSkin *pSkin = m_pClient->m_Skins.Find(pSkinName);
-OwnSkinInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-OwnSkinInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-OwnSkinInfo.m_SkinMetrics = pSkin->m_Metrics;
-OwnSkinInfo.m_CustomColoredSkin = *pUseCustomColor;
-if(*pUseCustomColor)
-{
-				OwnSkinInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(*pColorBody).UnclampLighting());
-				OwnSkinInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(*pColorFeet).UnclampLighting());
-}
-else
-{
-				OwnSkinInfo.m_ColorBody = ColorRGBA(1.0f, 1.0f, 1.0f);
-				OwnSkinInfo.m_ColorFeet = ColorRGBA(1.0f, 1.0f, 1.0f);
-}
-OwnSkinInfo.m_Size = 90.0f;
-
-const CAnimState *pIdleState = CAnimState::GetIdle();
-vec2 OffsetToMid;
-RenderTools()->GetRenderTeeOffsetToRenderedTee(pIdleState, &OwnSkinInfo, OffsetToMid);
-vec2 TeeRenderPos(RT1.x + 60.0f, (RT1.y + 7.0f) + RT2.h);
-int Emote = m_Dummy ? g_Config.m_ClDummyDefaultEyes : g_Config.m_ClPlayerDefaultEyes;
-RenderTools()->RenderTee(pIdleState, &OwnSkinInfo, Emote, vec2(1, 0), TeeRenderPos);
-
-
+		const CAnimState *pIdleState = CAnimState::GetIdle();
+		vec2 OffsetToMid;
+		RenderTools()->GetRenderTeeOffsetToRenderedTee(pIdleState, &OwnSkinInfo, OffsetToMid);
+		vec2 TeeRenderPos(RT1.x + 60.0f, (RT1.y + 7.0f) + RT2.h);
+		int Emote = m_Dummy ? g_Config.m_ClDummyDefaultEyes : g_Config.m_ClPlayerDefaultEyes;
+		RenderTools()->RenderTee(pIdleState, &OwnSkinInfo, Emote, vec2(1, 0), TeeRenderPos);
 
 		StALogo.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		WB.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
@@ -990,18 +947,65 @@ RenderTools()->RenderTee(pIdleState, &OwnSkinInfo, Emote, vec2(1, 0), TeeRenderP
 		rank.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
 		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
-		//RT1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
-		//RT2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
-
-
-
 	}
 	else if(s_StatsPage == 1)
 	{
+		//test
+		static CStatsPlayer s_StatsPlayer;
+
+				// render background
+				CUIRect Bottom1, TabBar1, Label, Button1, SearchBox, FetchButton;
+			MainView.HSplitTop(20.0f, &Bottom1, &MainView);
+			Bottom1.Draw(ms_ColorTabbarActive, 0, 10.0f);
+			MainView.HSplitTop(20.0f, &TabBar1, &MainView);
+			MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
+			MainView.Margin(10.0f, &MainView);
+
+				// tab bar
+				TabBar1.VSplitLeft(TabBar1.w, &Button1, &TabBar1);
+			static CButtonContainer s_Button2;
+			if(DoButton_MenuTab(&s_Button2, Localize("Player profile"), s_StatsPage == 1, &Button1, 0))
+					s_StatsPage == 1;
+
+				// Title
+				MainView.HSplitTop(20.0f, &Label, &MainView);
+			Label.VSplitRight(300.0f, &Label, &SearchBox);
+			char aWelcome[128];
+			str_format(aWelcome, sizeof(aWelcome), "Player profile");
+			UI()->DoLabel(&Label, aWelcome, 14.0f, TEXTALIGN_ML);
+
+				SearchBox.VSplitLeft(200.0f, &SearchBox, &FetchButton);
+			SearchBox.VMargin(15.0f, &SearchBox);
+			UI()->DoEditBox(&m_StatsPlayerInput, &SearchBox, 14.0f);
+
+				static CButtonContainer s_FetchButton;
+			if((DoButton_Menu(&s_FetchButton, Localize("Fetch"), 0, &FetchButton) || (Input()->KeyPress(KEY_RETURN) && m_StatsPlayerInput.IsActive())) && !m_StatsPlayerInput.IsEmpty())
+				{
+					m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
+				}
+
+				if(!s_StatsPlayer.m_pGetStats)
+					return;
+
+				if(s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_PENDING)
+					return;
+
+				if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_DONE)
+					return m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
+
+				MainView.HSplitTop(20.0f, &Label, &MainView);
+					if(s_StatsPlayer.m_pGetStats->State() == -1) // error (404)
+				{
+					UI()->DoLabel(&Label, "No player found.", 14.0f, TEXTALIGN_ML);
+					return;
+				}
+			char aPoints[128];
+			str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
+			UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
+		}
 
 	}
-}
 
 void CMenus::RenderInGameNetwork(CUIRect MainView)
 {

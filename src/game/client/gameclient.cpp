@@ -69,6 +69,7 @@
 #include "components/sounds.h"
 #include "components/spectator.h"
 #include "components/statboard.h"
+#include "components/parser.h"
 #include "components/voting.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
@@ -145,6 +146,7 @@ void CGameClient::OnConsoleInit()
 					      &m_DebugHud,
 					      &m_Scoreboard,
 					      &m_Statboard,
+					      &m_Stats,
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
