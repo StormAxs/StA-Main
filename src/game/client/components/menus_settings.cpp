@@ -1300,6 +1300,7 @@ void CMenus::DoJoystickBar(const CUIRect *pRect, float Current, float Tolerance,
 	Handle.Draw(SliderColor, IGraphics::CORNER_ALL, Handle.h / 2.0f);
 }
 
+
 void CMenus::RenderSettingsControls(CUIRect MainView)
 {
 	// this is kinda slow, but whatever
@@ -1490,13 +1491,14 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 			DoSettingsControlsButtons(32, 44, MiscSettings);
 		}
 	}
-	//sta
+	// sta
 	{
+
 		BindWheelSettings.HSplitTop(Margin, nullptr, &BindWheelSettings);
 		BindWheelSettings.HSplitTop(80.0f, &BindWheelSettings, 0);
 		if(s_ScrollRegion.AddRect(BindWheelSettings))
 		{
-			BindWheelSettings.Draw(ColorRGBA(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 10.0f);
+			BindWheelSettings.Draw(vec4(1, 1, 1, 0.15f), IGraphics::CORNER_ALL, 10.0f);
 			BindWheelSettings.VMargin(Margin, &BindWheelSettings);
 
 			BindWheelSettings.HSplitTop(HeaderHeight, &Button, &BindWheelSettings);
@@ -1525,6 +1527,7 @@ void CMenus::ResetSettingsControls()
 	g_Config.m_InpControllerTolerance = 5;
 	g_Config.m_UiControllerSens = 100;
 }
+
 
 void CMenus::RenderSettingsGraphics(CUIRect MainView)
 {
@@ -3486,7 +3489,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			g_Config.m_ClShowpred ^= 1;
 
 		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Auto Verify"), g_Config.m_ClAutoVerify, &Button))
+		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Server Auto Whitelist"), g_Config.m_ClAutoVerify, &Button))
 			g_Config.m_ClAutoVerify ^= 1;
 
 	}
