@@ -396,9 +396,9 @@ public:
 		bool m_Active;
 		bool m_ChatIgnore;
 		bool m_EmoticonIgnore;
+
 		bool m_Friend;
 		bool m_Foe;
-
 		int m_AuthLevel;
 		bool m_Afk;
 		bool m_Paused;

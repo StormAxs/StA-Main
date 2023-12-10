@@ -468,6 +468,20 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor));
 			TextRender()->TextColor(Color);
 		}
+		//fwends
+		TextRender()->SetCursor(&Cursor, NameOffset, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
+		if(m_pClient->m_aClients[pInfo->m_ClientID].m_Friend)
+		{
+			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ScFriendColor));
+			TextRender()->TextColor(Color);
+		}
+		//not fwends:3
+		TextRender()->SetCursor(&Cursor, NameOffset, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
+		if(m_pClient->m_aClients[pInfo->m_ClientID].m_Foe)
+		{
+			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ScBlacklistPColor));
+			TextRender()->TextColor(Color);
+		}
 
 		if(g_Config.m_ClShowIDs)
 		{
@@ -513,7 +527,7 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 			ColorRGBA rgb = color_cast<ColorRGBA>(ColorHSLA((300.0f - clamp(pInfo->m_Latency, 0, 300)) / 1000.0f, 1.0f, 0.5f));
 			TextRender()->TextColor(rgb);
 		}
-		str_from_int(clamp(pInfo->m_Latency, 0, 999), aBuf);
+		str_from_int(clamp(pInfo->m_Latency, 0, 6000), aBuf);
 		tw = TextRender()->TextWidth(FontSize, aBuf, -1, -1.0f);
 		TextRender()->SetCursor(&Cursor, PingOffset + PingLength - tw, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_STOP_AT_END);
 		Cursor.m_LineWidth = PingLength;
