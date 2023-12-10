@@ -108,8 +108,8 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	MainView.VMargin(VMargin, &Menu);
 	Menu.HSplitBottom(15.0f, &Menu, 0);
 
-	MainView.VSplitLeft(570.0f, &Menu, nullptr);
-	Menu.VSplitLeft(Menu.w / 1.49, nullptr, &Menu);
+	MainView.VSplitLeft(MainView.w / 2 + 115, &Menu, nullptr);
+	Menu.VSplitLeft(Menu.w / 1.45, nullptr, &Menu);
 	Menu.HSplitBottom(40.0f, &Menu, &Button);
 	static CButtonContainer s_QuitButton;
 	bool UsedEscape = false;

@@ -980,7 +980,7 @@ void CMenus::RenderStats(CUIRect MainView)
 			UI()->DoEditBox(&m_StatsPlayerInput, &SearchBox, 14.0f);
 
 				static CButtonContainer s_FetchButton;
-			if((DoButton_Menu(&s_FetchButton, Localize("Fetch"), 0, &FetchButton) || (Input()->KeyPress(KEY_RETURN) && m_StatsPlayerInput.IsActive())) && !m_StatsPlayerInput.IsEmpty())
+			if((DoButton_Menu(&s_FetchButton, Localize("Fetch(Find)"), 0, &FetchButton) || (Input()->KeyPress(KEY_RETURN) && m_StatsPlayerInput.IsActive())) && !m_StatsPlayerInput.IsEmpty())
 				{
 					m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
 				}
