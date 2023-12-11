@@ -842,15 +842,19 @@ void CMenus::RenderStats(CUIRect MainView)
 
 	static int s_StatsPage = 0;
 
-	TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
+	TabBar.VSplitLeft(TabBar.w / 3, &Button, &TabBar);
 	static CButtonContainer s_Button0;
-	if(DoButton_MenuTab(&s_Button0, Localize("DDStats"), s_StatsPage == 0, &Button, 0))
+	if(DoButton_MenuTab(&s_Button0, Localize("Account"), s_StatsPage == 0, &Button, 0))
 		s_StatsPage = 0;
 
-	TabBar.VSplitRight(TabBar.w, &TabBar, &Button);
+	TabBar.VSplitMid(&Button, &TabBar);
 	static CButtonContainer s_Button1;
-	if(DoButton_MenuTab(&s_Button1, Localize("Map Tracking"), s_StatsPage == 1, &Button, 0))
+	if(DoButton_MenuTab(&s_Button1, Localize("Map Tracker"), s_StatsPage == 1, &Button, 0))
 		s_StatsPage = 1;
+
+	static CButtonContainer s_Button2;
+	if(DoButton_MenuTab(&s_Button2, Localize("DDStats"), s_StatsPage == 2, &TabBar, 0))
+		s_StatsPage = 2;
 
 	if(s_StatsPage == 0)
 	{
@@ -951,62 +955,66 @@ void CMenus::RenderStats(CUIRect MainView)
 	}
 	else if(s_StatsPage == 1)
 	{
-		//test
-		static CStatsPlayer s_StatsPlayer;
-
-				// render background
-				CUIRect Bottom1, TabBar1, Label, Button1, SearchBox, FetchButton;
-			MainView.HSplitTop(20.0f, &Bottom1, &MainView);
-			Bottom1.Draw(ms_ColorTabbarActive, 0, 10.0f);
-			MainView.HSplitTop(20.0f, &TabBar1, &MainView);
-			MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
-			MainView.Margin(10.0f, &MainView);
-
-				// tab bar
-				TabBar1.VSplitLeft(TabBar1.w, &Button1, &TabBar1);
-			static CButtonContainer s_Button2;
-			if(DoButton_MenuTab(&s_Button2, Localize("Player profile"), s_StatsPage == 1, &Button1, 0))
-					s_StatsPage == 1;
-
-				// Title
-				MainView.HSplitTop(20.0f, &Label, &MainView);
-			Label.VSplitRight(300.0f, &Label, &SearchBox);
-			char aWelcome[128];
-			str_format(aWelcome, sizeof(aWelcome), "Player profile");
-			UI()->DoLabel(&Label, aWelcome, 14.0f, TEXTALIGN_ML);
-
-				SearchBox.VSplitLeft(200.0f, &SearchBox, &FetchButton);
-			SearchBox.VMargin(15.0f, &SearchBox);
-			UI()->DoEditBox(&m_StatsPlayerInput, &SearchBox, 14.0f);
-
-				static CButtonContainer s_FetchButton;
-			if((DoButton_Menu(&s_FetchButton, Localize("Fetch(Find)"), 0, &FetchButton) || (Input()->KeyPress(KEY_RETURN) && m_StatsPlayerInput.IsActive())) && !m_StatsPlayerInput.IsEmpty())
-				{
-					m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
-				}
-
-				if(!s_StatsPlayer.m_pGetStats)
-					return;
-
-				if(s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_PENDING)
-					return;
-
-				if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_DONE)
-					return m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
-
-				MainView.HSplitTop(20.0f, &Label, &MainView);
-					if(s_StatsPlayer.m_pGetStats->State() == -1) // error (404)
-				{
-					UI()->DoLabel(&Label, "No player found.", 14.0f, TEXTALIGN_ML);
-					return;
-				}
-			char aPoints[128];
-			str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
-			UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
-		}
 
 	}
 
+	else if (s_StatsPage ==2)
+	{
+		//test
+		static CStatsPlayer s_StatsPlayer;
+
+		// render background
+		CUIRect Bottom1, TabBar1, Label, Button1, SearchBox, FetchButton;
+		MainView.HSplitTop(20.0f, &Bottom1, &MainView);
+		Bottom1.Draw(ms_ColorTabbarActive, 0, 10.0f);
+		MainView.HSplitTop(20.0f, &TabBar1, &MainView);
+		MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
+		MainView.Margin(10.0f, &MainView);
+
+		// tab bar
+		TabBar1.VSplitLeft(TabBar1.w, &Button1, &TabBar1);
+		static CButtonContainer s_Button2;
+		if(DoButton_MenuTab(&s_Button2, Localize("Player profile"), s_StatsPage == 1, &Button1, 0))
+			s_StatsPage == 1;
+
+		// Title
+		MainView.HSplitTop(20.0f, &Label, &MainView);
+		Label.VSplitRight(300.0f, &Label, &SearchBox);
+		char aWelcome[128];
+		str_format(aWelcome, sizeof(aWelcome), "Player profile");
+		UI()->DoLabel(&Label, aWelcome, 14.0f, TEXTALIGN_ML);
+
+		SearchBox.VSplitLeft(200.0f, &SearchBox, &FetchButton);
+		SearchBox.VMargin(15.0f, &SearchBox);
+		UI()->DoEditBox(&m_StatsPlayerInput, &SearchBox, 14.0f);
+
+		static CButtonContainer s_FetchButton;
+		if((DoButton_Menu(&s_FetchButton, Localize("Fetch(Find)"), 0, &FetchButton) || (Input()->KeyPress(KEY_RETURN) && m_StatsPlayerInput.IsActive())) && !m_StatsPlayerInput.IsEmpty())
+		{
+			m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
+		}
+
+		if(!s_StatsPlayer.m_pGetStats)
+			return;
+
+		if(s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_PENDING)
+			return;
+
+		if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_DONE)
+			return m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
+
+		MainView.HSplitTop(20.0f, &Label, &MainView);
+		if(s_StatsPlayer.m_pGetStats->State() == -1) // error (404)
+		{
+			UI()->DoLabel(&Label, "No player found.", 14.0f, TEXTALIGN_ML);
+			return;
+		}
+		char aPoints[128];
+		str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
+		UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
+	}
+
+}
 void CMenus::RenderInGameNetwork(CUIRect MainView)
 {
 	MainView.Draw(ms_ColorTabbarActive, IGraphics::CORNER_B, 10.0f);
