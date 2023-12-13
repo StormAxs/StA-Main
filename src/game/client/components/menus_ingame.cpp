@@ -949,16 +949,16 @@ void CMenus::RenderStats(CUIRect MainView)
 		LF.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		LP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		rank.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
-		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_T, 2.0f);
 		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
-		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 0.0f);
+		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
 	}
 	else if(s_StatsPage == 1)
 	{
 
 	}
 
-	else if (s_StatsPage ==2)
+	else if (s_StatsPage ==2) //only uses DDstats!
 	{
 		//test
 		static CStatsPlayer s_StatsPlayer;
@@ -994,17 +994,17 @@ void CMenus::RenderStats(CUIRect MainView)
 			m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
 		}
 
-		if(!s_StatsPlayer.m_pGetStats)
+		if(!s_StatsPlayer.m_pGetStatsDDStats)
 			return;
 
-		if(s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_PENDING)
+		if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING)
 			return;
 
-		if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStats->State() == s_StatsPlayer.m_pGetStats->STATE_DONE)
+		if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
 			return m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
 
 		MainView.HSplitTop(20.0f, &Label, &MainView);
-		if(s_StatsPlayer.m_pGetStats->State() == -1) // error (404)
+		if(s_StatsPlayer.m_pGetStatsDDStats->State() == -1) // error (404)
 		{
 			UI()->DoLabel(&Label, "No player found.", 14.0f, TEXTALIGN_ML);
 			return;

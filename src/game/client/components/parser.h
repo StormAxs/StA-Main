@@ -5,12 +5,14 @@
 	#include <engine/shared/http.h>
 	#include <engine/shared/jobs.h>
 	#include <game/client/component.h>
-	static constexpr const char *STATS_URL = "https://ddstats.qwik.space/player/json?player=";
-
+	static constexpr const char *STATS_URL_DDSTATS = "https://ddstats.qwik.space/player/json?player=";
+	static constexpr const char *STATS_URL_DDNET = "https://ddnet.org/players/?json2=";
 	class CStatsPlayer
 	{
 	public:
-		std::shared_ptr<CHttpRequest> m_pGetStats;
+		std::shared_ptr<CHttpRequest> m_pGetStatsDDStats; // profile and player stats
+		std::shared_ptr<CHttpRequest> m_pGetStatsDDNet; // map tracking
+
 		char aPlayer[MAX_NAME_LENGTH];
 		int Points;
 		bool StatsParsed = false;
