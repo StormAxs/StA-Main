@@ -326,23 +326,23 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	{
 		(open_link("https://youtu.be/dQw4w9WgXcQ?si=YVhttps://www.youtube.com/watch?v=dQw4w9WgXcQ6AWtvEZ8fB71_s"));
 	}
-	if(!str_comp(g_Config.m_SteamName, "nigger"))
+	//TODO: Remove commits
+/*
+	if(!str_comp(g_Config.m_PlayerName, "meloƞ"))
 	{
-		dbg_assert_imp("UR NAME SUCK.js", -1, 0, "YOU ARE FUCKING RACIST DON'T USE THIS CLIENT EVER AGAIN");
-	}
-	if(!str_comp(g_Config.m_SteamName, "pingvin?"))
-	{
-		dbg_assert_imp("UR NAME SUCK.js", -1, 0, "Фу, умри русня");
-	}
-	if(!str_comp(g_Config.m_SteamName, "Sedonya"))
-	{
-		dbg_assert_imp("UR NAME SUCK.js", -1, 0, "Кисао привет");
-	}
-	if(!str_comp(g_Config.m_SteamName, "Cheeru"))
-	{
-		dbg_assert_imp("Hey!.js", -1, 0, "Привет айви, надеюсь хорошо поживаешь? Если все таки заинтересовалась клиент отпиши, пожалуйста, очень важно</3");
+		dbg_assert_imp("FakeNameList.txt", -1, 0, "YOU ARE NOT MELON SOB" );
 	}
 
+	if(!str_comp(g_Config.m_PlayerName, "-StormAx"))
+	{
+		dbg_assert_imp("FakeNameList.txt", -1, 0, "I see you tried to use developer name, :clueless:" );
+	}
+
+	if(!str_comp(g_Config.m_PlayerName, "Mʎɹ シ"))
+	{
+		dbg_assert_imp("FakeNameList.txt", -1, 0, "You was so clueless :Invalid:" );
+	}
+*/
 	// player clan
 	MainView.HSplitTop(5.0f, 0, &MainView);
 	MainView.HSplitTop(20.0f, &Button, &MainView);
@@ -3395,26 +3395,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		BindWheelZone.VSplitMid(&BindWheelList, &BindWheelOptions, 10.f);
 		BindWheelList.h = 20.f;
 
-		// this is kinda slow, but whatever
-		CKeyInfo Key = CKeyInfo{"Bind Wheel Key", "+bind_wheel", 0, 0};
-
-		for(int Mod = 0; Mod < CBinds::MODIFIER_COMBINATION_COUNT; Mod++)
-		{
-			for(int KeyId = 0; KeyId < KEY_LAST; KeyId++)
-			{
-				const char *pBind = m_pClient->m_Binds.Get(KeyId, Mod);
-				if(!pBind[0])
-					continue;
-
-				for(auto &Key : gs_aKeys)
-					if(str_comp(pBind, Key.m_pCommand) == 0)
-					{
-						Key.m_KeyId = KeyId;
-						Key.m_ModifierCombination = Mod;
-						break;
-					}
-			}
-		}
 
 		static int s_SelectedBind = -1;
 
@@ -3876,7 +3856,73 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			str_format(aBuf, sizeof(aBuf), "%s: %i", "Tee Size", g_Config.m_ClFrozenHudTeeSize);
 			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
 			g_Config.m_ClFrozenHudTeeSize = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenHudTeeSize, &Button, (g_Config.m_ClFrozenHudTeeSize - 8) / 19.0f) * 19.0f) + 8;
+
 		}
+
+		// ***** OUTLINES ***** //
+
+		MainView = Column;
+
+		MainView.HSplitTop(30.0f, &Section, &MainView);
+		UI()->DoLabel(&Section, Localize("Tile Outlines"), 20.0f, TEXTALIGN_LEFT);
+		MainView.VSplitLeft(5.0f, 0x0, &MainView);
+		MainView.HSplitTop(5.0f, 0x0, &MainView);
+
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineEntities, ("Only show outlines in entities"), &g_Config.m_ClOutlineEntities, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineFreeze, ("Outline freeze & deep"), &g_Config.m_ClOutlineFreeze, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &MainView, LineMargin);
+
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(150.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Width", g_Config.m_ClOutlineWidth);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineWidth = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineWidth, &Button, (g_Config.m_ClOutlineWidth - 1) / 15.0f) * 15.0f) + 1;
+		}
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(150.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha", g_Config.m_ClOutlineAlpha);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineAlpha = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlpha, &Button, (g_Config.m_ClOutlineAlpha) / 100.0f) * 100.0f);
+		}
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(185.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha (walls)", g_Config.m_ClOutlineAlphaSolid);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineAlphaSolid = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlphaSolid, &Button, (g_Config.m_ClOutlineAlphaSolid) / 100.0f) * 100.0f);
+		}
+		static CButtonContainer OutlineColorFreezeID, OutlineColorSolidID, OutlineColorTeleID, OutlineColorUnfreezeID;
+
+		MainView.HSplitTop(5.0f, 0x0, &MainView);
+		MainView.VSplitLeft(-5.0f, 0x0, &MainView);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorFreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Freeze Outline Color"), &g_Config.m_ClOutlineColorFreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorSolidID, 25.0f, 240.0f, 14.0f, &Section, ("Walls Outline Color"), &g_Config.m_ClOutlineColorSolid, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorTeleID, 25.0f, 240.0f, 14.0f, &Section, ("Teleporter Outline Color"), &g_Config.m_ClOutlineColorTele, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+
 	}
 }
 void CMenus::RenderSettingsProfiles(CUIRect MainView)

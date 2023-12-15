@@ -35,8 +35,6 @@ class CMapLayers : public CComponent
 	int m_LastLocalTick;
 	bool m_EnvelopeUpdate;
 
-	bool m_OnlineOnly;
-
 	struct STileLayerVisuals
 	{
 		STileLayerVisuals() :
@@ -160,6 +158,7 @@ public:
 	void EnvelopeUpdate();
 
 	static void EnvelopeEval(int TimeOffsetMillis, int Env, ColorRGBA &Channels, void *pUser);
+	bool m_OnlineOnly;
 };
 
 #endif

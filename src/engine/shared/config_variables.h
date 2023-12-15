@@ -721,3 +721,18 @@ MACRO_CONFIG_INT(ScShowFrozenNameplaterColor, sc_show_frozen_nameplates_color, 0
 
 MACRO_CONFIG_INT(ClChatFontSize, cl_chat_size, 60, 10, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat font size")
 MACRO_CONFIG_INT(ClChatWidth, cl_chat_width, 200, 140, 400, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat width")
+
+//Outline Variables
+MACRO_CONFIG_INT(ClOutline, sc_outline, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outlines")
+MACRO_CONFIG_INT(ClOutlineEntities, sc_outline_in_entities, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Only show outlines in entities")
+MACRO_CONFIG_INT(ClOutlineFreeze, sc_outline_freeze, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around freeze and deep")
+MACRO_CONFIG_INT(ClOutlineUnFreeze, sc_outline_unfreeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around unfreeze and undeep")
+MACRO_CONFIG_INT(ClOutlineTele, sc_outline_tele, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around teleporters")
+MACRO_CONFIG_INT(ClOutlineSolid, sc_outline_solid, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around hook and unhook")
+MACRO_CONFIG_INT(ClOutlineWidth, sc_outline_width, 5, 1, 16, CFGFLAG_CLIENT | CFGFLAG_SAVE, "(1-16) Width of freeze outline")
+MACRO_CONFIG_INT(ClOutlineAlpha, sc_outline_alpha, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "(0-100) Outline alpha")
+MACRO_CONFIG_INT(ClOutlineAlphaSolid, sc_outline_alpha_solid, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "(0-100) Outline solids alpha")
+MACRO_CONFIG_COL(ClOutlineColorSolid, sc_outline_color_solid, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Solid outline color") //0 0 0
+MACRO_CONFIG_COL(ClOutlineColorFreeze, sc_outline_color_freeze, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Freeze outline color") //0 0 0
+MACRO_CONFIG_COL(ClOutlineColorTele, sc_outline_color_tele, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Tele outline color") //0 0 0
+MACRO_CONFIG_COL(ClOutlineColorUnfreeze, sc_outline_color_unfreeze, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Unfreeze outline color") //0 0 0

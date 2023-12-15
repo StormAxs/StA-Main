@@ -2220,6 +2220,8 @@ if(CLIENT)
     components/motd.cpp
     components/motd.h
     components/nameplates.cpp
+          components/outlines.cpp
+          components/outlines.h
     components/nameplates.h
     components/particles.cpp
     components/particles.h

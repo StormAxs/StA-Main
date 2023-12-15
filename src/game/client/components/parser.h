@@ -26,6 +26,6 @@
 		int Sizeof() const override { return sizeof(*this); }
 		void FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer);
 		void ParseJSON(CStatsPlayer *pStatsDest);
-	};
+       };
 
 	#endif // GAME_CLIENT_COMPONENTS_STATS_H

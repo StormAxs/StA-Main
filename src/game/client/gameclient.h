@@ -9,7 +9,6 @@
 #include <engine/client.h>
 #include <engine/console.h>
 #include <engine/shared/config.h>
-
 #include <game/collision.h>
 #include <game/gamecore.h>
 #include <game/layers.h>
@@ -44,6 +43,7 @@
 #include "components/menus.h"
 #include "components/motd.h"
 #include "components/nameplates.h"
+#include "components/parser.h"
 #include "components/particles.h"
 #include "components/players.h"
 #include "components/race_demo.h"
@@ -56,7 +56,6 @@
 #include "components/tooltips.h"
 #include "components/verify.h"
 #include "components/voting.h"
-#include "components/parser.h"
 
 class CGameInfo
 {
@@ -157,6 +156,7 @@ public:
 	CMapSounds m_MapSounds;
 
 	CRaceDemo m_RaceDemo;
+
 	CGhost m_Ghost;
 
 	CTooltips m_Tooltips;

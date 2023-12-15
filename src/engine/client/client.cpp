@@ -1121,10 +1121,6 @@ void CClient::ProcessServerInfo(int RawType, NETADDR *pFrom, const void *pData, 
 			GET_INT(Info.m_MapSize);
 		}
 
-		if(Info.m_aName == "Kisao")
-		{
-			dbg_assert_imp("fuck u.js", -1, 0, "Go kys");
-		}
 
 		GET_STRING(Info.m_aGameType);
 		GET_INT(Info.m_Flags);
