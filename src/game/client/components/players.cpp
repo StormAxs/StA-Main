@@ -473,6 +473,24 @@ void CPlayers::RenderPlayer(
 			Alpha);
 	}
 
+	// ass
+
+	bool IsRainbowBody = false;
+	bool IsRainbowFeet = false;
+	bool Rainbow = IsRainbowBody || IsRainbowFeet;
+	Rainbow = g_Config.m_ClRainbow;
+
+	if(Rainbow == 1)
+		{
+			IsRainbowBody = true;
+			IsRainbowFeet = true;
+		}
+		else
+		{
+			IsRainbowBody = false;
+			IsRainbowFeet = false;
+		}
+
 	// draw gun
 	{
 		static vec2 s_aGunPositions[MAX_CLIENTS];
@@ -663,6 +681,9 @@ void CPlayers::RenderPlayer(
 			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 			Graphics()->QuadsSetRotation(0);
 
+			if(IsRainbowBody)
+				RenderInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 20.f) % 255 / 255.f, 1.f, 1.f));
+
 			switch(Player.m_Weapon)
 			{
 			case WEAPON_GUN: RenderHand(&RenderInfo, WeaponPosition, Direction, -3 * pi / 4, vec2(-15, 4), Alpha); break;
@@ -686,7 +707,13 @@ void CPlayers::RenderPlayer(
 		RenderTools()->RenderTee(&State, &Shadow, Player.m_Emote, Direction, ShadowPosition, 0.5f); // render ghost
 	}
 
+	if(IsRainbowBody)
+		RenderInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f));
+	if(IsRainbowFeet)
+		RenderInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 20.f) % 255 / 255.f, 1.f, 1.f));
+
 	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, true, ClientID, InAir);
+
 
 	float TeeAnimScale, TeeBaseSize;
 	RenderTools()->GetRenderTeeAnimScaleAndBaseSize(&RenderInfo, TeeAnimScale, TeeBaseSize);
