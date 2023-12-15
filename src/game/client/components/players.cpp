@@ -473,14 +473,20 @@ void CPlayers::RenderPlayer(
 			Alpha);
 	}
 
-	// ass
+	// rainbow
+	bool 	IsRainbowBody = g_Config.m_ClRainbow,
+	     	IsRainbowFeet = g_Config.m_ClRainbow;
 
-	bool IsRainbowBody = false;
-	bool IsRainbowFeet = false;
-	bool Rainbow = IsRainbowBody || IsRainbowFeet;
-	Rainbow = g_Config.m_ClRainbow;
+	if (g_Config.m_ClRainbowEveryone == 1)
+	{
+		g_Config.m_ClRainbow = 1;
+	}
+	else
+	{
+		g_Config.m_ClRainbow = Local == 1;
+	}
 
-	if(Rainbow == 1)
+	if(g_Config.m_ClRainbow == 1)
 		{
 			IsRainbowBody = true;
 			IsRainbowFeet = true;
@@ -710,7 +716,8 @@ void CPlayers::RenderPlayer(
 	if(IsRainbowBody)
 		RenderInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f));
 	if(IsRainbowFeet)
-		RenderInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 20.f) % 255 / 255.f, 1.f, 1.f));
+		RenderInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f));
+
 
 	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, true, ClientID, InAir);
 

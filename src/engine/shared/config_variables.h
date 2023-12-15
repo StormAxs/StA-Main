@@ -737,5 +737,6 @@ MACRO_CONFIG_COL(ClOutlineColorFreeze, sc_outline_color_freeze, 0, CFGFLAG_CLIEN
 MACRO_CONFIG_COL(ClOutlineColorTele, sc_outline_color_tele, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Tele outline color") //0 0 0
 MACRO_CONFIG_COL(ClOutlineColorUnfreeze, sc_outline_color_unfreeze, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Unfreeze outline color") //0 0 0
 
-MACRO_CONFIG_INT(ClRainbow, sc_rainbow, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around hook and unhook")
-MACRO_CONFIG_INT(ClRainbowSpeed, sc_rainbow_speed, 20, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draws outline around hook and unhook")
+MACRO_CONFIG_INT(ClRainbow, sc_rainbow, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow urself")
+MACRO_CONFIG_INT(ClRainbowSpeed, sc_rainbow_speed, 20, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow speed")
+MACRO_CONFIG_INT(ClRainbowEveryone, sc_rainbow_all, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow all")
