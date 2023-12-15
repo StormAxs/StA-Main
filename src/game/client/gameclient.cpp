@@ -133,7 +133,7 @@ void CGameClient::OnConsoleInit()
 					      &m_NamePlates,
 					      //bindwheel
 					      &m_BindWheel,
-
+					      &m_Outlines,
 					      &m_Particles.m_RenderExtra,
 					      &m_Particles.m_RenderGeneral,
 					      &m_FreezeBars,

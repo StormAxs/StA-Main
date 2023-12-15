@@ -22,6 +22,7 @@
 #include "components/bindwheel.h"
 #include "components/broadcast.h"
 #include "components/camera.h"
+#include "components/outlines.h"
 #include "components/chat.h"
 #include "components/console.h"
 #include "components/controls.h"
@@ -121,6 +122,7 @@ public:
 	CBindWheel m_BindWheel;
 	CVerify m_Verify;
 	CBroadcast m_Broadcast;
+	COutlines m_Outlines;
 	CGameConsole m_GameConsole;
 	CBinds m_Binds;
 	CSkinProfiles m_SkinProfiles;

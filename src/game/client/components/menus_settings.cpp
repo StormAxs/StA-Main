@@ -3831,7 +3831,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
 
 		MainView.HSplitTop(40.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, ("Frozen Tee Display"), 20.0f, TEXTALIGN_LEFT);
+		UI()->DoLabel(&Section, ("Frozen Tee Display "), 20.0f, TEXTALIGN_LEFT);
 		MainView.VSplitLeft(5.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
 		MainView.HSplitTop(5.1f, 0x0, &MainView);
 
@@ -3864,7 +3864,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		MainView = Column;
 
 		MainView.HSplitTop(30.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, Localize("Tile Outlines"), 20.0f, TEXTALIGN_LEFT);
+		UI()->DoLabel(&Section, Localize("Tile Outlines(TYSM TClient)"), 20.0f, TEXTALIGN_LEFT);
 		MainView.VSplitLeft(5.0f, 0x0, &MainView);
 		MainView.HSplitTop(5.0f, 0x0, &MainView);
 
