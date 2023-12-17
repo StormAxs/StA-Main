@@ -12,7 +12,7 @@
 void CBindWheel::OnInit()
 {
 	CDataFileReader DF;
-	if(!DF.Open(Storage(), "bind_wheel.binds", IStorageTW::TYPE_ALL))
+	if(!DF.Open(Storage(), "bind_wheel.binds", IStorage::TYPE_ALL))
 		return;
 
 	int Start, Num;
@@ -30,7 +30,7 @@ void CBindWheel::OnInit()
 void CBindWheel::OnShutdown()
 {
 	CDataFileWriter DF;
-	DF.Open(Storage(), "bind_wheel.binds", IStorageTW::TYPE_ALL);
+	DF.Open(Storage(), "bind_wheel.binds", IStorage::TYPE_ALL);
 
 	int ID = 0;
 	for(const SBind &Bind : m_vBinds)

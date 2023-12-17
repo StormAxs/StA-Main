@@ -3325,7 +3325,7 @@ void CGameContext::ConAddMapVotes(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 
 	std::vector<CMapNameItem> vMapList;
-	pSelf->Storage()->ListDirectory(IStorageTW::TYPE_ALL, "maps", MapScan, &vMapList);
+	pSelf->Storage()->ListDirectory(IStorage::TYPE_ALL, "maps", MapScan, &vMapList);
 	std::sort(vMapList.begin(), vMapList.end());
 
 	for(auto &Item : vMapList)
@@ -3426,7 +3426,7 @@ void CGameContext::OnConsoleInit()
 	m_pConfig = m_pConfigManager->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 
 	Console()->Register("tune", "s[tuning] ?i[value]", CFGFLAG_SERVER | CFGFLAG_GAME, ConTuneParam, this, "Tune variable to value or show current value");
 	Console()->Register("toggle_tune", "s[tuning] i[value 1] i[value 2]", CFGFLAG_SERVER | CFGFLAG_GAME, ConToggleTuneParam, this, "Toggle tune variable");
@@ -3482,7 +3482,7 @@ void CGameContext::OnInit(const void *pPersistentData)
 	m_pConfig = m_pConfigManager->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pAntibot = Kernel()->RequestInterface<IAntibot>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
@@ -3586,7 +3586,7 @@ void CGameContext::OnInit(const void *pPersistentData)
 		m_pController = new CGameControllerDDRace(this);
 
 	const char *pCensorFilename = "censorlist.txt";
-	IOHANDLE File = Storage()->OpenFile(pCensorFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
+	IOHANDLE File = Storage()->OpenFile(pCensorFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
 	if(!File)
 	{
 		dbg_msg("censorlist", "failed to open '%s'", pCensorFilename);
@@ -3612,7 +3612,7 @@ void CGameContext::OnInit(const void *pPersistentData)
 		char aFilename[IO_MAX_PATH_LENGTH];
 		str_format(aFilename, sizeof(aFilename), "teehistorian/%s.teehistorian", aGameUuid);
 
-		IOHANDLE THFile = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+		IOHANDLE THFile = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 		if(!THFile)
 		{
 			dbg_msg("teehistorian", "failed to open '%s'", aFilename);
@@ -3795,7 +3795,7 @@ void CGameContext::DeleteTempfile()
 {
 	if(m_aDeleteTempfile[0] != 0)
 	{
-		Storage()->RemoveFile(m_aDeleteTempfile, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(m_aDeleteTempfile, IStorage::TYPE_SAVE);
 		m_aDeleteTempfile[0] = 0;
 	}
 }
@@ -3805,7 +3805,7 @@ void CGameContext::OnMapChange(char *pNewMapName, int MapNameSize)
 	char aConfig[IO_MAX_PATH_LENGTH];
 	str_format(aConfig, sizeof(aConfig), "maps/%s.cfg", g_Config.m_SvMap);
 
-	IOHANDLE File = Storage()->OpenFile(aConfig, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
+	IOHANDLE File = Storage()->OpenFile(aConfig, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
 	if(!File)
 	{
 		// No map-specific config, just return.
@@ -3838,7 +3838,7 @@ void CGameContext::OnMapChange(char *pNewMapName, int MapNameSize)
 	}
 
 	CDataFileReader Reader;
-	Reader.Open(Storage(), pNewMapName, IStorageTW::TYPE_ALL);
+	Reader.Open(Storage(), pNewMapName, IStorage::TYPE_ALL);
 
 	CDataFileWriter Writer;
 
@@ -3918,7 +3918,7 @@ void CGameContext::OnMapChange(char *pNewMapName, int MapNameSize)
 	free(pSettings);
 	Reader.Close();
 	char aTemp[IO_MAX_PATH_LENGTH];
-	Writer.Open(Storage(), IStorageTW::FormatTmpPath(aTemp, sizeof(aTemp), pNewMapName));
+	Writer.Open(Storage(), IStorage::FormatTmpPath(aTemp, sizeof(aTemp), pNewMapName));
 	Writer.Finish();
 
 	str_copy(pNewMapName, aTemp, MapNameSize);

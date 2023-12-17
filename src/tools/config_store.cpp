@@ -6,9 +6,9 @@
 #include <game/mapitems.h>
 #include <vector>
 
-void Process(IStorageTW *pStorage, const char *pMapName, const char *pConfigName)
+void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
 {
-	IOHANDLE File = pStorage->OpenFile(pConfigName, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ABSOLUTE);
+	IOHANDLE File = pStorage->OpenFile(pConfigName, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ABSOLUTE);
 	if(!File)
 	{
 		dbg_msg("config_store", "config '%s' not found", pConfigName);
@@ -42,7 +42,7 @@ void Process(IStorageTW *pStorage, const char *pMapName, const char *pConfigName
 	}
 
 	CDataFileReader Reader;
-	Reader.Open(pStorage, pMapName, IStorageTW::TYPE_ABSOLUTE);
+	Reader.Open(pStorage, pMapName, IStorage::TYPE_ABSOLUTE);
 
 	CDataFileWriter Writer;
 

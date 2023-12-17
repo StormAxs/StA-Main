@@ -271,7 +271,7 @@ class CEditor : public IEditor
 	class IGraphics *m_pGraphics = nullptr;
 	class ITextRender *m_pTextRender = nullptr;
 	class ISound *m_pSound = nullptr;
-	class IStorageTW *m_pStorage = nullptr;
+	class IStorage *m_pStorage = nullptr;
 	CRenderTools m_RenderTools;
 	CUI m_UI;
 
@@ -308,7 +308,7 @@ public:
 	class IGraphics *Graphics() { return m_pGraphics; }
 	class ISound *Sound() { return m_pSound; }
 	class ITextRender *TextRender() { return m_pTextRender; }
-	class IStorageTW *Storage() { return m_pStorage; }
+	class IStorage *Storage() { return m_pStorage; }
 	CUI *UI() { return &m_UI; }
 	CRenderTools *RenderTools() { return &m_RenderTools; }
 

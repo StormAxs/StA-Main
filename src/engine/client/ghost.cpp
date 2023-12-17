@@ -23,13 +23,13 @@ CGhostRecorder::CGhostRecorder()
 void CGhostRecorder::Init()
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 }
 
 // Record
 int CGhostRecorder::Start(const char *pFilename, const char *pMap, SHA256_DIGEST MapSha256, const char *pName)
 {
-	m_File = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+	m_File = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	if(!m_File)
 	{
 		char aBuf[256];
@@ -167,7 +167,7 @@ CGhostLoader::CGhostLoader()
 void CGhostLoader::Init()
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 }
 
 void CGhostLoader::ResetBuffer()
@@ -180,7 +180,7 @@ void CGhostLoader::ResetBuffer()
 
 int CGhostLoader::Load(const char *pFilename, const char *pMap, SHA256_DIGEST MapSha256, unsigned MapCrc)
 {
-	m_File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorageTW::TYPE_SAVE);
+	m_File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_SAVE);
 	if(!m_File)
 	{
 		char aBuf[256];
@@ -368,7 +368,7 @@ bool CGhostLoader::GetGhostInfo(const char *pFilename, CGhostInfo *pGhostInfo, c
 	CGhostHeader Header;
 	mem_zero(&Header, sizeof(Header));
 
-	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorageTW::TYPE_SAVE);
+	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_SAVE);
 	if(!File)
 		return false;
 

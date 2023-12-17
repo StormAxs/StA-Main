@@ -719,7 +719,7 @@ bool CEditor::CallbackOpenMap(const char *pFileName, int StorageType, void *pUse
 	CEditor *pEditor = (CEditor *)pUser;
 	if(pEditor->Load(pFileName, StorageType))
 	{
-		pEditor->m_ValidSaveFilename = StorageType == IStorageTW::TYPE_SAVE && (pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder || (pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentLink && str_comp(pEditor->m_aFileDialogCurrentLink, "themes") == 0));
+		pEditor->m_ValidSaveFilename = StorageType == IStorage::TYPE_SAVE && (pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder || (pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentLink && str_comp(pEditor->m_aFileDialogCurrentLink, "themes") == 0));
 		pEditor->m_Dialog = DIALOG_NONE;
 		return true;
 	}
@@ -748,7 +748,7 @@ bool CEditor::CallbackAppendMap(const char *pFileName, int StorageType, void *pU
 
 bool CEditor::CallbackSaveMap(const char *pFileName, int StorageType, void *pUser)
 {
-	dbg_assert(StorageType == IStorageTW::TYPE_SAVE, "Saving only allowed for IStorageTW::TYPE_SAVE");
+	dbg_assert(StorageType == IStorage::TYPE_SAVE, "Saving only allowed for IStorage::TYPE_SAVE");
 
 	CEditor *pEditor = static_cast<CEditor *>(pUser);
 	char aBuf[IO_MAX_PATH_LENGTH];
@@ -786,7 +786,7 @@ bool CEditor::CallbackSaveMap(const char *pFileName, int StorageType, void *pUse
 
 bool CEditor::CallbackSaveCopyMap(const char *pFileName, int StorageType, void *pUser)
 {
-	dbg_assert(StorageType == IStorageTW::TYPE_SAVE, "Saving only allowed for IStorageTW::TYPE_SAVE");
+	dbg_assert(StorageType == IStorage::TYPE_SAVE, "Saving only allowed for IStorage::TYPE_SAVE");
 
 	CEditor *pEditor = static_cast<CEditor *>(pUser);
 	char aBuf[IO_MAX_PATH_LENGTH];
@@ -811,7 +811,7 @@ bool CEditor::CallbackSaveCopyMap(const char *pFileName, int StorageType, void *
 
 bool CEditor::CallbackSaveImage(const char *pFileName, int StorageType, void *pUser)
 {
-	dbg_assert(StorageType == IStorageTW::TYPE_SAVE, "Saving only allowed for IStorageTW::TYPE_SAVE");
+	dbg_assert(StorageType == IStorage::TYPE_SAVE, "Saving only allowed for IStorage::TYPE_SAVE");
 
 	CEditor *pEditor = static_cast<CEditor *>(pUser);
 	char aBuf[IO_MAX_PATH_LENGTH];
@@ -866,7 +866,7 @@ bool CEditor::CallbackSaveImage(const char *pFileName, int StorageType, void *pU
 
 bool CEditor::CallbackSaveSound(const char *pFileName, int StorageType, void *pUser)
 {
-	dbg_assert(StorageType == IStorageTW::TYPE_SAVE, "Saving only allowed for IStorageTW::TYPE_SAVE");
+	dbg_assert(StorageType == IStorage::TYPE_SAVE, "Saving only allowed for IStorage::TYPE_SAVE");
 
 	CEditor *pEditor = static_cast<CEditor *>(pUser);
 	char aBuf[IO_MAX_PATH_LENGTH];
@@ -3921,7 +3921,7 @@ bool CEditor::ReplaceImage(const char *pFileName, int StorageType, bool CheckDup
 {
 	// check if we have that image already
 	char aBuf[128];
-	IStorageTW::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
+	IStorage::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
 	if(CheckDuplicate)
 	{
 		for(const auto &pImage : m_Map.m_vpImages)
@@ -3981,7 +3981,7 @@ bool CEditor::AddImage(const char *pFileName, int StorageType, void *pUser)
 
 	// check if we have that image already
 	char aBuf[128];
-	IStorageTW::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
+	IStorage::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
 	for(const auto &pImage : pEditor->m_Map.m_vpImages)
 	{
 		if(!str_comp(pImage->m_aName, aBuf))
@@ -4042,7 +4042,7 @@ bool CEditor::AddSound(const char *pFileName, int StorageType, void *pUser)
 
 	// check if we have that sound already
 	char aBuf[128];
-	IStorageTW::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
+	IStorage::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
 	for(const auto &pSound : pEditor->m_Map.m_vpSounds)
 	{
 		if(!str_comp(pSound->m_aName, aBuf))
@@ -4104,7 +4104,7 @@ bool CEditor::ReplaceSound(const char *pFileName, int StorageType, bool CheckDup
 {
 	// check if we have that sound already
 	char aBuf[128];
-	IStorageTW::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
+	IStorage::StripPathAndExtension(pFileName, aBuf, sizeof(aBuf));
 	if(CheckDuplicate)
 	{
 		for(const auto &pSound : m_Map.m_vpSounds)
@@ -4348,7 +4348,7 @@ void CEditor::RenderImagesList(CUIRect ToolBox)
 		AddImageButton.HSplitTop(5.0f, nullptr, &AddImageButton);
 		AddImageButton.HSplitTop(RowHeight, &AddImageButton, nullptr);
 		if(DoButton_Editor(&s_AddImageButton, "Add", 0, &AddImageButton, 0, "Load a new image to use in the map"))
-			InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", false, AddImage, this);
+			InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", false, AddImage, this);
 	}
 	s_ScrollRegion.End();
 }
@@ -4461,7 +4461,7 @@ void CEditor::RenderSounds(CUIRect ToolBox)
 		AddSoundButton.HSplitTop(5.0f, nullptr, &AddSoundButton);
 		AddSoundButton.HSplitTop(RowHeight, &AddSoundButton, nullptr);
 		if(DoButton_Editor(&s_AddSoundButton, "Add", 0, &AddSoundButton, 0, "Load a new sound to use in the map"))
-			InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_SOUND, "Add Sound", "Add", "mapres", false, AddSound, this);
+			InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_SOUND, "Add Sound", "Add", "mapres", false, AddSound, this);
 	}
 	s_ScrollRegion.End();
 }
@@ -4600,7 +4600,7 @@ void CEditor::RenderFileDialog()
 	UI()->DoLabel(&Title, m_pFileDialogTitle, 12.0f, TEXTALIGN_ML);
 
 	// pathbox
-	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType >= IStorageTW::TYPE_SAVE)
+	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType >= IStorage::TYPE_SAVE)
 	{
 		char aPath[IO_MAX_PATH_LENGTH], aBuf[128 + IO_MAX_PATH_LENGTH];
 		Storage()->GetCompletePath(m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType, m_pFileDialogPath, aPath, sizeof(aPath));
@@ -4623,7 +4623,7 @@ void CEditor::RenderFileDialog()
 	static CListBox s_ListBox;
 	s_ListBox.SetActive(!UI()->IsPopupOpen());
 
-	if(m_FileDialogStorageType == IStorageTW::TYPE_SAVE)
+	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
 	{
 		UI()->DoLabel(&FileBoxLabel, "Filename:", 10.0f, TEXTALIGN_ML);
 		if(DoEditBox(&m_FileDialogFileNameInput, &FileBox, 10.0f))
@@ -4884,7 +4884,7 @@ void CEditor::RenderFileDialog()
 					if(str_comp(m_pFileDialogPath, m_aFileDialogCurrentFolder) == 0)
 					{
 						m_FileDialogShowingRoot = true;
-						if(m_FileDialogStorageType == IStorageTW::TYPE_ALL)
+						if(m_FileDialogStorageType == IStorage::TYPE_ALL)
 						{
 							m_aFilesSelectedName[0] = '\0'; // will select first list item
 						}
@@ -4958,14 +4958,14 @@ void CEditor::RenderFileDialog()
 	if(DoButton_Editor(&s_RefreshButton, "Refresh", 0, &Button, 0, nullptr) || (s_ListBox.Active() && (Input()->KeyIsPressed(KEY_F5) || (Input()->ModifierIsPressed() && Input()->KeyIsPressed(KEY_R)))))
 		FilelistPopulate(m_FileDialogLastPopulatedStorageType, true);
 
-	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType != IStorageTW::TYPE_ALL)
+	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType != IStorage::TYPE_ALL)
 	{
 		ButtonBar.VSplitRight(ButtonSpacing, &ButtonBar, nullptr);
 		ButtonBar.VSplitRight(90.0f, &ButtonBar, &Button);
 		if(DoButton_Editor(&s_ShowDirectoryButton, "Show directory", 0, &Button, 0, "Open the current directory in the file browser"))
 		{
 			char aOpenPath[IO_MAX_PATH_LENGTH];
-			Storage()->GetCompletePath(m_FilesSelectedIndex >= 0 ? m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType : IStorageTW::TYPE_SAVE, m_pFileDialogPath, aOpenPath, sizeof(aOpenPath));
+			Storage()->GetCompletePath(m_FilesSelectedIndex >= 0 ? m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType : IStorage::TYPE_SAVE, m_pFileDialogPath, aOpenPath, sizeof(aOpenPath));
 			if(!open_file(aOpenPath))
 			{
 				ShowFileDialogError("Failed to open the directory '%s'.", aOpenPath);
@@ -4976,7 +4976,7 @@ void CEditor::RenderFileDialog()
 	ButtonBar.VSplitRight(ButtonSpacing, &ButtonBar, nullptr);
 	ButtonBar.VSplitRight(50.0f, &ButtonBar, &Button);
 	static CUI::SConfirmPopupContext s_ConfirmDeletePopupContext;
-	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType == IStorageTW::TYPE_SAVE && !m_vpFilteredFileList[m_FilesSelectedIndex]->m_IsLink && str_comp(m_vpFilteredFileList[m_FilesSelectedIndex]->m_aFilename, "..") != 0)
+	if(m_FilesSelectedIndex >= 0 && m_vpFilteredFileList[m_FilesSelectedIndex]->m_StorageType == IStorage::TYPE_SAVE && !m_vpFilteredFileList[m_FilesSelectedIndex]->m_IsLink && str_comp(m_vpFilteredFileList[m_FilesSelectedIndex]->m_aFilename, "..") != 0)
 	{
 		if(DoButton_Editor(&s_DeleteButton, "Delete", 0, &Button, 0, nullptr) || (s_ListBox.Active() && UI()->ConsumeHotkey(CUI::HOTKEY_DELETE)))
 		{
@@ -4991,14 +4991,14 @@ void CEditor::RenderFileDialog()
 			str_format(aDeleteFilePath, sizeof(aDeleteFilePath), "%s/%s", m_pFileDialogPath, m_vpFilteredFileList[m_FilesSelectedIndex]->m_aFilename);
 			if(IsDir)
 			{
-				if(Storage()->RemoveFolder(aDeleteFilePath, IStorageTW::TYPE_SAVE))
+				if(Storage()->RemoveFolder(aDeleteFilePath, IStorage::TYPE_SAVE))
 					FilelistPopulate(m_FileDialogLastPopulatedStorageType, true);
 				else
 					ShowFileDialogError("Failed to delete folder '%s'. Make sure it's empty first.", aDeleteFilePath);
 			}
 			else
 			{
-				if(Storage()->RemoveFile(aDeleteFilePath, IStorageTW::TYPE_SAVE))
+				if(Storage()->RemoveFile(aDeleteFilePath, IStorage::TYPE_SAVE))
 					FilelistPopulate(m_FileDialogLastPopulatedStorageType, true);
 				else
 					ShowFileDialogError("Failed to delete file '%s'.", aDeleteFilePath);
@@ -5011,7 +5011,7 @@ void CEditor::RenderFileDialog()
 	else
 		s_ConfirmDeletePopupContext.Reset();
 
-	if(!m_FileDialogShowingRoot && m_FileDialogStorageType == IStorageTW::TYPE_SAVE)
+	if(!m_FileDialogShowingRoot && m_FileDialogStorageType == IStorage::TYPE_SAVE)
 	{
 		ButtonBar.VSplitLeft(70.0f, &Button, &ButtonBar);
 		if(DoButton_Editor(&s_NewFolderButton, "New folder", 0, &Button, 0, nullptr))
@@ -5073,12 +5073,12 @@ void CEditor::FilelistPopulate(int StorageType, bool KeepSelection)
 			str_copy(Item.m_aName, "All combined");
 			Item.m_IsDir = true;
 			Item.m_IsLink = true;
-			Item.m_StorageType = IStorageTW::TYPE_ALL;
+			Item.m_StorageType = IStorage::TYPE_ALL;
 			Item.m_TimeModified = 0;
 			m_vCompleteFileList.push_back(Item);
 		}
 
-		for(int CheckStorageType = IStorageTW::TYPE_SAVE; CheckStorageType < Storage()->NumPaths(); ++CheckStorageType)
+		for(int CheckStorageType = IStorage::TYPE_SAVE; CheckStorageType < Storage()->NumPaths(); ++CheckStorageType)
 		{
 			if(Storage()->FolderExists(m_pFileDialogPath, CheckStorageType))
 			{
@@ -5142,10 +5142,10 @@ void CEditor::InvokeFileDialog(int StorageType, int FileType, const char *pTitle
 	bool (*pfnFunc)(const char *pFileName, int StorageType, void *pUser), void *pUser)
 {
 	m_FileDialogStorageType = StorageType;
-	if(m_FileDialogStorageType == IStorageTW::TYPE_ALL)
+	if(m_FileDialogStorageType == IStorage::TYPE_ALL)
 	{
 		int NumStoragesWithFolder = 0;
-		for(int CheckStorageType = IStorageTW::TYPE_SAVE; CheckStorageType < Storage()->NumPaths(); ++CheckStorageType)
+		for(int CheckStorageType = IStorage::TYPE_SAVE; CheckStorageType < Storage()->NumPaths(); ++CheckStorageType)
 		{
 			if(Storage()->FolderExists(pBasePath, CheckStorageType))
 			{
@@ -7319,7 +7319,7 @@ void CEditor::Render()
 		// ctrl+a to append map
 		if(Input()->KeyPress(KEY_A) && ModPressed)
 		{
-			InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", false, CallbackAppendMap, this);
+			InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", false, CallbackAppendMap, this);
 		}
 		// ctrl+o or ctrl+l to open
 		if((Input()->KeyPress(KEY_O) || Input()->KeyPress(KEY_L)) && ModPressed)
@@ -7351,17 +7351,17 @@ void CEditor::Render()
 				}
 				else
 				{
-					InvokeFileDialog(IStorageTW::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CallbackOpenMap, this);
+					InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", false, CallbackOpenMap, this);
 				}
 			}
 		}
 
 		// ctrl+shift+alt+s to save copy
 		if(Input()->KeyPress(KEY_S) && ModPressed && ShiftPressed && AltPressed)
-			InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CallbackSaveCopyMap, this);
+			InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CallbackSaveCopyMap, this);
 		// ctrl+shift+s to save as
 		else if(Input()->KeyPress(KEY_S) && ModPressed && ShiftPressed)
-			InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CallbackSaveMap, this);
+			InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", true, CallbackSaveMap, this);
 		// ctrl+s to save
 		else if(Input()->KeyPress(KEY_S) && ModPressed)
 		{
@@ -7370,11 +7370,11 @@ void CEditor::Render()
 				if(!m_PopupEventWasActivated)
 				{
 					str_copy(m_aFileSaveName, m_aFileName);
-					CallbackSaveMap(m_aFileSaveName, IStorageTW::TYPE_SAVE, this);
+					CallbackSaveMap(m_aFileSaveName, IStorage::TYPE_SAVE, this);
 				}
 			}
 			else
-				InvokeFileDialog(IStorageTW::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", false, CallbackSaveMap, this);
+				InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", false, CallbackSaveMap, this);
 		}
 	}
 
@@ -7593,42 +7593,42 @@ int CEditor::GetTextureUsageFlag()
 IGraphics::CTextureHandle CEditor::GetFrontTexture()
 {
 	if(!m_FrontTexture.IsValid())
-		m_FrontTexture = Graphics()->LoadTexture("editor/front.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_FrontTexture = Graphics()->LoadTexture("editor/front.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_FrontTexture;
 }
 
 IGraphics::CTextureHandle CEditor::GetTeleTexture()
 {
 	if(!m_TeleTexture.IsValid())
-		m_TeleTexture = Graphics()->LoadTexture("editor/tele.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_TeleTexture = Graphics()->LoadTexture("editor/tele.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_TeleTexture;
 }
 
 IGraphics::CTextureHandle CEditor::GetSpeedupTexture()
 {
 	if(!m_SpeedupTexture.IsValid())
-		m_SpeedupTexture = Graphics()->LoadTexture("editor/speedup.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_SpeedupTexture = Graphics()->LoadTexture("editor/speedup.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_SpeedupTexture;
 }
 
 IGraphics::CTextureHandle CEditor::GetSwitchTexture()
 {
 	if(!m_SwitchTexture.IsValid())
-		m_SwitchTexture = Graphics()->LoadTexture("editor/switch.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_SwitchTexture = Graphics()->LoadTexture("editor/switch.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_SwitchTexture;
 }
 
 IGraphics::CTextureHandle CEditor::GetTuneTexture()
 {
 	if(!m_TuneTexture.IsValid())
-		m_TuneTexture = Graphics()->LoadTexture("editor/tune.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_TuneTexture = Graphics()->LoadTexture("editor/tune.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_TuneTexture;
 }
 
 IGraphics::CTextureHandle CEditor::GetEntitiesTexture()
 {
 	if(!m_EntitiesTexture.IsValid())
-		m_EntitiesTexture = Graphics()->LoadTexture("editor/entities/DDNet.png", IStorageTW::TYPE_ALL, GetTextureUsageFlag());
+		m_EntitiesTexture = Graphics()->LoadTexture("editor/entities/DDNet.png", IStorage::TYPE_ALL, GetTextureUsageFlag());
 	return m_EntitiesTexture;
 }
 
@@ -7641,7 +7641,7 @@ void CEditor::Init()
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
 	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pSound = Kernel()->RequestInterface<ISound>();
 	m_UI.Init(Kernel());
 	m_UI.SetPopupMenuClosedCallback([this]() {
@@ -7656,9 +7656,9 @@ void CEditor::Init()
 	for(CEditorComponent &Component : m_vComponents)
 		Component.Init(this);
 
-	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorageTW::TYPE_ALL);
-	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorageTW::TYPE_ALL);
-	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorageTW::TYPE_ALL);
+	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorage::TYPE_ALL);
+	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorage::TYPE_ALL);
+	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorage::TYPE_ALL);
 
 	m_pTilesetPicker = std::make_shared<CLayerTiles>(this, 16, 16);
 	m_pTilesetPicker->MakePalette();
@@ -7843,7 +7843,7 @@ void CEditor::HandleWriterFinishJobs()
 	m_WriterFinishJobs.pop_front();
 
 	char aBuf[2 * IO_MAX_PATH_LENGTH + 128];
-	if(Storage()->FileExists(pJob->GetRealFileName(), IStorageTW::TYPE_SAVE) && !Storage()->RemoveFile(pJob->GetRealFileName(), IStorageTW::TYPE_SAVE))
+	if(Storage()->FileExists(pJob->GetRealFileName(), IStorage::TYPE_SAVE) && !Storage()->RemoveFile(pJob->GetRealFileName(), IStorage::TYPE_SAVE))
 	{
 		str_format(aBuf, sizeof(aBuf), "Saving failed: Could not remove old map file '%s'.", pJob->GetRealFileName());
 		ShowFileDialogError("%s", aBuf);
@@ -7851,7 +7851,7 @@ void CEditor::HandleWriterFinishJobs()
 		return;
 	}
 
-	if(!Storage()->RenameFile(pJob->GetTempFileName(), pJob->GetRealFileName(), IStorageTW::TYPE_SAVE))
+	if(!Storage()->RenameFile(pJob->GetTempFileName(), pJob->GetRealFileName(), IStorage::TYPE_SAVE))
 	{
 		str_format(aBuf, sizeof(aBuf), "Saving failed: Could not move temporary map file '%s' to '%s'.", pJob->GetTempFileName(), pJob->GetRealFileName());
 		ShowFileDialogError("%s", aBuf);
@@ -7875,7 +7875,7 @@ void CEditor::HandleWriterFinishJobs()
 		if(!mem_comp(ServerAddr.ip, aIpv4Localhost, sizeof(aIpv4Localhost)) || !mem_comp(ServerAddr.ip, aIpv6Localhost, sizeof(aIpv6Localhost)))
 		{
 			char aMapName[128];
-			IStorageTW::StripPathAndExtension(pJob->GetRealFileName(), aMapName, sizeof(aMapName));
+			IStorage::StripPathAndExtension(pJob->GetRealFileName(), aMapName, sizeof(aMapName));
 			if(!str_comp(aMapName, CurrentServerInfo.m_aMap))
 				Client()->Rcon("reload");
 		}
@@ -7983,13 +7983,13 @@ void CEditor::OnDialogClose()
 
 void CEditor::LoadCurrentMap()
 {
-	if(Load(m_pClient->GetCurrentMapPath(), IStorageTW::TYPE_SAVE))
+	if(Load(m_pClient->GetCurrentMapPath(), IStorage::TYPE_SAVE))
 	{
 		m_ValidSaveFilename = true;
 	}
 	else
 	{
-		Load(m_pClient->GetCurrentMapPath(), IStorageTW::TYPE_ALL);
+		Load(m_pClient->GetCurrentMapPath(), IStorage::TYPE_ALL);
 		m_ValidSaveFilename = false;
 	}
 
@@ -8019,7 +8019,7 @@ bool CEditor::HandleMapDrop(const char *pFileName, int StorageType)
 	}
 	else
 	{
-		return Load(pFileName, IStorageTW::TYPE_ALL_OR_ABSOLUTE);
+		return Load(pFileName, IStorage::TYPE_ALL_OR_ABSOLUTE);
 	}
 }
 

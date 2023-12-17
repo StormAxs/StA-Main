@@ -23,8 +23,8 @@ struct MapObject // quad pivot or tile layer
 	float m_aaExtendedArea[2][2]; // extended with parallax
 };
 
-bool ReplaceArea(IStorageTW *, const char[3][64], const float[][2][2]);
-bool OpenMaps(IStorageTW *, const char[3][64], CDataFileReader[2], CDataFileWriter &);
+bool ReplaceArea(IStorage *, const char[3][64], const float[][2][2]);
+bool OpenMaps(IStorage *, const char[3][64], CDataFileReader[2], CDataFileWriter &);
 void SaveOutputMap(CDataFileReader &, CDataFileWriter &);
 bool CompareLayers(const char[3][64], CDataFileReader[2]);
 void CompareGroups(const char[3][64], CDataFileReader[2]);
@@ -92,7 +92,7 @@ int main(int argc, const char *argv[])
 		aaMapNames[0], aaMapNames[1], aaaGameAreas[0][0][0], aaaGameAreas[0][1][0], aaaGameAreas[1][0][0], aaaGameAreas[1][1][0],
 		aaaGameAreas[0][0][1] - aaaGameAreas[0][0][0], aaaGameAreas[0][1][1] - aaaGameAreas[0][1][0], aaMapNames[2]);
 
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 	for(int i = 0; i < 1024; i++)
 	{
 		g_apNewData[i] = g_apNewItem[i] = 0;
@@ -102,7 +102,7 @@ int main(int argc, const char *argv[])
 	return ReplaceArea(pStorage, aaMapNames, aaaGameAreas) ? 0 : 1;
 }
 
-bool ReplaceArea(IStorageTW *pStorage, const char aaMapNames[3][64], const float aaaGameAreas[][2][2])
+bool ReplaceArea(IStorage *pStorage, const char aaMapNames[3][64], const float aaaGameAreas[][2][2])
 {
 	CDataFileReader aInputMaps[2];
 	CDataFileWriter OutputMap;
@@ -141,18 +141,18 @@ bool ReplaceArea(IStorageTW *pStorage, const char aaMapNames[3][64], const float
 	return true;
 }
 
-bool OpenMaps(IStorageTW *pStorage, const char aaMapNames[3][64], CDataFileReader aInputMaps[2], CDataFileWriter &OutputMap)
+bool OpenMaps(IStorage *pStorage, const char aaMapNames[3][64], CDataFileReader aInputMaps[2], CDataFileWriter &OutputMap)
 {
 	for(int i = 0; i < 2; i++)
 	{
-		if(!aInputMaps[i].Open(pStorage, aaMapNames[i], IStorageTW::TYPE_ABSOLUTE))
+		if(!aInputMaps[i].Open(pStorage, aaMapNames[i], IStorage::TYPE_ABSOLUTE))
 		{
 			dbg_msg("map_replace_area", "ERROR: unable to open map '%s'", aaMapNames[i]);
 			return false;
 		}
 	}
 
-	if(!OutputMap.Open(pStorage, aaMapNames[2], IStorageTW::TYPE_ABSOLUTE))
+	if(!OutputMap.Open(pStorage, aaMapNames[2], IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_replace_area", "ERROR: unable to open map '%s'", aaMapNames[2]);
 		return false;

@@ -592,7 +592,7 @@ void CChat::StoreSave(const char *pText)
     }
     */
 
-    IOHANDLE File = Storage()->OpenFile(SAVES_FILE, IOFLAG_APPEND, IStorageTW::TYPE_SAVE);
+    IOHANDLE File = Storage()->OpenFile(SAVES_FILE, IOFLAG_APPEND, IStorage::TYPE_SAVE);
     if(!File)
         return;
 

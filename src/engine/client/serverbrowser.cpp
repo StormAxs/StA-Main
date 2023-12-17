@@ -94,7 +94,7 @@ void CServerBrowser::SetBaseInfo(class CNetClient *pClient, const char *pNetVers
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pFavorites = Kernel()->RequestInterface<IFavorites>();
 	m_pFriends = Kernel()->RequestInterface<IFriends>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pPingCache = CreateServerBrowserPingCache(m_pConsole, m_pStorage);
 
 	RegisterCommands();
@@ -1102,7 +1102,7 @@ void CServerBrowser::LoadDDNetInfoJson()
 {
 	void *pBuf;
 	unsigned Length;
-	if(!m_pStorage->ReadFile(DDNET_INFO_FILE, IStorageTW::TYPE_SAVE, &pBuf, &Length))
+	if(!m_pStorage->ReadFile(DDNET_INFO_FILE, IStorage::TYPE_SAVE, &pBuf, &Length))
 		return;
 
 	json_value_free(m_pDDNetInfo);

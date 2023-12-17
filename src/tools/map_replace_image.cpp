@@ -97,7 +97,7 @@ void *ReplaceImageItem(int Index, CMapItemImage *pImgItem, const char *pImgName,
 	pNewImgItem->m_Height = ImgInfo.m_Height;
 
 	g_NewNameID = pImgItem->m_ImageName;
-	IStorageTW::StripPathAndExtension(pImgFile, g_aNewName, sizeof(g_aNewName));
+	IStorage::StripPathAndExtension(pImgFile, g_aNewName, sizeof(g_aNewName));
 	g_NewDataID = pImgItem->m_ImageData;
 	g_pNewData = ImgInfo.m_pData;
 	g_NewDataSize = (size_t)ImgInfo.m_Width * ImgInfo.m_Height * ImgInfo.PixelSize();
@@ -119,7 +119,7 @@ int main(int argc, const char **argv)
 		return -1;
 	}
 
-	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_BASIC, argc, argv);
+	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_BASIC, argc, argv);
 	if(!pStorage)
 	{
 		dbg_msg("map_replace_image", "error loading storage");
@@ -131,7 +131,7 @@ int main(int argc, const char **argv)
 	const char *pImageName = argv[3];
 	const char *pImageFile = argv[4];
 
-	if(!g_DataReader.Open(pStorage, pSourceFileName, IStorageTW::TYPE_ALL))
+	if(!g_DataReader.Open(pStorage, pSourceFileName, IStorage::TYPE_ALL))
 	{
 		dbg_msg("map_replace_image", "failed to open source map. filename='%s'", pSourceFileName);
 		return -1;

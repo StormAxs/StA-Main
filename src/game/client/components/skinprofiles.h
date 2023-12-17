@@ -34,7 +34,7 @@ public:
 class CSkinProfiles : public CComponent
 {
 	static void ConAddProfile(IConsole::IResult *pResult, void *pUserData);
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 	IOHANDLE m_ProfilesFile;
 
 public:

@@ -39,7 +39,7 @@ class CUpdater : public IUpdater
 	friend class CUpdaterFetchTask;
 
 	class IClient *m_pClient;
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 	class IEngine *m_pEngine;
 
 	CLock m_Lock;

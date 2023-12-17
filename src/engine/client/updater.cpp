@@ -96,14 +96,14 @@ CUpdater::CUpdater()
 	m_State = CLEAN;
 	m_Percent = 0;
 
-	IStorageTW::FormatTmpPath(m_aClientExecTmp, sizeof(m_aClientExecTmp), CLIENT_EXEC);
-	IStorageTW::FormatTmpPath(m_aServerExecTmp, sizeof(m_aServerExecTmp), SERVER_EXEC);
+	IStorage::FormatTmpPath(m_aClientExecTmp, sizeof(m_aClientExecTmp), CLIENT_EXEC);
+	IStorage::FormatTmpPath(m_aServerExecTmp, sizeof(m_aServerExecTmp), SERVER_EXEC);
 }
 
 void CUpdater::Init()
 {
 	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 }
 
@@ -241,7 +241,7 @@ void CUpdater::ParseUpdate()
 	char aPath[IO_MAX_PATH_LENGTH];
 	void *pBuf;
 	unsigned Length;
-	if(!m_pStorage->ReadFile(m_pStorage->GetBinaryPath("update/update.json", aPath, sizeof(aPath)), IStorageTW::TYPE_ABSOLUTE, &pBuf, &Length))
+	if(!m_pStorage->ReadFile(m_pStorage->GetBinaryPath("update/update.json", aPath, sizeof(aPath)), IStorage::TYPE_ABSOLUTE, &pBuf, &Length))
 		return;
 
 	json_value *pVersions = json_parse((json_char *)pBuf, Length);

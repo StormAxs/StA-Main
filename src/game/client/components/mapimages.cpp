@@ -127,7 +127,7 @@ void CMapImages::OnMapLoadImpl(class CLayers *pLayers, IMap *pMap)
 		{
 			char aPath[IO_MAX_PATH_LENGTH];
 			str_format(aPath, sizeof(aPath), "mapres/%s.png", pName);
-			m_aTextures[i] = Graphics()->LoadTexture(aPath, IStorageTW::TYPE_ALL, LoadFlag);
+			m_aTextures[i] = Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL, LoadFlag);
 		}
 		else if(Format == CImageInfo::FORMAT_RGBA)
 		{
@@ -225,7 +225,7 @@ IGraphics::CTextureHandle CMapImages::GetEntities(EMapImageEntityLayerType Entit
 
 		CImageInfo ImgInfo;
 		bool ImagePNGLoaded = false;
-		if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL))
+		if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL))
 			ImagePNGLoaded = true;
 		else
 		{
@@ -234,7 +234,7 @@ IGraphics::CTextureHandle CMapImages::GetEntities(EMapImageEntityLayerType Entit
 			if(EntitiesModType == MAP_IMAGE_MOD_TYPE_DDNET)
 			{
 				str_format(aPath, sizeof(aPath), "%s.png", m_aEntitiesPath);
-				if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL))
+				if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL))
 				{
 					ImagePNGLoaded = true;
 					TryDefault = false;
@@ -245,7 +245,7 @@ IGraphics::CTextureHandle CMapImages::GetEntities(EMapImageEntityLayerType Entit
 			{
 				// try default
 				str_format(aPath, sizeof(aPath), "editor/entities_clear/%s.png", gs_apModEntitiesNames[EntitiesModType]);
-				if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL))
+				if(Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL))
 				{
 					ImagePNGLoaded = true;
 				}
@@ -357,7 +357,7 @@ IGraphics::CTextureHandle CMapImages::GetSpeedupArrow()
 	if(!m_SpeedupArrowIsLoaded)
 	{
 		int TextureLoadFlag = (Graphics()->Uses2DTextureArrays() ? IGraphics::TEXLOAD_TO_2D_ARRAY_TEXTURE : IGraphics::TEXLOAD_TO_3D_TEXTURE) | IGraphics::TEXLOAD_NO_2D_TEXTURE;
-		m_SpeedupArrowTexture = Graphics()->LoadTexture("editor/speed_arrow_array.png", IStorageTW::TYPE_ALL, TextureLoadFlag);
+		m_SpeedupArrowTexture = Graphics()->LoadTexture("editor/speed_arrow_array.png", IStorage::TYPE_ALL, TextureLoadFlag);
 
 		m_SpeedupArrowIsLoaded = true;
 	}

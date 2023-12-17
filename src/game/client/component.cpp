@@ -7,7 +7,7 @@ class IEngine *CComponent::Engine() const { return m_pClient->Engine(); }
 class IGraphics *CComponent::Graphics() const { return m_pClient->Graphics(); }
 class ITextRender *CComponent::TextRender() const { return m_pClient->TextRender(); }
 class IInput *CComponent::Input() const { return m_pClient->Input(); }
-class IStorageTW *CComponent::Storage() const { return m_pClient->Storage(); }
+class IStorage *CComponent::Storage() const { return m_pClient->Storage(); }
 class CUI *CComponent::UI() const { return m_pClient->UI(); }
 class ISound *CComponent::Sound() const { return m_pClient->Sound(); }
 class CRenderTools *CComponent::RenderTools() const { return m_pClient->RenderTools(); }

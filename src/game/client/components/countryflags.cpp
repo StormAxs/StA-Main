@@ -16,7 +16,7 @@
 void CCountryFlags::LoadCountryflagsIndexfile()
 {
 	const char *pFilename = "countryflags/index.txt";
-	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
+	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
 	if(!File)
 	{
 		char aBuf[128];
@@ -63,7 +63,7 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 		char aBuf[128];
 		CImageInfo Info;
 		str_format(aBuf, sizeof(aBuf), "countryflags/%s.png", aOrigin);
-		if(!Graphics()->LoadPNG(&Info, aBuf, IStorageTW::TYPE_ALL))
+		if(!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 		{
 			char aMsg[128];
 			str_format(aMsg, sizeof(aMsg), "failed to load '%s'", aBuf);

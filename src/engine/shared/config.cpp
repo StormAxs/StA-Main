@@ -377,7 +377,7 @@ CConfigManager::CConfigManager()
 void CConfigManager::Init()
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 
 	const auto &&AddVariable = [this](SConfigVariable *pVariable) {
 		m_vpAllVariables.push_back(pVariable);
@@ -466,7 +466,7 @@ bool CConfigManager::Save()
 		return true;
 
 	char aConfigFileTmp[IO_MAX_PATH_LENGTH];
-	m_ConfigFile = m_pStorage->OpenFile(IStorageTW::FormatTmpPath(aConfigFileTmp, sizeof(aConfigFileTmp), CONFIG_FILE), IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+	m_ConfigFile = m_pStorage->OpenFile(IStorage::FormatTmpPath(aConfigFileTmp, sizeof(aConfigFileTmp), CONFIG_FILE), IOFLAG_WRITE, IStorage::TYPE_SAVE);
 
 	if(!m_ConfigFile)
 	{
@@ -512,7 +512,7 @@ bool CConfigManager::Save()
 		return false;
 	}
 
-	if(!m_pStorage->RenameFile(aConfigFileTmp, CONFIG_FILE, IStorageTW::TYPE_SAVE))
+	if(!m_pStorage->RenameFile(aConfigFileTmp, CONFIG_FILE, IStorage::TYPE_SAVE))
 	{
 		log_error("config", "ERROR: renaming %s to " CONFIG_FILE " failed", aConfigFileTmp);
 		return false;

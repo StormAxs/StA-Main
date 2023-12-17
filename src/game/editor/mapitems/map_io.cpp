@@ -499,7 +499,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 
 				// load external
 				CImageInfo ImgInfo;
-				if(m_pEditor->Graphics()->LoadPNG(&ImgInfo, aBuf, IStorageTW::TYPE_ALL))
+				if(m_pEditor->Graphics()->LoadPNG(&ImgInfo, aBuf, IStorage::TYPE_ALL))
 				{
 					pImg->m_Width = ImgInfo.m_Width;
 					pImg->m_Height = ImgInfo.m_Height;
@@ -568,7 +568,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 				str_format(aBuf, sizeof(aBuf), "mapres/%s.opus", pSound->m_aName);
 
 				// load external
-				if(m_pEditor->Storage()->ReadFile(aBuf, IStorageTW::TYPE_ALL, &pSound->m_pData, &pSound->m_DataSize))
+				if(m_pEditor->Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pSound->m_pData, &pSound->m_DataSize))
 				{
 					pSound->m_SoundID = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
 				}

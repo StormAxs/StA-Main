@@ -191,7 +191,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		static CButtonContainer s_SettingsButtonID;
 		if(DoButton_Menu(&s_SettingsButtonID, Localize("Settings file"), 0, &SettingsButton))
 		{
-			Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, CONFIG_FILE, aBuf, sizeof(aBuf));
+			Storage()->GetCompletePath(IStorage::TYPE_SAVE, CONFIG_FILE, aBuf, sizeof(aBuf));
 			if(!open_file(aBuf))
 			{
 				dbg_msg("menus", "couldn't open file '%s'", aBuf);
@@ -207,7 +207,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		static CButtonContainer s_ConfigButtonID;
 		if(DoButton_Menu(&s_ConfigButtonID, Localize("Config directory"), 0, &ConfigButton))
 		{
-			Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, "", aBuf, sizeof(aBuf));
+			Storage()->GetCompletePath(IStorage::TYPE_SAVE, "", aBuf, sizeof(aBuf));
 			if(!open_file(aBuf))
 			{
 				dbg_msg("menus", "couldn't open file '%s'", aBuf);
@@ -224,8 +224,8 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		static CButtonContainer s_ThemesButtonID;
 		if(DoButton_Menu(&s_ThemesButtonID, Localize("Themes directory"), 0, &DirectoryButton))
 		{
-			Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, "themes", aBuf, sizeof(aBuf));
-			Storage()->CreateFolder("themes", IStorageTW::TYPE_SAVE);
+			Storage()->GetCompletePath(IStorage::TYPE_SAVE, "themes", aBuf, sizeof(aBuf));
+			Storage()->CreateFolder("themes", IStorage::TYPE_SAVE);
 			if(!open_file(aBuf))
 			{
 				dbg_msg("menus", "couldn't open file '%s'", aBuf);
@@ -971,8 +971,8 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 	static CButtonContainer s_DirectoryButtonID;
 	if(DoButton_Menu(&s_DirectoryButtonID, Localize("Skins directory"), 0, &DirectoryButton))
 	{
-		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, "skins", aBuf, sizeof(aBuf));
-		Storage()->CreateFolder("skins", IStorageTW::TYPE_SAVE);
+		Storage()->GetCompletePath(IStorage::TYPE_SAVE, "skins", aBuf, sizeof(aBuf));
+		Storage()->CreateFolder("skins", IStorage::TYPE_SAVE);
 		if(!open_file(aBuf))
 		{
 			dbg_msg("menus", "couldn't open file '%s'", aBuf);
@@ -3481,7 +3481,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		MainView.HSplitTop(40.0f, &Section, &MainView);
 		UI()->DoLabel(&Section, ("GO TO Appearence->Chat "), 40.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
+		MainView.VSplitLeft(5.1f, 0x0, &MainView);
 		MainView.HSplitTop(5.1f, 0x0, &MainView);
 	}
 	if(s_CurTab == STA_TAB_PAGE3)
@@ -3491,7 +3491,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		MainView.HSplitTop(40.0f, &Section, &MainView);
 		UI()->DoLabel(&Section, ("Frozen Tee Display "), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
+		MainView.VSplitLeft(3.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
 		MainView.HSplitTop(5.1f, 0x0, &MainView);
 
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &MainView, LineMargin);
@@ -3520,9 +3520,8 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		CUIRect Rainbow;
 		MainView.HSplitTop(20.0f, &Rainbow, &MainView);
 		UI()->DoLabel(&Rainbow, ("Rainbow Tee(s)"), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
-		MainView.HSplitTop(20.0f, &Rainbow, &MainView);
-
+		MainView.VSplitLeft(5.0f, 0x0, &MainView);
+		MainView.HSplitTop(5.0f, &Rainbow, &MainView);
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClRainbow, ("Rainbow Skin"), &g_Config.m_ClRainbow, &Rainbow, LineMargin);
 
 		// ***** OUTLINES ***** //
@@ -3997,7 +3996,7 @@ void CMenus::RenderSettingsProfiles(CUIRect MainView)
 	FileButton.VSplitLeft(130.0, &FileButton, 0);
 	if(DoButton_Menu(&s_ProfilesFile, Localize("Profiles file"), 0, &FileButton))
 	{
-		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, PROFILES_FILE, aTempBuf, sizeof(aTempBuf));
+		Storage()->GetCompletePath(IStorage::TYPE_SAVE, PROFILES_FILE, aTempBuf, sizeof(aTempBuf));
 		if(!open_file(aTempBuf))
 		{
 			dbg_msg("menus", "couldn't open file");

@@ -41,7 +41,7 @@
 
 #include <engine/graphics.h>
 
-class IStorageTW;
+class IStorage;
 
 // ------------ CGraphicsBackend_Threaded
 
@@ -999,7 +999,7 @@ CGraphicsBackend_SDL_GL::CGraphicsBackend_SDL_GL(TTranslateFunc &&TranslateFunc)
 	mem_zero(m_aErrorString, std::size(m_aErrorString));
 }
 
-int CGraphicsBackend_SDL_GL::Init(const char *pName, int *pScreen, int *pWidth, int *pHeight, int *pRefreshRate, int *pFsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight, int *pCurrentWidth, int *pCurrentHeight, IStorageTW *pStorage)
+int CGraphicsBackend_SDL_GL::Init(const char *pName, int *pScreen, int *pWidth, int *pHeight, int *pRefreshRate, int *pFsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight, int *pCurrentWidth, int *pCurrentHeight, IStorage *pStorage)
 {
 #if defined(CONF_HEADLESS_CLIENT)
 	int InitError = 0;

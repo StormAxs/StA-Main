@@ -8,7 +8,7 @@
 
 TEST(Datafile, ExtendedType)
 {
-	auto pStorage = std::unique_ptr<IStorageTW>(CreateLocalStorage());
+	auto pStorage = std::unique_ptr<IStorage>(CreateLocalStorage());
 	CTestInfo Info;
 
 	CMapItemTest ItemTest;
@@ -29,7 +29,7 @@ TEST(Datafile, ExtendedType)
 
 	{
 		CDataFileReader Reader;
-		Reader.Open(pStorage.get(), Info.m_aFilename, IStorageTW::TYPE_ALL);
+		Reader.Open(pStorage.get(), Info.m_aFilename, IStorage::TYPE_ALL);
 
 		int Start, Num;
 		Reader.GetType(MAPITEMTYPE_TEST, &Start, &Num);
@@ -57,13 +57,13 @@ TEST(Datafile, ExtendedType)
 
 	if(!HasFailure())
 	{
-		pStorage->RemoveFile(Info.m_aFilename, IStorageTW::TYPE_SAVE);
+		pStorage->RemoveFile(Info.m_aFilename, IStorage::TYPE_SAVE);
 	}
 }
 
 TEST(Datafile, StringData)
 {
-	auto pStorage = std::unique_ptr<IStorageTW>(CreateLocalStorage());
+	auto pStorage = std::unique_ptr<IStorage>(CreateLocalStorage());
 	CTestInfo Info;
 
 	{
@@ -84,7 +84,7 @@ TEST(Datafile, StringData)
 
 	{
 		CDataFileReader Reader;
-		Reader.Open(pStorage.get(), Info.m_aFilename, IStorageTW::TYPE_ALL);
+		Reader.Open(pStorage.get(), Info.m_aFilename, IStorage::TYPE_ALL);
 
 		EXPECT_EQ(Reader.GetDataString(-1000), nullptr);
 		EXPECT_STREQ(Reader.GetDataString(-1), "");
@@ -102,6 +102,6 @@ TEST(Datafile, StringData)
 
 	if(!HasFailure())
 	{
-		pStorage->RemoveFile(Info.m_aFilename, IStorageTW::TYPE_SAVE);
+		pStorage->RemoveFile(Info.m_aFilename, IStorage::TYPE_SAVE);
 	}
 }

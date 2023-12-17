@@ -45,7 +45,7 @@ protected:
 	/**
 	 * Get the storage interface.
 	 */
-	class IStorageTW *Storage() const;
+	class IStorage *Storage() const;
 	/**
 	 * Get the ui interface.
 	 */

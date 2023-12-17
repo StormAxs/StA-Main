@@ -5,10 +5,10 @@
 struct SListDirectoryContext
 {
 	const char *m_pPath;
-	IStorageTW *m_pStorage;
+	IStorage *m_pStorage;
 };
 
-inline void ProcessItem(const char *pItemName, IStorageTW *pStorage)
+inline void ProcessItem(const char *pItemName, IStorage *pStorage)
 {
 	char aConfig[2048];
 
@@ -50,7 +50,7 @@ int main(int argc, const char **argv) // NOLINT(misc-definitions-in-headers)
 	CCmdlineFix CmdlineFix(&argc, &argv);
 	log_set_global_logger_default();
 
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 	if(!pStorage)
 		return -1;
 
@@ -63,7 +63,7 @@ int main(int argc, const char **argv) // NOLINT(misc-definitions-in-headers)
 	else if(argc == 2 && fs_is_dir(argv[1]))
 	{
 		SListDirectoryContext Context = {argv[1], pStorage};
-		pStorage->ListDirectory(IStorageTW::TYPE_ALL, argv[1], ListdirCallback, &Context);
+		pStorage->ListDirectory(IStorage::TYPE_ALL, argv[1], ListdirCallback, &Context);
 	}
 
 	for(int i = 1; i < argc; i++)

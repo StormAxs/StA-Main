@@ -737,7 +737,7 @@ void CGraphics_Threaded::KickCommandBuffer()
 
 class CScreenshotSaveJob : public IJob
 {
-	IStorageTW *m_pStorage;
+	IStorage *m_pStorage;
 	IConsole *m_pConsole;
 	char m_aName[IO_MAX_PATH_LENGTH];
 	int m_Width;
@@ -748,7 +748,7 @@ class CScreenshotSaveJob : public IJob
 	{
 		char aWholePath[IO_MAX_PATH_LENGTH];
 		char aBuf[64 + IO_MAX_PATH_LENGTH];
-		IOHANDLE File = m_pStorage->OpenFile(m_aName, IOFLAG_WRITE, IStorageTW::TYPE_SAVE, aWholePath, sizeof(aWholePath));
+		IOHANDLE File = m_pStorage->OpenFile(m_aName, IOFLAG_WRITE, IStorage::TYPE_SAVE, aWholePath, sizeof(aWholePath));
 		if(File)
 		{
 			TImageByteBuffer ByteBuffer;
@@ -768,7 +768,7 @@ class CScreenshotSaveJob : public IJob
 	}
 
 public:
-	CScreenshotSaveJob(IStorageTW *pStorage, IConsole *pConsole, const char *pName, int Width, int Height, void *pData) :
+	CScreenshotSaveJob(IStorage *pStorage, IConsole *pConsole, const char *pName, int Width, int Height, void *pData) :
 		m_pStorage(pStorage),
 		m_pConsole(pConsole),
 		m_Width(Width),
@@ -2549,7 +2549,7 @@ int CGraphics_Threaded::InitWindow()
 int CGraphics_Threaded::Init()
 {
 	// fetch pointers
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 

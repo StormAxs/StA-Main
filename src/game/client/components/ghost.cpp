@@ -450,13 +450,13 @@ void CGhost::StopRecord(int Time)
 
 		// save new ghost file
 		if(Item.HasFile())
-			Storage()->RenameFile(m_aTmpFilename, Item.m_aFilename, IStorageTW::TYPE_SAVE);
+			Storage()->RenameFile(m_aTmpFilename, Item.m_aFilename, IStorage::TYPE_SAVE);
 
 		// add item to menu list
 		m_pClient->m_Menus.UpdateOwnGhost(Item);
 	}
 	else if(RecordingToFile) // no new record
-		Storage()->RemoveFile(m_aTmpFilename, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(m_aTmpFilename, IStorage::TYPE_SAVE);
 
 	m_aTmpFilename[0] = 0;
 

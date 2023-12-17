@@ -14,7 +14,7 @@ TEST(ServerBrowser, PingCache)
 	Info.m_DeleteTestStorageFilesOnSuccess = true;
 
 	auto pConsole = CreateConsole(CFGFLAG_CLIENT);
-	auto pStorage = std::unique_ptr<IStorageTW>(Info.CreateTestStorage());
+	auto pStorage = std::unique_ptr<IStorage>(Info.CreateTestStorage());
 	auto pPingCache = std::unique_ptr<IServerBrowserPingCache>(CreateServerBrowserPingCache(pConsole.get(), pStorage.get()));
 
 	NETADDR Localhost4, Localhost6, OtherLocalhost4, OtherLocalhost6;

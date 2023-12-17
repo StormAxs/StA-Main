@@ -1813,7 +1813,7 @@ int CMenus::CCommunityIconDownloadJob::OnCompletion(int State)
 	State = CHttpRequest::OnCompletion(State);
 	if(State == HTTP_DONE)
 	{
-		if(m_pMenus->LoadCommunityIconFile(Dest(), IStorageTW::TYPE_SAVE, m_ImageInfo, m_Sha256))
+		if(m_pMenus->LoadCommunityIconFile(Dest(), IStorage::TYPE_SAVE, m_ImageInfo, m_Sha256))
 			m_Success = true;
 		else
 			State = HTTP_ERROR;
@@ -1823,9 +1823,9 @@ int CMenus::CCommunityIconDownloadJob::OnCompletion(int State)
 
 CMenus::CCommunityIconDownloadJob::CCommunityIconDownloadJob(CMenus *pMenus, const char *pCommunityId, const char *pUrl, const SHA256_DIGEST &Sha256) :
 	CHttpRequest(pUrl),
-	CAbstractCommunityIconJob(pMenus, pCommunityId, IStorageTW::TYPE_SAVE)
+	CAbstractCommunityIconJob(pMenus, pCommunityId, IStorage::TYPE_SAVE)
 {
-	WriteToFile(pMenus->Storage(), m_aPath, IStorageTW::TYPE_SAVE);
+	WriteToFile(pMenus->Storage(), m_aPath, IStorage::TYPE_SAVE);
 	ExpectSha256(Sha256);
 	Timeout(CTimeout{0, 0, 0, 0});
 	LogProgress(HTTPLOG::FAILURE);

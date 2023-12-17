@@ -867,7 +867,7 @@ void CGameContext::ConDrySave(IConsole::IResult *pResult, void *pUserData)
 	str_timestamp(aTimestamp, sizeof(aTimestamp));
 	char aBuf[64];
 	str_format(aBuf, sizeof(aBuf), "%s_%s_%s.save", pSelf->Server()->GetMapName(), aTimestamp, pSelf->Server()->GetAuthName(pResult->m_ClientID));
-	IOHANDLE File = pSelf->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorageTW::TYPE_ALL);
+	IOHANDLE File = pSelf->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
 	if(!File)
 		return;
 

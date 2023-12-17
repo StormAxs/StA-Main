@@ -7,10 +7,10 @@
 #include <engine/storage.h>
 #include <game/mapitems.h>
 
-bool Process(IStorageTW *pStorage, const char *pMapName, const char *pPathSave)
+bool Process(IStorage *pStorage, const char *pMapName, const char *pPathSave)
 {
 	CDataFileReader Reader;
-	if(!Reader.Open(pStorage, pMapName, IStorageTW::TYPE_ABSOLUTE))
+	if(!Reader.Open(pStorage, pMapName, IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_extract", "error opening map '%s'", pMapName);
 		return false;
@@ -119,7 +119,7 @@ int main(int argc, const char *argv[])
 	CCmdlineFix CmdlineFix(&argc, &argv);
 	log_set_global_logger_default();
 
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 	if(!pStorage)
 		return -1;
 

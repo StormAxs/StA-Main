@@ -50,11 +50,11 @@ class CLocalizationDatabase
 	CHeap m_StringsHeap;
 
 public:
-	void LoadIndexfile(class IStorageTW *pStorage, class IConsole *pConsole);
+	void LoadIndexfile(class IStorage *pStorage, class IConsole *pConsole);
 	const std::vector<CLanguage> &Languages() const { return m_vLanguages; }
 	void SelectDefaultLanguage(class IConsole *pConsole, char *pFilename, size_t Length) const;
 
-	bool Load(const char *pFilename, class IStorageTW *pStorage, class IConsole *pConsole);
+	bool Load(const char *pFilename, class IStorage *pStorage, class IConsole *pConsole);
 
 	void AddString(const char *pOrgStr, const char *pNewStr, const char *pContext);
 	const char *FindString(unsigned Hash, unsigned ContextHash) const;

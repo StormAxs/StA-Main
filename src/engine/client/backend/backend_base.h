@@ -135,7 +135,7 @@ public:
 		uint32_t m_Width;
 		uint32_t m_Height;
 
-		class IStorageTW *m_pStorage;
+		class IStorage *m_pStorage;
 		std::atomic<uint64_t> *m_pTextureMemoryUsage;
 		std::atomic<uint64_t> *m_pBufferMemoryUsage;
 		std::atomic<uint64_t> *m_pStreamMemoryUsage;

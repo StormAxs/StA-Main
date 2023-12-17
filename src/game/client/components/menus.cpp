@@ -69,7 +69,7 @@ CMenus::CMenus()
 	m_ShowStart = true;
 
 	str_copy(m_aCurrentDemoFolder, "demos");
-	m_DemolistStorageType = IStorageTW::TYPE_ALL;
+	m_DemolistStorageType = IStorage::TYPE_ALL;
 
 	m_DemoPlayerState = DEMOPLAYER_NONE;
 	m_Dummy = false;
@@ -859,7 +859,7 @@ void CMenus::OnInit()
 	Console()->Chain("cl_asset_hud", ConchainAssetHud, this);
 	Console()->Chain("cl_asset_extras", ConchainAssetExtras, this);
 
-	m_TextureBlob = Graphics()->LoadTexture("blob.png", IStorageTW::TYPE_ALL);
+	m_TextureBlob = Graphics()->LoadTexture("blob.png", IStorage::TYPE_ALL);
 
 	// setup load amount
 	const int NumMenuImages = 5;
@@ -872,11 +872,11 @@ void CMenus::OnInit()
 
 	// load menu images
 	m_vMenuImages.clear();
-	Storage()->ListDirectory(IStorageTW::TYPE_ALL, "menuimages", MenuImageScan, this);
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "menuimages", MenuImageScan, this);
 
 	// load community icons
 	m_vCommunityIcons.clear();
-	Storage()->ListDirectory(IStorageTW::TYPE_ALL, "communityicons", CommunityIconScan, this);
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "communityicons", CommunityIconScan, this);
 }
 
 void CMenus::OnConsoleInit()
@@ -1571,11 +1571,11 @@ int CMenus::Render()
 				str_format(aVideoPath, sizeof(aVideoPath), "videos/%s", m_DemoRenderInput.GetString());
 				if(!str_endswith(aVideoPath, ".mp4"))
 					str_append(aVideoPath, ".mp4");
-				if(Storage()->FolderExists(aVideoPath, IStorageTW::TYPE_SAVE))
+				if(Storage()->FolderExists(aVideoPath, IStorage::TYPE_SAVE))
 				{
 					PopupMessage(Localize("Error"), Localize("A folder with this name already exists"), Localize("Ok"), POPUP_RENDER_DEMO);
 				}
-				else if(Storage()->FileExists(aVideoPath, IStorageTW::TYPE_SAVE))
+				else if(Storage()->FileExists(aVideoPath, IStorage::TYPE_SAVE))
 				{
 					char aMessage[128 + IO_MAX_PATH_LENGTH];
 					str_format(aMessage, sizeof(aMessage), Localize("File '%s' already exists, do you want to overwrite it?"), m_DemoRenderInput.GetString());

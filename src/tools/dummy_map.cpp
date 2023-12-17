@@ -7,7 +7,7 @@
 
 #include <game/mapitems.h>
 
-void CreateEmptyMap(IStorageTW *pStorage)
+void CreateEmptyMap(IStorage *pStorage)
 {
 	const char *pMapName = "maps/dummy3.map";
 
@@ -82,7 +82,7 @@ void CreateEmptyMap(IStorageTW *pStorage)
 	CDataFileReader Reader;
 	void *pData;
 	unsigned DataSize;
-	if(!pStorage->ReadFile(pMapName, IStorageTW::TYPE_ALL, &pData, &DataSize))
+	if(!pStorage->ReadFile(pMapName, IStorage::TYPE_ALL, &pData, &DataSize))
 	{
 		dbg_msg("dummy_map", "couldn't open map file '%s' for reading", pMapName);
 		return;
@@ -109,7 +109,7 @@ int main(int argc, const char **argv)
 {
 	CCmdlineFix CmdlineFix(&argc, &argv);
 	log_set_global_logger_default();
-	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_SERVER, argc, argv);
+	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_SERVER, argc, argv);
 	if(!pStorage)
 		return -1;
 	CreateEmptyMap(pStorage);

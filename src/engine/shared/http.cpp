@@ -71,7 +71,7 @@ int CurlDebug(CURL *pHandle, curl_infotype Type, char *pData, size_t DataSize, v
 	return 0;
 }
 
-bool HttpInit(IStorageTW *pStorage)
+bool HttpInit(IStorage *pStorage)
 {
 	if(curl_global_init(CURL_GLOBAL_DEFAULT))
 	{
@@ -395,7 +395,7 @@ int CHttpRequest::OnCompletion(int State)
 	return State;
 }
 
-void CHttpRequest::WriteToFile(IStorageTW *pStorage, const char *pDest, int StorageType)
+void CHttpRequest::WriteToFile(IStorage *pStorage, const char *pDest, int StorageType)
 {
 	m_WriteToFile = true;
 	str_copy(m_aDest, pDest);

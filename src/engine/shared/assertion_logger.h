@@ -4,8 +4,8 @@
 #include <memory>
 
 class ILogger;
-class IStorageTW;
+class IStorage;
 
-std::unique_ptr<ILogger> CreateAssertionLogger(IStorageTW *pStorage, const char *pGameName);
+std::unique_ptr<ILogger> CreateAssertionLogger(IStorage *pStorage, const char *pGameName);
 
 #endif

@@ -938,7 +938,7 @@ void CGameConsole::Dump(int Type)
 	char aFilename[IO_MAX_PATH_LENGTH];
 	str_timestamp(aBuf, sizeof(aBuf));
 	str_format(aFilename, sizeof(aFilename), "dumps/%s_dump_%s.txt", pConsole->m_pName, aBuf);
-	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	if(File)
 	{
 		pConsole->PumpBacklogPending();

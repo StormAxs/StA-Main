@@ -849,7 +849,7 @@ void CMenus::RenderDemoPlayerSliceSavePopup(CUIRect MainView)
 		{
 			char aPath[IO_MAX_PATH_LENGTH];
 			str_format(aPath, sizeof(aPath), "%s/%s.demo", m_aCurrentDemoFolder, m_DemoSliceInput.GetString());
-			if(Storage()->FileExists(aPath, IStorageTW::TYPE_SAVE))
+			if(Storage()->FileExists(aPath, IStorage::TYPE_SAVE))
 			{
 				s_ConfirmPopupContext.Reset();
 				s_ConfirmPopupContext.YesNoButtons();
@@ -880,8 +880,8 @@ void CMenus::RenderDemoPlayerSliceSavePopup(CUIRect MainView)
 			m_StartPaused = false;
 			m_DemoRenderInput.Set(m_aCurrentDemoSelectionName);
 			UI()->SetActiveItem(&m_DemoRenderInput);
-			if(m_DemolistStorageType != IStorageTW::TYPE_ALL && m_DemolistStorageType != IStorageTW::TYPE_SAVE)
-				m_DemolistStorageType = IStorageTW::TYPE_ALL; // Select a storage type containing the sliced demo
+			if(m_DemolistStorageType != IStorage::TYPE_ALL && m_DemolistStorageType != IStorage::TYPE_SAVE)
+				m_DemolistStorageType = IStorage::TYPE_ALL; // Select a storage type containing the sliced demo
 		}
 #endif
 	}
@@ -933,7 +933,7 @@ void CMenus::DemolistPopulate()
 	m_vDemos.clear();
 
 	int NumStoragesWithDemos = 0;
-	for(int StorageType = IStorageTW::TYPE_SAVE; StorageType < Storage()->NumPaths(); ++StorageType)
+	for(int StorageType = IStorage::TYPE_SAVE; StorageType < Storage()->NumPaths(); ++StorageType)
 	{
 		if(Storage()->FolderExists("demos", StorageType))
 		{
@@ -953,11 +953,11 @@ void CMenus::DemolistPopulate()
 			Item.m_Date = 0;
 			Item.m_IsDir = true;
 			Item.m_IsLink = true;
-			Item.m_StorageType = IStorageTW::TYPE_ALL;
+			Item.m_StorageType = IStorage::TYPE_ALL;
 			m_vDemos.push_back(Item);
 		}
 
-		for(int StorageType = IStorageTW::TYPE_SAVE; StorageType < Storage()->NumPaths(); ++StorageType)
+		for(int StorageType = IStorage::TYPE_SAVE; StorageType < Storage()->NumPaths(); ++StorageType)
 		{
 			if(Storage()->FolderExists("demos", StorageType))
 			{
@@ -1438,7 +1438,7 @@ void CMenus::RenderDemoBrowserButtons(CUIRect ButtonsView, bool WasListboxItemAc
 	}
 
 	// demos directory button
-	if(m_DemolistSelectedIndex >= 0 && m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType != IStorageTW::TYPE_ALL)
+	if(m_DemolistSelectedIndex >= 0 && m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType != IStorage::TYPE_ALL)
 	{
 		CUIRect DemosDirectoryButton;
 		ButtonBarBottom.VSplitLeft(ButtonBarBottom.h * 10.0f, &DemosDirectoryButton, &ButtonBarBottom);
@@ -1447,7 +1447,7 @@ void CMenus::RenderDemoBrowserButtons(CUIRect ButtonsView, bool WasListboxItemAc
 		if(DoButton_Menu(&s_DemosDirectoryButton, Localize("Demos directory"), 0, &DemosDirectoryButton))
 		{
 			char aBuf[IO_MAX_PATH_LENGTH];
-			Storage()->GetCompletePath(m_DemolistSelectedIndex >= 0 ? m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType : IStorageTW::TYPE_SAVE, m_aCurrentDemoFolder[0] == '\0' ? "demos" : m_aCurrentDemoFolder, aBuf, sizeof(aBuf));
+			Storage()->GetCompletePath(m_DemolistSelectedIndex >= 0 ? m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType : IStorage::TYPE_SAVE, m_aCurrentDemoFolder[0] == '\0' ? "demos" : m_aCurrentDemoFolder, aBuf, sizeof(aBuf));
 			if(!open_file(aBuf))
 			{
 				dbg_msg("menus", "couldn't open file '%s'", aBuf);
@@ -1478,7 +1478,7 @@ void CMenus::RenderDemoBrowserButtons(CUIRect ButtonsView, bool WasListboxItemAc
 					if(fs_parent_dir(m_aCurrentDemoFolder))
 					{
 						m_aCurrentDemoFolder[0] = '\0';
-						if(m_DemolistStorageType == IStorageTW::TYPE_ALL)
+						if(m_DemolistStorageType == IStorage::TYPE_ALL)
 						{
 							m_aCurrentDemoSelectionName[0] = '\0'; // will select first list item
 						}
@@ -1522,7 +1522,7 @@ void CMenus::RenderDemoBrowserButtons(CUIRect ButtonsView, bool WasListboxItemAc
 
 		if(m_aCurrentDemoFolder[0] != '\0')
 		{
-			if(str_comp(m_vpFilteredDemos[m_DemolistSelectedIndex]->m_aFilename, "..") != 0 && m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType == IStorageTW::TYPE_SAVE)
+			if(str_comp(m_vpFilteredDemos[m_DemolistSelectedIndex]->m_aFilename, "..") != 0 && m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType == IStorage::TYPE_SAVE)
 			{
 				// rename button
 				CUIRect RenameButton;

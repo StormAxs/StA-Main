@@ -5,7 +5,7 @@
 class CServerInfo;
 class IConsole;
 class IEngine;
-class IStorageTW;
+class IStorage;
 
 class IServerBrowserHttp
 {
@@ -25,5 +25,5 @@ public:
 	virtual const NETADDR &LegacyServer(int Index) const = 0;
 };
 
-IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IConsole *pConsole, IStorageTW *pStorage, const char *pPreviousBestUrl);
+IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IConsole *pConsole, IStorage *pStorage, const char *pPreviousBestUrl);
 #endif // ENGINE_CLIENT_SERVERBROWSER_HTTP_H

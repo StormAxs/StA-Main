@@ -81,7 +81,7 @@ CClient::CClient() :
 	for(auto &DemoRecorder : m_aDemoRecorder)
 		DemoRecorder = CDemoRecorder(&m_SnapshotDelta);
 	m_LastRenderTime = time_get();
-	IStorageTW::FormatTmpPath(m_aDDNetInfoTmp, sizeof(m_aDDNetInfoTmp), DDNET_INFO_FILE);
+	IStorage::FormatTmpPath(m_aDDNetInfoTmp, sizeof(m_aDDNetInfoTmp), DDNET_INFO_FILE);
 	mem_zero(m_aInputs, sizeof(m_aInputs));
 	mem_zero(m_aapSnapshots, sizeof(m_aapSnapshots));
 	for(auto &SnapshotStorage : m_aSnapshotStorage)
@@ -201,9 +201,9 @@ void CClient::SendMapRequest()
 	if(m_MapdownloadFileTemp)
 	{
 		io_close(m_MapdownloadFileTemp);
-		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
 	}
-	m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+	m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	CMsgPacker Msg(NETMSG_REQUEST_MAP_DATA, true);
 	Msg.AddInt(m_MapdownloadChunk);
 	SendMsg(CONN_MAIN, &Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH);
@@ -579,7 +579,7 @@ void CClient::DisconnectWithReason(const char *pReason)
 	if(m_MapdownloadFileTemp)
 	{
 		io_close(m_MapdownloadFileTemp);
-		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
 	}
 	m_MapdownloadFileTemp = 0;
 	m_MapdownloadSha256Present = false;
@@ -694,7 +694,7 @@ void CClient::ServerInfoRequest()
 
 void CClient::LoadDebugFont()
 {
-	m_DebugFont = Graphics()->LoadTexture("debug_font.png", IStorageTW::TYPE_ALL);
+	m_DebugFont = Graphics()->LoadTexture("debug_font.png", IStorage::TYPE_ALL);
 }
 
 // ---
@@ -983,7 +983,7 @@ static void FormatMapDownloadFilename(const char *pName, const SHA256_DIGEST *pS
 	char aSuffix[32];
 	if(Temp)
 	{
-		IStorageTW::FormatTmpPath(aSuffix, sizeof(aSuffix), "");
+		IStorage::FormatTmpPath(aSuffix, sizeof(aSuffix), "");
 	}
 	else
 	{
@@ -1042,7 +1042,7 @@ const char *CClient::LoadMapSearch(const char *pMapName, SHA256_DIGEST *pWantedS
 	// search for the map within subfolders
 	char aFilename[IO_MAX_PATH_LENGTH];
 	str_format(aFilename, sizeof(aFilename), "%s.map", pMapName);
-	if(Storage()->FindFile(aFilename, "maps", IStorageTW::TYPE_ALL, aBuf, sizeof(aBuf)))
+	if(Storage()->FindFile(aFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
 	{
 		pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
 		if(!pError)
@@ -1435,7 +1435,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 					if(m_MapdownloadFileTemp)
 					{
 						io_close(m_MapdownloadFileTemp);
-						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageTW::TYPE_SAVE);
+						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
 					}
 
 					// start map download
@@ -1465,7 +1465,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 						bool UseConfigUrl = str_comp(g_Config.m_ClMapDownloadUrl, "https://maps.ddnet.org") != 0 || m_aMapDownloadUrl[0] == '\0';
 						str_format(aUrl, sizeof(aUrl), "%s/%s", UseConfigUrl ? g_Config.m_ClMapDownloadUrl : m_aMapDownloadUrl, aEscaped);
 
-						m_pMapdownloadTask = HttpGetFile(pMapUrl ? pMapUrl : aUrl, Storage(), m_aMapdownloadFilenameTemp, IStorageTW::TYPE_SAVE);
+						m_pMapdownloadTask = HttpGetFile(pMapUrl ? pMapUrl : aUrl, Storage(), m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
 						m_pMapdownloadTask->Timeout(CTimeout{g_Config.m_ClMapDownloadConnectTimeoutMs, 0, g_Config.m_ClMapDownloadLowSpeedLimit, g_Config.m_ClMapDownloadLowSpeedTime});
 						m_pMapdownloadTask->MaxResponseSize(1024 * 1024 * 1024); // 1 GiB
 						m_pMapdownloadTask->ExpectSha256(*pMapSha256);
@@ -2013,9 +2013,9 @@ void CClient::FinishMapDownload()
 	SHA256_DIGEST *pSha256 = m_MapdownloadSha256Present ? &m_MapdownloadSha256 : 0;
 
 	bool FileSuccess = true;
-	if(Storage()->FileExists(m_aMapdownloadFilename, IStorageTW::TYPE_SAVE))
-		FileSuccess &= Storage()->RemoveFile(m_aMapdownloadFilename, IStorageTW::TYPE_SAVE);
-	FileSuccess &= Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorageTW::TYPE_SAVE);
+	if(Storage()->FileExists(m_aMapdownloadFilename, IStorage::TYPE_SAVE))
+		FileSuccess &= Storage()->RemoveFile(m_aMapdownloadFilename, IStorage::TYPE_SAVE);
+	FileSuccess &= Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorage::TYPE_SAVE);
 	if(!FileSuccess)
 	{
 		ResetMapDownload();
@@ -2045,7 +2045,7 @@ void CClient::FinishMapDownload()
 		{
 			io_close(m_MapdownloadFileTemp);
 			m_MapdownloadFileTemp = 0;
-			Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageTW::TYPE_SAVE);
+			Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
 		}
 		ResetMapDownload();
 		DisconnectWithReason(pError);
@@ -2063,12 +2063,12 @@ void CClient::ResetDDNetInfo()
 
 bool CClient::IsDDNetInfoChanged()
 {
-	IOHANDLE OldFile = m_pStorage->OpenFile(DDNET_INFO_FILE, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_SAVE);
+	IOHANDLE OldFile = m_pStorage->OpenFile(DDNET_INFO_FILE, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_SAVE);
 
 	if(!OldFile)
 		return true;
 
-	IOHANDLE NewFile = m_pStorage->OpenFile(m_aDDNetInfoTmp, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_SAVE);
+	IOHANDLE NewFile = m_pStorage->OpenFile(m_aDDNetInfoTmp, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_SAVE);
 
 	if(NewFile)
 	{
@@ -2102,14 +2102,14 @@ void CClient::FinishDDNetInfo()
 	ResetDDNetInfo();
 	if(IsDDNetInfoChanged())
 	{
-		m_pStorage->RenameFile(m_aDDNetInfoTmp, DDNET_INFO_FILE, IStorageTW::TYPE_SAVE);
+		m_pStorage->RenameFile(m_aDDNetInfoTmp, DDNET_INFO_FILE, IStorage::TYPE_SAVE);
 		LoadDDNetInfo();
 		if(m_ServerBrowser.GetCurrentType() == IServerBrowser::TYPE_INTERNET || m_ServerBrowser.GetCurrentType() == IServerBrowser::TYPE_FAVORITES)
 			m_ServerBrowser.Refresh(m_ServerBrowser.GetCurrentType());
 	}
 	else
 	{
-		m_pStorage->RemoveFile(m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE);
+		m_pStorage->RemoveFile(m_aDDNetInfoTmp, IStorage::TYPE_SAVE);
 	}
 }
 
@@ -2592,12 +2592,12 @@ void CClient::Update()
 			FinishDDNetInfo();
 		else if(m_pDDNetInfoTask->State() == HTTP_ERROR)
 		{
-			Storage()->RemoveFile(m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE);
+			Storage()->RemoveFile(m_aDDNetInfoTmp, IStorage::TYPE_SAVE);
 			ResetDDNetInfo();
 		}
 		else if(m_pDDNetInfoTask->State() == HTTP_ABORTED)
 		{
-			Storage()->RemoveFile(m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE);
+			Storage()->RemoveFile(m_aDDNetInfoTmp, IStorage::TYPE_SAVE);
 			m_pDDNetInfoTask = NULL;
 		}
 	}
@@ -2679,7 +2679,7 @@ void CClient::InitInterfaces()
 #endif
 	m_pDiscord = Kernel()->RequestInterface<IDiscord>();
 	m_pSteam = Kernel()->RequestInterface<ISteam>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 
 	m_DemoEditor.Init(m_pGameClient->NetVersion(), &m_SnapshotDelta, m_pConsole, m_pStorage);
 
@@ -2835,7 +2835,7 @@ void CClient::Run()
 		// handle pending demo play
 		if(m_aCmdPlayDemo[0])
 		{
-			const char *pError = DemoPlayer_Play(m_aCmdPlayDemo, IStorageTW::TYPE_ALL_OR_ABSOLUTE);
+			const char *pError = DemoPlayer_Play(m_aCmdPlayDemo, IStorage::TYPE_ALL_OR_ABSOLUTE);
 			if(pError)
 				dbg_msg("demo_player", "playing passed demo file '%s' failed: %s", m_aCmdPlayDemo, pError);
 			m_aCmdPlayDemo[0] = 0;
@@ -2844,7 +2844,7 @@ void CClient::Run()
 		// handle pending map edits
 		if(m_aCmdEditMap[0])
 		{
-			int Result = m_pEditor->HandleMapDrop(m_aCmdEditMap, IStorageTW::TYPE_ALL_OR_ABSOLUTE);
+			int Result = m_pEditor->HandleMapDrop(m_aCmdEditMap, IStorage::TYPE_ALL_OR_ABSOLUTE);
 			if(Result)
 				g_Config.m_ClEditor = true;
 			else
@@ -3002,9 +3002,9 @@ void CClient::Run()
 				s_SavedConfig = true;
 			}
 
-			if(m_pStorage->FileExists(m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE))
+			if(m_pStorage->FileExists(m_aDDNetInfoTmp, IStorage::TYPE_SAVE))
 			{
-				m_pStorage->RemoveFile(m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE);
+				m_pStorage->RemoveFile(m_aDDNetInfoTmp, IStorage::TYPE_SAVE);
 			}
 
 			if(m_vWarnings.empty() && !GameClient()->IsDisplayingWarning())
@@ -3688,7 +3688,7 @@ void CClient::DemoRecorder_Stop(int Recorder, bool RemoveFile)
 		const char *pFilename = m_aDemoRecorder[Recorder].GetCurrentFilename();
 		if(pFilename[0] != '\0')
 		{
-			Storage()->RemoveFile(pFilename, IStorageTW::TYPE_SAVE);
+			Storage()->RemoveFile(pFilename, IStorage::TYPE_SAVE);
 			m_aDemoRecorder[Recorder].ClearCurrentFilename();
 		}
 	}
@@ -3744,7 +3744,7 @@ void CClient::Con_BenchmarkQuit(IConsole::IResult *pResult, void *pUserData)
 void CClient::BenchmarkQuit(int Seconds, const char *pFilename)
 {
 	char aBuf[IO_MAX_PATH_LENGTH];
-	m_BenchmarkFile = Storage()->OpenFile(pFilename, IOFLAG_WRITE, IStorageTW::TYPE_ABSOLUTE, aBuf, sizeof(aBuf));
+	m_BenchmarkFile = Storage()->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_ABSOLUTE, aBuf, sizeof(aBuf));
 	m_BenchmarkStopTime = time_get() + time_freq() * Seconds;
 }
 
@@ -4339,7 +4339,7 @@ int main(int argc, const char **argv)
 	// create the components
 	IEngine *pEngine = CreateEngine(GAME_NAME, pFutureConsoleLogger, 2 * std::thread::hardware_concurrency() + 2);
 	IConsole *pConsole = CreateConsole(CFGFLAG_CLIENT).release();
-	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_CLIENT, argc, (const char **)argv);
+	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_CLIENT, argc, (const char **)argv);
 	IConfigManager *pConfigManager = CreateConfigManager();
 	IEngineSound *pEngineSound = CreateEngineSound();
 	IEngineInput *pEngineInput = CreateEngineInput();
@@ -4355,7 +4355,7 @@ int main(int argc, const char **argv)
 	char aDate[64];
 	str_timestamp(aDate, sizeof(aDate));
 	str_format(aBufName, sizeof(aBufName), "dumps/" GAME_NAME "_%s_crash_log_%s_%d_%s.RTP", CONF_PLATFORM_STRING, aDate, pid(), GIT_SHORTREV_HASH != nullptr ? GIT_SHORTREV_HASH : "");
-	pStorage->GetCompletePath(IStorageTW::TYPE_SAVE, aBufName, aBufPath, sizeof(aBufPath));
+	pStorage->GetCompletePath(IStorage::TYPE_SAVE, aBufName, aBufPath, sizeof(aBufPath));
 	set_exception_handler_log_file(aBufPath);
 #endif
 
@@ -4423,7 +4423,7 @@ int main(int argc, const char **argv)
 	pClient->InitInterfaces();
 
 	// execute config file
-	if(pStorage->FileExists(CONFIG_FILE, IStorageTW::TYPE_ALL))
+	if(pStorage->FileExists(CONFIG_FILE, IStorage::TYPE_ALL))
 	{
 		pConsole->SetUnknownCommandCallback(SaveUnknownCommandCallback, pClient);
 		if(!pConsole->ExecuteFile(CONFIG_FILE))
@@ -4438,7 +4438,7 @@ int main(int argc, const char **argv)
 	}
 
 	// execute autoexec file
-	if(pStorage->FileExists(AUTOEXEC_CLIENT_FILE, IStorageTW::TYPE_ALL))
+	if(pStorage->FileExists(AUTOEXEC_CLIENT_FILE, IStorage::TYPE_ALL))
 	{
 		pConsole->ExecuteFile(AUTOEXEC_CLIENT_FILE);
 	}
@@ -4472,7 +4472,7 @@ int main(int argc, const char **argv)
 	const int Mode = g_Config.m_Logappend ? IOFLAG_APPEND : IOFLAG_WRITE;
 	if(g_Config.m_Logfile[0])
 	{
-		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, Mode, IStorageTW::TYPE_SAVE_OR_ABSOLUTE);
+		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, Mode, IStorage::TYPE_SAVE_OR_ABSOLUTE);
 		if(Logfile)
 		{
 			pFutureFileLogger->Set(log_logger_file(Logfile));
@@ -4629,7 +4629,7 @@ void CClient::RequestDDNetInfo()
 	}
 
 	// Use ipv4 so we can know the ingame ip addresses of players before they join game servers
-	m_pDDNetInfoTask = HttpGetFile(aUrl, Storage(), m_aDDNetInfoTmp, IStorageTW::TYPE_SAVE);
+	m_pDDNetInfoTask = HttpGetFile(aUrl, Storage(), m_aDDNetInfoTmp, IStorage::TYPE_SAVE);
 	m_pDDNetInfoTask->Timeout(CTimeout{10000, 0, 500, 10});
 	m_pDDNetInfoTask->IpResolve(IPRESOLVE::V4);
 	Engine()->AddJob(m_pDDNetInfoTask);

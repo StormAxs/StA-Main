@@ -25,10 +25,10 @@ int SqliteHandleError(IConsole *pConsole, int Error, sqlite3 *pSqlite, const cha
 	return Error;
 }
 
-CSqlite SqliteOpen(IConsole *pConsole, IStorageTW *pStorage, const char *pPath)
+CSqlite SqliteOpen(IConsole *pConsole, IStorage *pStorage, const char *pPath)
 {
 	char aFullPath[IO_MAX_PATH_LENGTH];
-	pStorage->GetCompletePath(IStorageTW::TYPE_SAVE, pPath, aFullPath, sizeof(aFullPath));
+	pStorage->GetCompletePath(IStorage::TYPE_SAVE, pPath, aFullPath, sizeof(aFullPath));
 	sqlite3 *pSqlite = nullptr;
 	const bool ErrorOpening = SQLITE_HANDLE_ERROR(sqlite3_open(aFullPath, &pSqlite)) != SQLITE_OK;
 	// Even on error, the database is initialized and needs to be freed.

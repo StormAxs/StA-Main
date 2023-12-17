@@ -149,7 +149,7 @@ int main(int argc, const char **argv)
 		return -1;
 	}
 
-	IStorageTW *pStorage = CreateStorage(IStorageTW::STORAGETYPE_BASIC, argc, argv);
+	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_BASIC, argc, argv);
 	if(!pStorage)
 	{
 		dbg_msg("map_convert_07", "error loading storage");
@@ -166,7 +166,7 @@ int main(int argc, const char **argv)
 	else
 	{
 		char aBuf[IO_MAX_PATH_LENGTH];
-		IStorageTW::StripPathAndExtension(pSourceFileName, aBuf, sizeof(aBuf));
+		IStorage::StripPathAndExtension(pSourceFileName, aBuf, sizeof(aBuf));
 		str_format(aDestFileName, sizeof(aDestFileName), "data/maps7/%s.map", aBuf);
 		if(fs_makedir("data") != 0)
 		{
@@ -181,13 +181,13 @@ int main(int argc, const char **argv)
 		}
 	}
 
-	if(!g_DataReader.Open(pStorage, pSourceFileName, IStorageTW::TYPE_ABSOLUTE))
+	if(!g_DataReader.Open(pStorage, pSourceFileName, IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_convert_07", "failed to open source map. filename='%s'", pSourceFileName);
 		return -1;
 	}
 
-	if(!g_DataWriter.Open(pStorage, aDestFileName, IStorageTW::TYPE_ABSOLUTE))
+	if(!g_DataWriter.Open(pStorage, aDestFileName, IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_convert_07", "failed to open destination map. filename='%s'", aDestFileName);
 		return -1;

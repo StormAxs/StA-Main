@@ -92,7 +92,7 @@ void CGameClient::OnConsoleInit()
 	m_pConfig = m_pConfigManager->Values();
 	m_pInput = Kernel()->RequestInterface<IInput>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
 	m_pEditor = Kernel()->RequestInterface<IEditor>();
@@ -315,7 +315,7 @@ void CGameClient::OnInit()
 		else if(g_pData->m_aImages[i].m_pFilename[0] == '\0') // handle special null image without filename
 			g_pData->m_aImages[i].m_Id = IGraphics::CTextureHandle();
 		else
-			g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorageTW::TYPE_ALL);
+			g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorage::TYPE_ALL);
 		m_Menus.RenderLoading(pLoadingDDNetCaption, Localize("Initializing assets"), 1);
 	}
 
@@ -3020,7 +3020,7 @@ void CGameClient::LoadGameSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3182,7 +3182,7 @@ void CGameClient::LoadEmoticonsSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3236,7 +3236,7 @@ void CGameClient::LoadParticlesSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3323,7 +3323,7 @@ void CGameClient::LoadHudSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)
@@ -3396,7 +3396,7 @@ void CGameClient::LoadExtrasSkin(const char *pPath, bool AsDir)
 	}
 
 	CImageInfo ImgInfo;
-	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorageTW::TYPE_ALL);
+	bool PngLoaded = Graphics()->LoadPNG(&ImgInfo, aPath, IStorage::TYPE_ALL);
 	if(!PngLoaded && !IsDefault)
 	{
 		if(AsDir)

@@ -62,7 +62,7 @@ enum
 class CConfigManager : public IConfigManager
 {
 	IConsole *m_pConsole;
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 
 	IOHANDLE m_ConfigFile;
 	bool m_Failed;

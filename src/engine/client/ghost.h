@@ -60,7 +60,7 @@ class CGhostRecorder : public IGhostRecorder
 {
 	IOHANDLE m_File;
 	class IConsole *m_pConsole;
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 
 	CGhostItem m_LastItem;
 
@@ -87,7 +87,7 @@ class CGhostLoader : public IGhostLoader
 {
 	IOHANDLE m_File;
 	class IConsole *m_pConsole;
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 
 	CGhostHeader m_Header;
 	CGhostInfo m_Info;

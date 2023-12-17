@@ -353,15 +353,15 @@ bool LoadPNG(CImageInfo *pImg, const char *pFilename)
 
 bool OpenMaps(const char pMapNames[2][64], CDataFileReader &InputMap, CDataFileWriter &OutputMap)
 {
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 
-	if(!InputMap.Open(pStorage, pMapNames[0], IStorageTW::TYPE_ABSOLUTE))
+	if(!InputMap.Open(pStorage, pMapNames[0], IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_create_pixelart", "ERROR: unable to open map '%s'", pMapNames[0]);
 		return false;
 	}
 
-	if(!OutputMap.Open(pStorage, pMapNames[1], IStorageTW::TYPE_ABSOLUTE))
+	if(!OutputMap.Open(pStorage, pMapNames[1], IStorage::TYPE_ABSOLUTE))
 	{
 		dbg_msg("map_create_pixelart", "ERROR: unable to open map '%s'", pMapNames[1]);
 		return false;

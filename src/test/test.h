@@ -3,14 +3,14 @@
 
 #include <cstddef>
 
-class IStorageTW;
+class IStorage;
 
 class CTestInfo
 {
 public:
 	CTestInfo();
 	~CTestInfo();
-	IStorageTW *CreateTestStorage();
+	IStorage *CreateTestStorage();
 	bool m_DeleteTestStorageFilesOnSuccess = false;
 	void Filename(char *pBuffer, size_t BufferLength, const char *pSuffix);
 	char m_aFilenamePrefix[128];

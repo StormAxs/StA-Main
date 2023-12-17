@@ -177,7 +177,7 @@ private:
 	class IConfigManager *m_pConfigManager;
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
-	class IStorageTW *m_pStorage;
+	class IStorage *m_pStorage;
 	class IDemoPlayer *m_pDemoPlayer;
 	class IFavorites *m_pFavorites;
 	class IServerBrowser *m_pServerBrowser;
@@ -242,7 +242,7 @@ public:
 	class CUI *UI() { return &m_UI; }
 	class ISound *Sound() const { return m_pSound; }
 	class IInput *Input() const { return m_pInput; }
-	class IStorageTW *Storage() const { return m_pStorage; }
+	class IStorage *Storage() const { return m_pStorage; }
 	class IConfigManager *ConfigManager() const { return m_pConfigManager; }
 	class CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }

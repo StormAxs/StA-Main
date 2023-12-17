@@ -137,7 +137,7 @@ void CSnapIDPool::FreeID(int ID)
 	}
 }
 
-void CServerBan::InitServerBan(IConsole *pConsole, IStorageTW *pStorage, CServer *pServer)
+void CServerBan::InitServerBan(IConsole *pConsole, IStorage *pStorage, CServer *pServer)
 {
 	CNetBan::Init(pConsole, pStorage);
 
@@ -2599,7 +2599,7 @@ int CServer::LoadMap(const char *pMapName)
 	{
 		free(m_apCurrentMapData[MAP_TYPE_SIX]);
 		void *pData;
-		Storage()->ReadFile(aBuf, IStorageTW::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIX]);
+		Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIX]);
 		m_apCurrentMapData[MAP_TYPE_SIX] = (unsigned char *)pData;
 	}
 
@@ -2608,7 +2608,7 @@ int CServer::LoadMap(const char *pMapName)
 	{
 		str_format(aBuf, sizeof(aBuf), "maps7/%s.map", pMapName);
 		void *pData;
-		if(!Storage()->ReadFile(aBuf, IStorageTW::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIXUP]))
+		if(!Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIXUP]))
 		{
 			Config()->m_SvSixup = 0;
 			if(m_pRegister)
@@ -2714,7 +2714,7 @@ int CServer::Run()
 	if(Config()->m_SvSqliteFile[0] != '\0')
 	{
 		char aFullPath[IO_MAX_PATH_LENGTH];
-		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE_OR_ABSOLUTE, Config()->m_SvSqliteFile, aFullPath, sizeof(aFullPath));
+		Storage()->GetCompletePath(IStorage::TYPE_SAVE_OR_ABSOLUTE, Config()->m_SvSqliteFile, aFullPath, sizeof(aFullPath));
 
 		if(Config()->m_SvUseSQL)
 		{
@@ -3403,7 +3403,7 @@ void CServer::SaveDemo(int ClientID, float Time)
 		char aNewFilename[IO_MAX_PATH_LENGTH];
 		str_format(aOldFilename, sizeof(aOldFilename), "demos/%s_%d_%d_tmp.demo", m_aCurrentMap, m_NetServer.Address().port, ClientID);
 		str_format(aNewFilename, sizeof(aNewFilename), "demos/%s_%s_%05.2f.demo", m_aCurrentMap, m_aClients[ClientID].m_aName, Time);
-		Storage()->RenameFile(aOldFilename, aNewFilename, IStorageTW::TYPE_SAVE);
+		Storage()->RenameFile(aOldFilename, aNewFilename, IStorage::TYPE_SAVE);
 	}
 }
 
@@ -3425,7 +3425,7 @@ void CServer::StopRecord(int ClientID)
 
 		char aFilename[IO_MAX_PATH_LENGTH];
 		str_format(aFilename, sizeof(aFilename), "demos/%s_%d_%d_tmp.demo", m_aCurrentMap, m_NetServer.Address().port, ClientID);
-		Storage()->RemoveFile(aFilename, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(aFilename, IStorage::TYPE_SAVE);
 	}
 }
 
@@ -3448,7 +3448,7 @@ void CServer::StopDemos()
 		{
 			char aPath[256];
 			str_format(aPath, sizeof(aPath), "demos/%s_%d_%d_tmp.demo", m_aCurrentMap, m_NetServer.Address().port, i);
-			Storage()->RemoveFile(aPath, IStorageTW::TYPE_SAVE);
+			Storage()->RemoveFile(aPath, IStorage::TYPE_SAVE);
 		}
 	}
 }
@@ -3803,7 +3803,7 @@ void CServer::RegisterCommands()
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pGameServer = Kernel()->RequestInterface<IGameServer>();
 	m_pMap = Kernel()->RequestInterface<IEngineMap>();
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pAntibot = Kernel()->RequestInterface<IEngineAntibot>();
 
 	HttpInit(m_pStorage);
@@ -3898,7 +3898,7 @@ const char *CServer::GetAnnouncementLine(const char *pFileName)
 		str_copy(m_aAnnouncementFile, pFileName);
 		m_vAnnouncements.clear();
 
-		IOHANDLE File = m_pStorage->OpenFile(pFileName, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorageTW::TYPE_ALL);
+		IOHANDLE File = m_pStorage->OpenFile(pFileName, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
 		if(!File)
 			return 0;
 

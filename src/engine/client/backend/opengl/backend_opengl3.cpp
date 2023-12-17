@@ -46,7 +46,7 @@ void CCommandProcessorFragment_OpenGL3_3::UseProgram(CGLSLTWProgram *pProgram)
 	}
 }
 
-void CCommandProcessorFragment_OpenGL3_3::InitPrimExProgram(CGLSLPrimitiveExProgram *pProgram, CGLSLCompiler *pCompiler, IStorageTW *pStorage, bool Textured, bool Rotationless)
+void CCommandProcessorFragment_OpenGL3_3::InitPrimExProgram(CGLSLPrimitiveExProgram *pProgram, CGLSLCompiler *pCompiler, IStorage *pStorage, bool Textured, bool Rotationless)
 {
 	CGLSL PrimitiveVertexShader;
 	CGLSL PrimitiveFragmentShader;

@@ -15,7 +15,7 @@ class IEngine;
 class IGraphics;
 class ISound;
 class ITextRender;
-class IStorageTW;
+class IStorage;
 class CRenderTools;
 
 class CEditorObject
@@ -75,7 +75,7 @@ public:
 	IGraphics *Graphics();
 	ISound *Sound();
 	ITextRender *TextRender();
-	IStorageTW *Storage();
+	IStorage *Storage();
 	CUI *UI();
 	CRenderTools *RenderTools();
 

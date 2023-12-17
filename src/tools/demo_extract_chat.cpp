@@ -190,12 +190,12 @@ public:
 	}
 };
 
-int Process(const char *pDemoFilePath, IStorageTW *pStorage)
+int Process(const char *pDemoFilePath, IStorage *pStorage)
 {
 	CSnapshotDelta DemoSnapshotDelta;
 	CDemoPlayer DemoPlayer(&DemoSnapshotDelta, false);
 
-	if(DemoPlayer.Load(pStorage, nullptr, pDemoFilePath, IStorageTW::TYPE_ALL_OR_ABSOLUTE) == -1)
+	if(DemoPlayer.Load(pStorage, nullptr, pDemoFilePath, IStorage::TYPE_ALL_OR_ABSOLUTE) == -1)
 	{
 		dbg_msg(TOOL_NAME, "Demo file '%s' failed to load: %s", pDemoFilePath, DemoPlayer.ErrorMessage());
 		return -1;
@@ -225,7 +225,7 @@ int Process(const char *pDemoFilePath, IStorageTW *pStorage)
 
 int main(int argc, const char *argv[])
 {
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 	if(!pStorage)
 	{
 		dbg_msg(TOOL_NAME, "Error loading storage");

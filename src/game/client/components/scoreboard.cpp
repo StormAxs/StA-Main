@@ -501,11 +501,17 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		}
 
 		// clan
+
 		if(str_comp(m_pClient->m_aClients[pInfo->m_ClientID].m_aClan,
 			   m_pClient->m_aClients[GameClient()->m_aLocalIDs[g_Config.m_ClDummy]].m_aClan) == 0)
 		{
 			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClSameClanColor));
 			TextRender()->TextColor(Color);
+			ColorRGBA special = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 20) % 255 / 255.f, 1.f, 1.f));
+			if(m_pClient->m_aClients[pInfo->m_ClientID].m_aClan == "Inner peace")
+			{
+				TextRender()->TextColor(special);
+			}
 		}
 		else
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);

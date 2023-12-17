@@ -9,7 +9,7 @@ protected:
 	void Test(const char *pInput, const char *pOutput)
 	{
 		char aBuf[32];
-		IStorageTW::StripPathAndExtension(pInput, aBuf, sizeof(aBuf));
+		IStorage::StripPathAndExtension(pInput, aBuf, sizeof(aBuf));
 		EXPECT_STREQ(aBuf, pOutput);
 	}
 };

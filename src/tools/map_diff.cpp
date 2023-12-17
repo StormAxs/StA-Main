@@ -5,13 +5,13 @@
 #include <game/gamecore.h>
 #include <game/mapitems.h>
 
-bool Process(IStorageTW *pStorage, const char **pMapNames)
+bool Process(IStorage *pStorage, const char **pMapNames)
 {
 	CDataFileReader aMaps[2];
 
 	for(int i = 0; i < 2; ++i)
 	{
-		if(!aMaps[i].Open(pStorage, pMapNames[i], IStorageTW::TYPE_ABSOLUTE))
+		if(!aMaps[i].Open(pStorage, pMapNames[i], IStorage::TYPE_ABSOLUTE))
 		{
 			dbg_msg("map_compare", "error opening map '%s'", pMapNames[i]);
 			return false;
@@ -113,7 +113,7 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 
-	IStorageTW *pStorage = CreateLocalStorage();
+	IStorage *pStorage = CreateLocalStorage();
 	if(!pStorage)
 		return -1;
 

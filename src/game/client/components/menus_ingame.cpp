@@ -1113,7 +1113,7 @@ void CMenus::GhostlistPopulate()
 {
 	m_vGhosts.clear();
 	m_GhostPopulateStartTime = time_get_nanoseconds();
-	Storage()->ListDirectoryInfo(IStorageTW::TYPE_ALL, m_pClient->m_Ghost.GetGhostDir(), GhostlistFetchCallback, this);
+	Storage()->ListDirectoryInfo(IStorage::TYPE_ALL, m_pClient->m_Ghost.GetGhostDir(), GhostlistFetchCallback, this);
 	std::sort(m_vGhosts.begin(), m_vGhosts.end());
 
 	CGhostItem *pOwnGhost = 0;
@@ -1178,7 +1178,7 @@ void CMenus::UpdateOwnGhost(CGhostItem Item)
 void CMenus::DeleteGhostItem(int Index)
 {
 	if(m_vGhosts[Index].HasFile())
-		Storage()->RemoveFile(m_vGhosts[Index].m_aFilename, IStorageTW::TYPE_SAVE);
+		Storage()->RemoveFile(m_vGhosts[Index].m_aFilename, IStorage::TYPE_SAVE);
 	m_vGhosts.erase(m_vGhosts.begin() + Index);
 }
 
@@ -1341,8 +1341,8 @@ void CMenus::RenderGhost(CUIRect MainView)
 	if(DoButton_Menu(&s_DirectoryButton, Localize("Ghosts directory"), 0, &Button))
 	{
 		char aBuf[IO_MAX_PATH_LENGTH];
-		Storage()->GetCompletePath(IStorageTW::TYPE_SAVE, "ghosts", aBuf, sizeof(aBuf));
-		Storage()->CreateFolder("ghosts", IStorageTW::TYPE_SAVE);
+		Storage()->GetCompletePath(IStorage::TYPE_SAVE, "ghosts", aBuf, sizeof(aBuf));
+		Storage()->CreateFolder("ghosts", IStorage::TYPE_SAVE);
 		if(!open_file(aBuf))
 		{
 			dbg_msg("menus", "couldn't open file '%s'", aBuf);

@@ -23,11 +23,11 @@ void CSkinProfiles::WriteLine(const char *pLine)
 
 void CSkinProfiles::OnInit()
 {
-	m_pStorage = Kernel()->RequestInterface<IStorageTW>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	IConsole *pConsole = Kernel()->RequestInterface<IConsole>();
 	pConsole->Register("add_profile", "i[body] i[feet] i[flag] i[emote] s[skin] s[name] s[clan]", CFGFLAG_CLIENT, ConAddProfile, this, "Add a profile");
 
-	IOHANDLE File = m_pStorage->OpenFile(PROFILES_FILE, IOFLAG_READ, IStorageTW::TYPE_ALL);
+	IOHANDLE File = m_pStorage->OpenFile(PROFILES_FILE, IOFLAG_READ, IStorage::TYPE_ALL);
 	if(File)
 	{
 		io_close(File);
@@ -56,7 +56,7 @@ bool CSkinProfiles::SaveProfiles()
 {
 	char aBufTmp[512];
 	bool Failed = false;
-	m_ProfilesFile = m_pStorage->OpenFile(PROFILES_FILE, IOFLAG_WRITE, IStorageTW::TYPE_SAVE);
+	m_ProfilesFile = m_pStorage->OpenFile(PROFILES_FILE, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 
 	if(!m_ProfilesFile)
 	{
