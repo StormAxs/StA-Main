@@ -3472,6 +3472,10 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Server Auto Whitelist"), g_Config.m_ClAutoVerify, &Button))
 			g_Config.m_ClAutoVerify ^= 1;
 
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Display skin name in nameplates"), g_Config.m_ClAutoVerify, &Button))
+			g_Config.m_ClShowSkinName ^= 1;
+
 	}
 
 	if(s_CurTab == STA_TAB_PAGE2)

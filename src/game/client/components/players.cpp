@@ -475,8 +475,8 @@ void CPlayers::RenderPlayer(
 
 	// rainbow
 	bool 	IsRainbowBody = g_Config.m_ClRainbow,
-	     	IsRainbowFeet = g_Config.m_ClRainbow;
-
+		IsRainbowFeet = g_Config.m_ClRainbow;
+		g_Config.m_ClRainbow = Local == 1;
 	if(g_Config.m_ClRainbow == 1)
 		{
 			IsRainbowBody = true;

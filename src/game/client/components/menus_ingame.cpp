@@ -954,14 +954,16 @@ void CMenus::RenderStats(CUIRect MainView)
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
 
 		char Welcome [128];
-		str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
-		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 		if (strcmp(Client()->PlayerName(), "-StormAx") == 0)
 		{
 			ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 /255.f, 1.f, 1.f));
 			TextRender()->TextColor(col);
-			return;
 		}
+
+		str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
+		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
+		return TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	}
 	else if(s_StatsPage == 1)
 	{

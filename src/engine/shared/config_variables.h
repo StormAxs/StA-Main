@@ -740,3 +740,6 @@ MACRO_CONFIG_COL(ClOutlineColorUnfreeze, sc_outline_color_unfreeze, 0, CFGFLAG_C
 MACRO_CONFIG_INT(ClRainbow, sc_rainbow, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow urself")
 MACRO_CONFIG_INT(ClRainbowSpeed, sc_rainbow_speed, 20, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow speed")
 MACRO_CONFIG_INT(ClRainbowEveryone, sc_rainbow_all, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow all")
+
+//tee skin name
+MACRO_CONFIG_INT(ClShowSkinName, sc_show_skin_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
