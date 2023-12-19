@@ -477,17 +477,16 @@ void CPlayers::RenderPlayer(
 
 	bool 	IsRainbowBody = g_Config.m_ClRainbow,
 		IsRainbowFeet = g_Config.m_ClRainbow;
-		g_Config.m_ClRainbow = Local;
 
-	if(g_Config.m_ClRainbow == 1)
+	if(g_Config.m_ClRainbow == 1 && (m_pClient->m_Snap.m_LocalClientID == ClientID) == 1)
 		{
 			IsRainbowBody = true;
 			IsRainbowFeet = true;
 		}
 		else
 		{
-			IsRainbowBody = 0;
-			IsRainbowFeet = 0;
+			IsRainbowBody = false;
+			IsRainbowFeet = false;
 		}
 
 

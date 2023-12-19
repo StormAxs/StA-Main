@@ -979,7 +979,7 @@ void CMenus::RenderStats(CUIRect MainView)
 
 
 
-		str_format(Welcome, sizeof(Welcome), " Current points: %s", s_StatsPlayer.Points);
+		str_format(Welcome, sizeof(Welcome), " Current points: %d", s_StatsPlayer.Points);
 		UI()->DoLabel(&CP, Welcome, 40.0f, TEXTALIGN_ML);
 
 
