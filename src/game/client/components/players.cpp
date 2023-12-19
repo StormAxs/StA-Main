@@ -474,9 +474,11 @@ void CPlayers::RenderPlayer(
 	}
 
 	// rainbow
+
 	bool 	IsRainbowBody = g_Config.m_ClRainbow,
 		IsRainbowFeet = g_Config.m_ClRainbow;
-		g_Config.m_ClRainbow = Local == 1;
+		g_Config.m_ClRainbow = Local;
+
 	if(g_Config.m_ClRainbow == 1)
 		{
 			IsRainbowBody = true;
@@ -484,9 +486,10 @@ void CPlayers::RenderPlayer(
 		}
 		else
 		{
-			IsRainbowBody = false;
-			IsRainbowFeet = false;
+			IsRainbowBody = 0;
+			IsRainbowFeet = 0;
 		}
+
 
 	// draw gun
 	{

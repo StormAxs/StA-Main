@@ -6,7 +6,6 @@
 
 	CStats::CStats() = default;
 
-
 	void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 	{
 		char aUrl_DDStats[256];

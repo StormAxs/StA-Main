@@ -462,7 +462,7 @@ void CClient::Connect(const char *pAddress, const char *pPassword)
 		str_copy(m_aConnectAddressStr, pAddress);
 
 	char aMsg[512];
-	str_format(aMsg, sizeof(aMsg), "connecting to '%s'", m_aConnectAddressStr);
+	str_format(aMsg, sizeof(aMsg), "Joining... '%s'", m_aConnectAddressStr);
 	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "client", aMsg, gs_ClientNetworkPrintColor);
 
 	ServerInfoRequest();

@@ -3481,7 +3481,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			g_Config.m_ClAutoVerify ^= 1;
 
 		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Display skin name in nameplates"), g_Config.m_ClAutoVerify, &Button))
+		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
 			g_Config.m_ClShowSkinName ^= 1;
 
 	}
