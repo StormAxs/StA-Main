@@ -5,6 +5,7 @@
 
 #include "memheap.h"
 #include <base/math.h>
+#include <base/system.h>
 #include <engine/console.h>
 #include <engine/storage.h>
 
@@ -136,7 +137,7 @@ class CConsole : public IConsole
 
 		int m_Victim;
 		void ResetVictim();
-		bool HasVictim();
+		bool HasVictim() const;
 		void SetVictim(int Victim);
 		void SetVictim(const char *pVictim);
 		int GetVictim() const override;

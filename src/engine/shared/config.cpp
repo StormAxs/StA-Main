@@ -51,12 +51,12 @@ struct SConfigVariable
 	virtual void ResetToOld() = 0;
 
 protected:
-	void ExecuteLine(const char *pLine)
+	void ExecuteLine(const char *pLine) const
 	{
 		m_pConsole->ExecuteLine(pLine, (m_Flags & CFGFLAG_GAME) != 0 ? IConsole::CLIENT_ID_GAME : -1);
 	}
 
-	bool CheckReadOnly()
+	bool CheckReadOnly() const
 	{
 		if(!m_ReadOnly)
 			return false;
@@ -156,7 +156,7 @@ struct SIntConfigVariable : public SConfigVariable
 
 	void ResetToOld() override
 	{
-		SetValue(m_OldValue);
+		*m_pVariable = m_OldValue;
 	}
 };
 
@@ -257,7 +257,7 @@ struct SColorConfigVariable : public SConfigVariable
 
 	void ResetToOld() override
 	{
-		SetValue(m_OldValue);
+		*m_pVariable = m_OldValue;
 	}
 };
 
@@ -362,7 +362,7 @@ struct SStringConfigVariable : public SConfigVariable
 
 	void ResetToOld() override
 	{
-		SetValue(m_pOldValue);
+		str_copy(m_pStr, m_pOldValue, m_MaxSize);
 	}
 };
 

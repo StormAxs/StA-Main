@@ -362,7 +362,7 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, CClientMask Mask)
 	}
 }
 
-void CGameContext::CreateSoundGlobal(int Sound, int Target)
+void CGameContext::CreateSoundGlobal(int Sound, int Target) const
 {
 	if(Sound < 0)
 		return;
@@ -380,7 +380,61 @@ void CGameContext::CreateSoundGlobal(int Sound, int Target)
 	}
 }
 
-bool CGameContext::SnapLaserObject(const CSnapContext &Context, int SnapID, const vec2 &To, const vec2 &From, int StartTick, int Owner, int LaserType, int Subtype, int SwitchNumber)
+void CGameContext::SnapSwitchers(int SnappingClient)
+{
+	if(Switchers().empty())
+		return;
+
+	CPlayer *pPlayer = SnappingClient != SERVER_DEMO_CLIENT ? m_apPlayers[SnappingClient] : 0;
+	int Team = pPlayer && pPlayer->GetCharacter() ? pPlayer->GetCharacter()->Team() : 0;
+
+	if(pPlayer && (pPlayer->GetTeam() == TEAM_SPECTATORS || pPlayer->IsPaused()) && pPlayer->m_SpectatorID != SPEC_FREEVIEW && m_apPlayers[pPlayer->m_SpectatorID] && m_apPlayers[pPlayer->m_SpectatorID]->GetCharacter())
+		Team = m_apPlayers[pPlayer->m_SpectatorID]->GetCharacter()->Team();
+
+	if(Team == TEAM_SUPER)
+		return;
+
+	int SentTeam = Team;
+	if(g_Config.m_SvTeam == SV_TEAM_FORCED_SOLO)
+		SentTeam = 0;
+
+	CNetObj_SwitchState *pSwitchState = Server()->SnapNewItem<CNetObj_SwitchState>(SentTeam);
+	if(!pSwitchState)
+		return;
+
+	pSwitchState->m_HighestSwitchNumber = clamp((int)Switchers().size() - 1, 0, 255);
+	mem_zero(pSwitchState->m_aStatus, sizeof(pSwitchState->m_aStatus));
+
+	std::vector<std::pair<int, int>> vEndTicks; // <EndTick, SwitchNumber>
+
+	for(int i = 0; i <= pSwitchState->m_HighestSwitchNumber; i++)
+	{
+		int Status = (int)Switchers()[i].m_aStatus[Team];
+		pSwitchState->m_aStatus[i / 32] |= (Status << (i % 32));
+
+		int EndTick = Switchers()[i].m_aEndTick[Team];
+		if(EndTick > 0 && EndTick < Server()->Tick() + 3 * Server()->TickSpeed() && Switchers()[i].m_aLastUpdateTick[Team] < Server()->Tick())
+		{
+			// only keep track of EndTicks that have less than three second left and are not currently being updated by a player being present on a switch tile, to limit how often these are sent
+			vEndTicks.emplace_back(Switchers()[i].m_aEndTick[Team], i);
+		}
+	}
+
+	// send the endtick of switchers that are about to toggle back (up to four, prioritizing those with the earliest endticks)
+	mem_zero(pSwitchState->m_aSwitchNumbers, sizeof(pSwitchState->m_aSwitchNumbers));
+	mem_zero(pSwitchState->m_aEndTicks, sizeof(pSwitchState->m_aEndTicks));
+
+	std::sort(vEndTicks.begin(), vEndTicks.end());
+	const int NumTimedSwitchers = minimum((int)vEndTicks.size(), (int)std::size(pSwitchState->m_aEndTicks));
+
+	for(int i = 0; i < NumTimedSwitchers; i++)
+	{
+		pSwitchState->m_aSwitchNumbers[i] = vEndTicks[i].second;
+		pSwitchState->m_aEndTicks[i] = vEndTicks[i].first;
+	}
+}
+
+bool CGameContext::SnapLaserObject(const CSnapContext &Context, int SnapID, const vec2 &To, const vec2 &From, int StartTick, int Owner, int LaserType, int Subtype, int SwitchNumber) const
 {
 	if(Context.GetClientVersion() >= VERSION_DDNET_MULTI_LASER)
 	{
@@ -415,7 +469,7 @@ bool CGameContext::SnapLaserObject(const CSnapContext &Context, int SnapID, cons
 	return true;
 }
 
-bool CGameContext::SnapPickup(const CSnapContext &Context, int SnapID, const vec2 &Pos, int Type, int SubType, int SwitchNumber)
+bool CGameContext::SnapPickup(const CSnapContext &Context, int SnapID, const vec2 &Pos, int Type, int SubType, int SwitchNumber) const
 {
 	if(Context.IsSixup())
 	{
@@ -489,7 +543,7 @@ void CGameContext::CallVote(int ClientID, const char *pDesc, const char *pCmd, c
 	pPlayer->m_LastVoteCall = Now;
 }
 
-void CGameContext::SendChatTarget(int To, const char *pText, int Flags)
+void CGameContext::SendChatTarget(int To, const char *pText, int Flags) const
 {
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Team = 0;
@@ -520,7 +574,7 @@ void CGameContext::SendChatTarget(int To, const char *pText, int Flags)
 	}
 }
 
-void CGameContext::SendChatTeam(int Team, const char *pText)
+void CGameContext::SendChatTeam(int Team, const char *pText) const
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		if(m_apPlayers[i] != nullptr && GetDDRaceTeam(i) == Team)
@@ -619,7 +673,7 @@ void CGameContext::SendStartWarning(int ClientID, const char *pMessage)
 	}
 }
 
-void CGameContext::SendEmoticon(int ClientID, int Emoticon, int TargetClientID)
+void CGameContext::SendEmoticon(int ClientID, int Emoticon, int TargetClientID) const
 {
 	CNetMsg_Sv_Emoticon Msg;
 	Msg.m_ClientID = ClientID;
@@ -627,21 +681,21 @@ void CGameContext::SendEmoticon(int ClientID, int Emoticon, int TargetClientID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, TargetClientID);
 }
 
-void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
+void CGameContext::SendWeaponPickup(int ClientID, int Weapon) const
 {
 	CNetMsg_Sv_WeaponPickup Msg;
 	Msg.m_Weapon = Weapon;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void CGameContext::SendMotd(int ClientID)
+void CGameContext::SendMotd(int ClientID) const
 {
 	CNetMsg_Sv_Motd Msg;
 	Msg.m_pMessage = g_Config.m_SvMotd;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void CGameContext::SendSettings(int ClientID)
+void CGameContext::SendSettings(int ClientID) const
 {
 	protocol7::CNetMsg_Sv_ServerSettings Msg;
 	Msg.m_KickVote = g_Config.m_SvVoteKick;
@@ -1297,9 +1351,9 @@ void CGameContext::OnClientPredictedEarlyInput(int ClientID, void *pInput)
 	}
 }
 
-struct CVoteOptionServer *CGameContext::GetVoteOption(int Index)
+const CVoteOptionServer *CGameContext::GetVoteOption(int Index) const
 {
-	CVoteOptionServer *pCurrent;
+	const CVoteOptionServer *pCurrent;
 	for(pCurrent = m_pVoteOptionFirst;
 		Index > 0 && pCurrent;
 		Index--, pCurrent = pCurrent->m_pNext)
@@ -1350,7 +1404,7 @@ void CGameContext::ProgressVoteOptions(int ClientID)
 	OptionMsg.m_pDescription14 = "";
 
 	// get current vote option by index
-	CVoteOptionServer *pCurrent = GetVoteOption(pPl->m_SendVoteIndex);
+	const CVoteOptionServer *pCurrent = GetVoteOption(pPl->m_SendVoteIndex);
 
 	while(CurIndex < NumVotesToSend && pCurrent != NULL)
 	{
@@ -1410,18 +1464,30 @@ void CGameContext::OnClientEnter(int ClientID)
 			Msg.m_pName = "team";
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
 		}
+	}
 
-		for(const IConsole::CCommandInfo *pCmd = Console()->FirstCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT);
-			pCmd; pCmd = pCmd->NextCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT))
+	for(const IConsole::CCommandInfo *pCmd = Console()->FirstCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT);
+		pCmd; pCmd = pCmd->NextCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT))
+	{
+		const char *pName = pCmd->m_pName;
+
+		if(Server()->IsSixup(ClientID))
 		{
-			if(!str_comp_nocase(pCmd->m_pName, "w") || !str_comp_nocase(pCmd->m_pName, "whisper"))
+			if(!str_comp_nocase(pName, "w") || !str_comp_nocase(pName, "whisper"))
 				continue;
 
-			const char *pName = pCmd->m_pName;
-			if(!str_comp_nocase(pCmd->m_pName, "r"))
+			if(!str_comp_nocase(pName, "r"))
 				pName = "rescue";
 
 			protocol7::CNetMsg_Sv_CommandInfo Msg;
+			Msg.m_pName = pName;
+			Msg.m_pArgsFormat = pCmd->m_pParams;
+			Msg.m_pHelpText = pCmd->m_pHelp;
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
+		}
+		else
+		{
+			CNetMsg_Sv_CommandInfo Msg;
 			Msg.m_pName = pName;
 			Msg.m_pArgsFormat = pCmd->m_pParams;
 			Msg.m_pHelpText = pCmd->m_pHelp;
@@ -2389,24 +2455,16 @@ void CGameContext::OnSetTeamNetMessage(const CNetMsg_Cl_SetTeam *pMsg, int Clien
 	}
 
 	// Switch team on given client and kill/respawn them
-	if(m_pController->CanJoinTeam(pMsg->m_Team, ClientID))
+	char aTeamJoinError[512];
+	if(m_pController->CanJoinTeam(pMsg->m_Team, ClientID, aTeamJoinError, sizeof(aTeamJoinError)))
 	{
-		if(pPlayer->IsPaused())
-			SendChatTarget(ClientID, "Use /pause first then you can kill");
-		else
-		{
-			if(pPlayer->GetTeam() == TEAM_SPECTATORS || pMsg->m_Team == TEAM_SPECTATORS)
-				m_VoteUpdate = true;
-			m_pController->DoTeamChange(pPlayer, pMsg->m_Team);
-			pPlayer->m_TeamChangeTick = Server()->Tick();
-		}
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS || pMsg->m_Team == TEAM_SPECTATORS)
+			m_VoteUpdate = true;
+		m_pController->DoTeamChange(pPlayer, pMsg->m_Team);
+		pPlayer->m_TeamChangeTick = Server()->Tick();
 	}
 	else
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Only %d active players are allowed", Server()->MaxClients() - g_Config.m_SvSpectatorSlots);
-		SendBroadcast(aBuf, ClientID);
-	}
+		SendBroadcast(aTeamJoinError, ClientID);
 }
 
 void CGameContext::OnIsDDNetLegacyNetMessage(const CNetMsg_Cl_IsDDNetLegacy *pMsg, int ClientID, CUnpacker *pUnpacker)
@@ -4199,7 +4257,7 @@ bool CGameContext::ProcessSpamProtection(int ClientID, bool RespectChatInitialDe
 	return false;
 }
 
-int CGameContext::GetDDRaceTeam(int ClientID)
+int CGameContext::GetDDRaceTeam(int ClientID) const
 {
 	return m_pController->Teams().m_Core.Team(ClientID);
 }
@@ -4468,7 +4526,7 @@ int CGameContext::GetClientVersion(int ClientID) const
 	return Server()->GetClientVersion(ClientID);
 }
 
-CClientMask CGameContext::ClientsMaskExcludeClientVersionAndHigher(int Version)
+CClientMask CGameContext::ClientsMaskExcludeClientVersionAndHigher(int Version) const
 {
 	CClientMask Mask;
 	for(int i = 0; i < MAX_CLIENTS; ++i)
@@ -4576,7 +4634,7 @@ bool CGameContext::RateLimitPlayerVote(int ClientID)
 	return false;
 }
 
-bool CGameContext::RateLimitPlayerMapVote(int ClientID)
+bool CGameContext::RateLimitPlayerMapVote(int ClientID) const
 {
 	if(!Server()->GetAuthedState(ClientID) && time_get() < m_LastMapVote + (time_freq() * g_Config.m_SvVoteMapTimeDelay))
 	{

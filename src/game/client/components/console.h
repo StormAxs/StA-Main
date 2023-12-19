@@ -30,6 +30,7 @@ class CGameConsole : public CComponent
 		struct CBacklogEntry
 		{
 			float m_YOffset;
+			int m_LineCount;
 			ColorRGBA m_PrintColor;
 			size_t m_Length;
 			char m_aText[1];
@@ -43,8 +44,9 @@ class CGameConsole : public CComponent
 		CLineInputBuffered<IConsole::CMDLINE_LENGTH> m_Input;
 		const char *m_pName;
 		int m_Type;
-		int m_BacklogCurPage;
-		int m_BacklogLastActivePage = -1;
+		int m_BacklogCurLine;
+		int m_BacklogLastActiveLine = -1;
+		int m_LinesRendered;
 
 		STextBoundingBox m_BoundingBox = {0.0f, 0.0f, 0.0f, 0.0f};
 		float m_LastInputHeight = 0.0f;
@@ -76,11 +78,26 @@ class CGameConsole : public CComponent
 		const char *m_pCommandHelp;
 		const char *m_pCommandParams;
 
+		bool m_Searching = false;
+		struct SSearchMatch
+		{
+			int m_Pos;
+			int m_StartLine;
+			int m_EndLine;
+			int m_EntryLine;
+
+			SSearchMatch(int Pos, int StartLine, int EndLine, int EntryLine) :
+				m_Pos(Pos), m_StartLine(StartLine), m_EndLine(EndLine), m_EntryLine(EntryLine) {}
+		};
+		int m_CurrentMatchIndex;
+		char m_aCurrentSearchString[IConsole::CMDLINE_LENGTH];
+		std::vector<SSearchMatch> m_vSearchMatches;
+
 		CInstance(int t);
 		void Init(CGameConsole *pGameConsole);
 
 		void ClearBacklog() REQUIRES(!m_BacklogPendingLock);
-		void ClearBacklogYOffsets();
+		void UpdateBacklogTextAttributes();
 		void PumpBacklogPending() REQUIRES(!m_BacklogPendingLock);
 		void ClearHistory();
 		void Reset();
@@ -89,10 +106,20 @@ class CGameConsole : public CComponent
 
 		bool OnInput(const IInput::CEvent &Event);
 		void PrintLine(const char *pLine, int Len, ColorRGBA PrintColor) REQUIRES(!m_BacklogPendingLock);
+		int GetLinesToScroll(int Direction, int LinesToScroll);
+		void ScrollToCenter(int StartLine, int EndLine);
+		void ClearSearch();
 
 		const char *GetString() const { return m_Input.GetString(); }
 		static void PossibleCommandsCompleteCallback(int Index, const char *pStr, void *pUser);
 		static void PossibleArgumentsCompleteCallback(int Index, const char *pStr, void *pUser);
+
+		void UpdateEntryTextAttributes(CBacklogEntry *pEntry) const;
+
+	private:
+		void UpdateSearch();
+
+		friend class CGameConsole;
 	};
 
 	class IConsole *m_pConsole;
@@ -109,6 +136,9 @@ class CGameConsole : public CComponent
 	float m_StateChangeDuration;
 
 	bool m_WantsSelectionCopy = false;
+
+	static const ColorRGBA ms_SearchHighlightColor;
+	static const ColorRGBA ms_SearchSelectedColor;
 
 	void Toggle(int Type);
 	void Dump(int Type);
@@ -145,6 +175,7 @@ public:
 	virtual void OnRender() override;
 	virtual void OnMessage(int MsgType, void *pRawMsg) override;
 	virtual bool OnInput(const IInput::CEvent &Event) override;
+	void Prompt(char (&aPrompt)[32]);
 
 	bool IsClosed() { return m_ConsoleState == CONSOLE_CLOSED; }
 };

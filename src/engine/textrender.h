@@ -140,6 +140,8 @@ MAYBE_UNUSED static const char *FONT_ICON_DICE_FIVE = "\xEF\x94\xA3";
 MAYBE_UNUSED static const char *FONT_ICON_DICE_SIX = "\xEF\x94\xA6";
 
 MAYBE_UNUSED static const char *FONT_ICON_LAYER_GROUP = "\xEF\x97\xBD";
+MAYBE_UNUSED static const char *FONT_ICON_UNDO = "\xEF\x8B\xAA";
+MAYBE_UNUSED static const char *FONT_ICON_REDO = "\xEF\x8B\xB9";
 } // end namespace FontIcons
 
 enum ETextCursorSelectionMode
@@ -179,6 +181,18 @@ struct STextBoundingBox
 	}
 };
 
+// Allow to render multi colored text in one go without having to call TextEx() multiple times.
+// Needed to allow multi colored multi line texts
+struct STextColorSplit
+{
+	int m_CharIndex; // Which index within the text should the split occur
+	int m_Length; // How long is the split
+	ColorRGBA m_Color; // The color the text should be starting from m_CharIndex
+
+	STextColorSplit(int CharIndex, int Length, const ColorRGBA &Color) :
+		m_CharIndex(CharIndex), m_Length(Length), m_Color(Color) {}
+};
+
 class CTextCursor
 {
 public:
@@ -197,6 +211,7 @@ public:
 
 	float m_FontSize;
 	float m_AlignedFontSize;
+	float m_LineSpacing;
 
 	ETextCursorSelectionMode m_CalculateSelectionMode;
 	float m_SelectionHeightFactor;
@@ -217,14 +232,47 @@ public:
 	int m_CursorCharacter;
 	vec2 m_CursorRenderedPosition;
 
+	// Color splits of the cursor to allow multicolored text
+	std::vector<STextColorSplit> m_vColorSplits;
+
 	float Height() const
 	{
-		return m_LineCount * m_AlignedFontSize;
+		return m_LineCount * m_AlignedFontSize + std::max(0, m_LineCount - 1) * m_LineSpacing;
 	}
 
 	STextBoundingBox BoundingBox() const
 	{
 		return {m_StartX, m_StartY, m_LongestLineWidth, Height()};
+	}
+
+	void Reset()
+	{
+		m_Flags = 0;
+		m_LineCount = 0;
+		m_GlyphCount = 0;
+		m_CharCount = 0;
+		m_MaxLines = 0;
+		m_StartX = 0;
+		m_StartY = 0;
+		m_LineWidth = 0;
+		m_X = 0;
+		m_Y = 0;
+		m_MaxCharacterHeight = 0;
+		m_LongestLineWidth = 0;
+		m_FontSize = 0;
+		m_AlignedFontSize = 0;
+		m_LineSpacing = 0;
+		m_CalculateSelectionMode = TEXT_CURSOR_SELECTION_MODE_NONE;
+		m_SelectionHeightFactor = 0;
+		m_PressMouse = vec2();
+		m_ReleaseMouse = vec2();
+		m_SelectionStart = 0;
+		m_SelectionEnd = 0;
+		m_CursorMode = TEXT_CURSOR_CURSOR_MODE_NONE;
+		m_ForceCursorRendering = false;
+		m_CursorCharacter = 0;
+		m_CursorRenderedPosition = vec2();
+		m_vColorSplits.clear();
 	}
 };
 
@@ -303,7 +351,7 @@ public:
 	virtual void TextSelectionColor(ColorRGBA rgb) = 0;
 	virtual void Text(float x, float y, float Size, const char *pText, float LineWidth = -1.0f) = 0;
 	virtual float TextWidth(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, int Flags = 0, const STextSizeProperties &TextSizeProps = {}) = 0;
-	virtual STextBoundingBox TextBoundingBox(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, int Flags = 0) = 0;
+	virtual STextBoundingBox TextBoundingBox(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, float LineSpacing = 0.0f, int Flags = 0) = 0;
 
 	virtual ColorRGBA GetTextColor() const = 0;
 	virtual ColorRGBA GetTextOutlineColor() const = 0;

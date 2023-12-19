@@ -78,10 +78,6 @@ enum
 };
 '''
 
-RawSource = '''
-#include "protocol.h"
-'''
-
 Enums = [
 	Enum("EMOTE", Emotes),
 	Enum("POWERUP", Powerups),
@@ -565,5 +561,15 @@ Messages = [
 		NetIntAny("m_Diff"),
 		NetBool("m_RecordPersonal"),
 		NetBool("m_RecordServer", default=False),
+	]),
+
+	NetMessageEx("Sv_CommandInfo", "commandinfo@netmsg.ddnet.org", [
+			NetStringStrict("m_pName"),
+			NetStringStrict("m_pArgsFormat"),
+			NetStringStrict("m_pHelpText")
+	]),
+
+	NetMessageEx("Sv_CommandInfoRemove", "commandinfo-remove@netmsg.ddnet.org", [
+			NetStringStrict("m_pName")
 	]),
 ]

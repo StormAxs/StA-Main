@@ -379,7 +379,7 @@ void CPlayer::Snap(int SnappingClient)
 			pPlayerInfo->m_PlayerFlags |= protocol7::PLAYERFLAG_ADMIN;
 
 		// Times are in milliseconds for 0.7
-		pPlayerInfo->m_Score = m_Score.has_value() ? GameServer()->Score()->PlayerData(id)->m_BestTime * 1000 : -1;
+		pPlayerInfo->m_Score = m_Score.has_value() ? GameServer()->Score()->PlayerData(m_ClientID)->m_BestTime * 1000 : -1;
 		pPlayerInfo->m_Latency = Latency;
 	}
 
@@ -412,7 +412,7 @@ void CPlayer::Snap(int SnappingClient)
 	if(!pDDNetPlayer)
 		return;
 
-	pDDNetPlayer->m_AuthLevel = Server()->GetAuthedState(id);
+	pDDNetPlayer->m_AuthLevel = Server()->GetAuthedState(m_ClientID);
 	pDDNetPlayer->m_Flags = 0;
 	if(m_Afk)
 		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_AFK;
@@ -832,12 +832,12 @@ int CPlayer::ForcePause(int Time)
 	return Pause(PAUSE_SPEC, true);
 }
 
-int CPlayer::IsPaused()
+int CPlayer::IsPaused() const
 {
 	return m_ForcePauseTime ? m_ForcePauseTime : -1 * m_Paused;
 }
 
-bool CPlayer::IsPlaying()
+bool CPlayer::IsPlaying() const
 {
 	return m_pCharacter && m_pCharacter->IsAlive();
 }
