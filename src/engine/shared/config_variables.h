@@ -699,7 +699,6 @@ MACRO_CONFIG_COL(ScBlacklistPColor, sc_blacklist_p_color, 65457, CFGFLAG_CLIENT 
 MACRO_CONFIG_COL(ScFriendColor, sc_friend_color, 7995321, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friends color")
 MACRO_CONFIG_COL(ScFrozenTeeColor, sc_frozen_tee_color, 172, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Frozen tee color")
 
-
 MACRO_CONFIG_INT(ClApplyProfileSkin, sc_passet_skin, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply skin in profiles")
 MACRO_CONFIG_INT(ClApplyProfileName, sc_passet_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply name in profiles")
 MACRO_CONFIG_INT(ClApplyProfileClan, sc_passet_clan, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply clan in profiles")

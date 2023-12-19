@@ -13,7 +13,6 @@ public:
 
 	virtual void ClearGameInfo() = 0;
 	virtual void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText, const char *pImage, const char *pPlayerName) = 0;
-
 };
 
 IDiscord *CreateDiscord();

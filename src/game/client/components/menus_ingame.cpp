@@ -33,9 +33,9 @@
 #include <engine/keys.h>
 #include <engine/storage.h>
 
+#include "parser.h"
 #include <chrono>
 #include <thread>
-#include "parser.h"
 
 using namespace FontIcons;
 using namespace std::chrono_literals;
@@ -860,7 +860,6 @@ void CMenus::RenderStats(CUIRect MainView)
 
 	if(s_StatsPage == 0)
 	{
-
 		float FontSize_BodyLeft = 25.0f;
 		float FontSize_HeadLeft = 40.0f;
 
@@ -888,7 +887,6 @@ void CMenus::RenderStats(CUIRect MainView)
 
 		CUIRect PointRect = MainView;
 
-
 		MainView.HSplitTop(MainView.h / 3, &WB, &MainView);
 		WB.VSplitRight(WB.w / 2 - 50, &WB, &StALogo);
 		WB.HSplitTop(WB.h / 2 + 30, &WB, &CP);
@@ -911,7 +909,6 @@ void CMenus::RenderStats(CUIRect MainView)
 		LF.Margin(1.0f, &LF);
 		MP1.VMargin(1.0f, &MP1);
 		MP2.VMargin(1.0f, &MP2);
-
 
 		const float LineMargin = 22.0f;
 		char *pSkinName = g_Config.m_ClPlayerSkin;
@@ -955,19 +952,18 @@ void CMenus::RenderStats(CUIRect MainView)
 		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
 
-		char Welcome [128];
+		char Welcome[128];
 		const char *names[] =
-		{
-			"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"
-		};
+			{
+				"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"};
 
-		for
-			(int i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
-			if (strcmp(Client()->PlayerName(), names[i]) == 0)
+		for(int i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+		{
+			if(strcmp(Client()->PlayerName(), names[i]) == 0)
 			{
 				break;
 			}
-			ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 /255.f, 1.f, 1.f));
+			ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
 			TextRender()->TextColor(col);
 		}
 
@@ -977,19 +973,14 @@ void CMenus::RenderStats(CUIRect MainView)
 		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-
-
 		str_format(Welcome, sizeof(Welcome), " Current points: %d", s_StatsPlayer.Points);
 		UI()->DoLabel(&CP, Welcome, 40.0f, TEXTALIGN_ML);
-
-
 	}
 	else if(s_StatsPage == 1)
 	{
-
 	}
 
-	else if (s_StatsPage ==2) //only uses DDstats!
+	else if(s_StatsPage == 2) //only uses DDstats!
 	{
 		//test
 		static CStatsPlayer s_StatsPlayer;
@@ -1044,7 +1035,6 @@ void CMenus::RenderStats(CUIRect MainView)
 		str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
 		UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
 	}
-
 }
 void CMenus::RenderInGameNetwork(CUIRect MainView)
 {

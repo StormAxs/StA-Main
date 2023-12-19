@@ -1122,7 +1122,6 @@ void CClient::ProcessServerInfo(int RawType, NETADDR *pFrom, const void *pData, 
 			GET_INT(Info.m_MapSize);
 		}
 
-
 		GET_STRING(Info.m_aGameType);
 		GET_INT(Info.m_Flags);
 		GET_INT(Info.m_NumPlayers);

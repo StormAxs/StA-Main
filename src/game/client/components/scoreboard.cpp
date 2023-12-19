@@ -327,7 +327,8 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		int DDTeam = m_pClient->m_Teams.Team(pInfo->m_ClientID);
 		if(DDTeam != -1 && DDTeam < TEAM_SUPER)
 			m_aTeamsCount[DDTeam]++;
-	}m_aTeamsCount, sizeof(int) * 64;
+	}
+	m_aTeamsCount, sizeof(int) * 64;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{

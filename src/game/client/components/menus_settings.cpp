@@ -327,7 +327,7 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 		(open_link("https://youtu.be/dQw4w9WgXcQ?si=YVhttps://www.youtube.com/watch?v=dQw4w9WgXcQ6AWtvEZ8fB71_s"));
 	}
 	//TODO: Remove commits
-/*
+	/*
 	if(!str_comp(g_Config.m_PlayerName, "meloƞ"))
 	{
 		dbg_assert_imp("FakeNameList.txt", -1, 0, "YOU ARE NOT MELON SOB" );
@@ -1300,7 +1300,6 @@ void CMenus::DoJoystickBar(const CUIRect *pRect, float Current, float Tolerance,
 	Handle.Draw(SliderColor, IGraphics::CORNER_ALL, Handle.h / 2.0f);
 }
 
-
 void CMenus::RenderSettingsControls(CUIRect MainView)
 {
 	// this is kinda slow, but whatever
@@ -1493,7 +1492,6 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	}
 	// sta
 	{
-
 		BindWheelSettings.HSplitTop(Margin, nullptr, &BindWheelSettings);
 		BindWheelSettings.HSplitTop(80.0f, &BindWheelSettings, 0);
 		if(s_ScrollRegion.AddRect(BindWheelSettings))
@@ -1527,7 +1525,6 @@ void CMenus::ResetSettingsControls()
 	g_Config.m_InpControllerTolerance = 5;
 	g_Config.m_UiControllerSens = 100;
 }
-
 
 void CMenus::RenderSettingsGraphics(CUIRect MainView)
 {
@@ -2648,12 +2645,12 @@ void CMenus::RenderSettingsAppearance(CUIRect MainView)
 		}
 	}
 	else if(s_CurTab == APPEARANCE_TAB_CHAT)
-    {
-        CChat &Chat = GameClient()->m_Chat;
-        CUIRect TopView, PreviewView;
-        MainView.h += 20.f; // Increase height a little
-        MainView.HSplitTop(MainView.h - 260, &TopView, &PreviewView);
-        TopView.VSplitMid(&LeftView, &RightView);
+	{
+		CChat &Chat = GameClient()->m_Chat;
+		CUIRect TopView, PreviewView;
+		MainView.h += 20.f; // Increase height a little
+		MainView.HSplitTop(MainView.h - 260, &TopView, &PreviewView);
+		TopView.VSplitMid(&LeftView, &RightView);
 
 		// ***** Chat ***** //
 		LeftView.HSplitTop(HeadlineAndVMargin, &Label, &LeftView);
@@ -2727,15 +2724,15 @@ void CMenus::RenderSettingsAppearance(CUIRect MainView)
 		ColorRGBA ClientColor = color_cast<ColorRGBA, ColorHSLA>(ColorHSLA(g_Config.m_ClMessageClientColor));
 		ColorRGBA DefaultNameColor(0.8f, 0.8f, 0.8f, 1.0f);
 
-        const float RealFontSize = Chat.FontSize() * 2;
-        const float RealMsgPaddingX = (!g_Config.m_ClChatOld ? Chat.MessagePaddingX() : 0) * 2;
-        const float RealMsgPaddingY = (!g_Config.m_ClChatOld ? Chat.MessagePaddingY() : 0) * 2;
-        const float RealMsgPaddingTee = (!g_Config.m_ClChatOld ? Chat.MessageTeeSize() + CChat::MESSAGE_TEE_PADDING_RIGHT : 0) * 2;
-        const float RealOffsetY = RealFontSize + RealMsgPaddingY;
+		const float RealFontSize = Chat.FontSize() * 2;
+		const float RealMsgPaddingX = (!g_Config.m_ClChatOld ? Chat.MessagePaddingX() : 0) * 2;
+		const float RealMsgPaddingY = (!g_Config.m_ClChatOld ? Chat.MessagePaddingY() : 0) * 2;
+		const float RealMsgPaddingTee = (!g_Config.m_ClChatOld ? Chat.MessageTeeSize() + CChat::MESSAGE_TEE_PADDING_RIGHT : 0) * 2;
+		const float RealOffsetY = RealFontSize + RealMsgPaddingY;
 
-        const float X = 5.0f + RealMsgPaddingX / 2.0f + Section.x;
-        float Y = Section.y;
-        float LineWidth = g_Config.m_ClChatWidth * 2 - (RealMsgPaddingX * 1.5f) - RealMsgPaddingTee;
+		const float X = 5.0f + RealMsgPaddingX / 2.0f + Section.x;
+		float Y = Section.y;
+		float LineWidth = g_Config.m_ClChatWidth * 2 - (RealMsgPaddingX * 1.5f) - RealMsgPaddingTee;
 
 		CTextCursor Cursor;
 		TextRender()->SetCursor(&Cursor, X, Y, RealFontSize, TEXTFLAG_RENDER);
@@ -3403,7 +3400,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		BindWheelZone.VSplitMid(&BindWheelList, &BindWheelOptions, 10.f);
 		BindWheelList.h = 20.f;
 
-
 		static int s_SelectedBind = -1;
 
 		auto &vBindsList = GameClient()->m_BindWheel.m_vBinds;
@@ -3483,7 +3479,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Left.HSplitTop(20.0f, &Button, &Left);
 		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
 			g_Config.m_ClShowSkinName ^= 1;
-
 	}
 
 	if(s_CurTab == STA_TAB_PAGE2)
@@ -3527,7 +3522,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			str_format(aBuf, sizeof(aBuf), "%s: %i", "Tee Size", g_Config.m_ClFrozenHudTeeSize);
 			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
 			g_Config.m_ClFrozenHudTeeSize = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenHudTeeSize, &Button, (g_Config.m_ClFrozenHudTeeSize - 8) / 19.0f) * 19.0f) + 8;
-
 		}
 		CUIRect Rainbow;
 		MainView.HSplitTop(20.0f, &Rainbow, &MainView);
@@ -3572,7 +3566,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
 			g_Config.m_ClOutlineAlpha = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlpha, &Button, (g_Config.m_ClOutlineAlpha) / 100.0f) * 100.0f);
 		}
-		{	
+		{
 			CUIRect Button, Label;
 			MainView.HSplitTop(5.0f, &Button, &MainView);
 			MainView.HSplitTop(20.0f, &Button, &MainView);
@@ -3598,8 +3592,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		MainView.HSplitTop(25.0f, &Section, &MainView);
 		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-
 	}
 }
 void CMenus::RenderSettingsProfiles(CUIRect MainView)

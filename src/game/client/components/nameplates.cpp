@@ -158,7 +158,6 @@ void CNamePlates::RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pP
 			rgb = m_pClient->GetDDTeamColor(m_pClient->m_Teams.Team(ClientID), 0.75f);
 		ColorRGBA TOutlineColor;
 
-
 		if(OtherTeam && !ForceAlpha)
 		{
 			TOutlineColor = ColorRGBA(0.0f, 0.0f, 0.0f, 0.2f * g_Config.m_ClShowOthersAlpha / 100.0f);
@@ -170,10 +169,11 @@ void CNamePlates::RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pP
 			TColor = ColorRGBA(rgb.r, rgb.g, rgb.b, a);
 		}
 
-        if(g_Config.m_ScShowFrozenNameplaterColor == 1)
-            if (GameClient()->m_aClients[ClientID].m_FreezeEnd) {
-                TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScFrozenTeeColor));
-            }
+		if(g_Config.m_ScShowFrozenNameplaterColor == 1)
+			if(GameClient()->m_aClients[ClientID].m_FreezeEnd)
+			{
+				TColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScFrozenTeeColor));
+			}
 
 		if(g_Config.m_ClNameplatesTeamcolors && m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS)
 		{

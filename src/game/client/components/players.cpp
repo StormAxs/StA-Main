@@ -46,8 +46,6 @@ void CPlayers::RenderHand(const CTeeRenderInfo *pInfo, vec2 CenterPos, vec2 Dir,
 
 	Graphics()->SetColor(pInfo->m_ColorBody.r, pInfo->m_ColorBody.g, pInfo->m_ColorBody.b, Alpha);
 
-
-
 	// two passes
 	for(int i = 0; i < 2; i++)
 	{
@@ -376,15 +374,15 @@ void CPlayers::RenderPlayer(
 		s_LastPredIntraTick = Client()->PredIntraGameTick(g_Config.m_ClDummy);
 	}
 
-    bool PredictLocalWeapons = false;
+	bool PredictLocalWeapons = false;
 	float AttackTime = (Client()->PrevGameTick(g_Config.m_ClDummy) - Player.m_AttackTick) / (float)Client()->GameTickSpeed() + Client()->GameTickTime(g_Config.m_ClDummy);
 	float LastAttackTime = (Client()->PrevGameTick(g_Config.m_ClDummy) - Player.m_AttackTick) / (float)Client()->GameTickSpeed() + s_LastGameTickTime;
-    if(ClientID >= 0 && m_pClient->m_aClients[ClientID].m_IsPredictedLocal && m_pClient->AntiPingGunfire())
-    {
-        PredictLocalWeapons = true;
+	if(ClientID >= 0 && m_pClient->m_aClients[ClientID].m_IsPredictedLocal && m_pClient->AntiPingGunfire())
+	{
+		PredictLocalWeapons = true;
 		AttackTime = (Client()->PredIntraGameTick(g_Config.m_ClDummy) + (Client()->PredGameTick(g_Config.m_ClDummy) - 1 - Player.m_AttackTick)) / (float)Client()->GameTickSpeed();
 		LastAttackTime = (s_LastPredIntraTick + (Client()->PredGameTick(g_Config.m_ClDummy) - 1 - Player.m_AttackTick)) / (float)Client()->GameTickSpeed();
-    }
+	}
 	float AttackTicksPassed = AttackTime * (float)Client()->GameTickSpeed();
 
 	float Angle;
@@ -475,20 +473,19 @@ void CPlayers::RenderPlayer(
 
 	// rainbow
 
-	bool 	IsRainbowBody = g_Config.m_ClRainbow,
-		IsRainbowFeet = g_Config.m_ClRainbow;
+	bool IsRainbowBody = g_Config.m_ClRainbow,
+	     IsRainbowFeet = g_Config.m_ClRainbow;
 
 	if(g_Config.m_ClRainbow == 1 && (m_pClient->m_Snap.m_LocalClientID == ClientID) == 1)
-		{
-			IsRainbowBody = true;
-			IsRainbowFeet = true;
-		}
-		else
-		{
-			IsRainbowBody = false;
-			IsRainbowFeet = false;
-		}
-
+	{
+		IsRainbowBody = true;
+		IsRainbowFeet = true;
+	}
+	else
+	{
+		IsRainbowBody = false;
+		IsRainbowFeet = false;
+	}
 
 	// draw gun
 	{
@@ -711,9 +708,7 @@ void CPlayers::RenderPlayer(
 	if(IsRainbowFeet)
 		RenderInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f));
 
-
 	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, true, ClientID, InAir);
-
 
 	float TeeAnimScale, TeeBaseSize;
 	RenderTools()->GetRenderTeeAnimScaleAndBaseSize(&RenderInfo, TeeAnimScale, TeeBaseSize);

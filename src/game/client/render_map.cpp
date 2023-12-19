@@ -719,7 +719,7 @@ void CRenderTools::RenderGameTileOutlines(CTile *pTiles, int w, int h, float Sca
 	int MaxScale = 12;
 	if(EndX - StartX > Graphics()->ScreenWidth() / MaxScale || EndY - StartY > Graphics()->ScreenHeight() / MaxScale)
 	{
-		int EdgeX = (EndX - StartX)-(Graphics()->ScreenWidth() / MaxScale);
+		int EdgeX = (EndX - StartX) - (Graphics()->ScreenWidth() / MaxScale);
 		StartX += EdgeX / 2;
 		EndX -= EdgeX / 2;
 		int EdgeY = (EndY - StartY) - (Graphics()->ScreenHeight() / MaxScale);
@@ -729,7 +729,8 @@ void CRenderTools::RenderGameTileOutlines(CTile *pTiles, int w, int h, float Sca
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
 	ColorRGBA col = ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f);
-	if (TileType == TILE_FREEZE) {
+	if(TileType == TILE_FREEZE)
+	{
 		col = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClOutlineColorFreeze));
 	}
 	else if(TileType == TILE_SOLID)
@@ -836,7 +837,6 @@ void CRenderTools::RenderGameTileOutlines(CTile *pTiles, int w, int h, float Sca
 				Neighbors[7] = IndexN != TILE_UNFREEZE && IndexN != TILE_DUNFREEZE;
 			}
 
-
 			float Size = (float)g_Config.m_ClOutlineWidth;
 			int NumQuads = 0;
 
@@ -900,7 +900,6 @@ void CRenderTools::RenderGameTileOutlines(CTile *pTiles, int w, int h, float Sca
 				NumQuads++;
 			}
 
-
 			Graphics()->QuadsDrawTL(Array, NumQuads);
 		}
 	Graphics()->QuadsEnd();
@@ -926,7 +925,6 @@ void CRenderTools::RenderTeleOutlines(CTile *pTiles, CTeleTile *pTele, int w, in
 		StartY += EdgeY / 2;
 		EndY -= EdgeY / 2;
 	}
-
 
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();

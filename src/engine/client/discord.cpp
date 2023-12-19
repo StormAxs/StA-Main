@@ -73,7 +73,8 @@ public:
 		m_pActivityManager->clear_activity(m_pActivityManager, 0, 0);
 	}
 
-	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText , const char *pImage, const char *pPlayerName) override {
+	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText, const char *pImage, const char *pPlayerName) override
+	{
 		DiscordActivity Activity;
 		mem_zero(&Activity, sizeof(DiscordActivity));
 		str_copy(Activity.assets.large_image, "150e4e96-9c83-4309-b692-b212c08e1934",

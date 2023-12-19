@@ -1,7 +1,7 @@
 #ifndef ENGINE_KEYS_H
 #define ENGINE_KEYS_H
 #if defined(CONF_FAMILY_WINDOWS)
-   #undef KEY_EXECUTE
+#undef KEY_EXECUTE
 #endif
 /* AUTO GENERATED! DO NOT EDIT MANUALLY! */
 enum

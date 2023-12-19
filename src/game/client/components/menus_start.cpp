@@ -126,7 +126,6 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	}
 	//Main buttons
 
-
 	Menu.HSplitBottom(100.0f, &Menu, 0);
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_SettingsButton;
