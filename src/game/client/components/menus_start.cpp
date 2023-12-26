@@ -23,7 +23,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(1, 1, 1, 1);
-	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 170, 60, 360, 103);
+	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 210, 50, 490, 103);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
@@ -129,7 +129,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(100.0f, &Menu, 0);
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_SettingsButton;
-	if(DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
+	if(DoButton_Menu(&s_SettingsButton, Localize(""), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
 		NewPage = PAGE_SETTINGS;
 
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
@@ -139,7 +139,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	if(!is_process_alive(m_ServerProcess.m_Process))
 		KillServer();
 
-	if(DoButton_Menu(&s_LocalServerButton, m_ServerProcess.m_Process ? Localize("Stop server") : Localize("Run server"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "local_server" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, m_ServerProcess.m_Process ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (CheckHotKey(KEY_R) && Input()->KeyPress(KEY_R)))
+	if(DoButton_Menu(&s_LocalServerButton, m_ServerProcess.m_Process ? Localize("") : Localize(""), 0, &Button, g_Config.m_ClShowStartMenuImages ? "local_server" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, m_ServerProcess.m_Process ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (CheckHotKey(KEY_R) && Input()->KeyPress(KEY_R)))
 	{
 		if(m_ServerProcess.m_Process)
 		{
@@ -170,7 +170,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_MapEditorButton;
-	if(DoButton_Menu(&s_MapEditorButton, Localize("Editor"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "editor" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, m_pClient->Editor()->HasUnsavedData() ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (!EditorHotkeyWasPressed && Client()->LocalTime() - EditorHotKeyChecktime < 0.1f && CheckHotKey(KEY_E)))
+	if(DoButton_Menu(&s_MapEditorButton, Localize(""), 0, &Button, g_Config.m_ClShowStartMenuImages ? "editor" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, m_pClient->Editor()->HasUnsavedData() ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (!EditorHotkeyWasPressed && Client()->LocalTime() - EditorHotKeyChecktime < 0.1f && CheckHotKey(KEY_E)))
 	{
 		g_Config.m_ClEditor = 1;
 		Input()->MouseModeRelative();
@@ -185,7 +185,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_DemoButton;
-	if(DoButton_Menu(&s_DemoButton, Localize("Demos"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "demos" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_D))
+	if(DoButton_Menu(&s_DemoButton, Localize(""), 0, &Button, g_Config.m_ClShowStartMenuImages ? "demos" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_D))
 	{
 		NewPage = PAGE_DEMOS;
 	}
@@ -193,7 +193,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_PlayButton;
-	if(DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "play_game" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || UI()->ConsumeHotkey(CUI::HOTKEY_ENTER) || CheckHotKey(KEY_P))
+	if(DoButton_Menu(&s_PlayButton, Localize("", "Start menu"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "play_game" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || UI()->ConsumeHotkey(CUI::HOTKEY_ENTER) || CheckHotKey(KEY_P))
 	{
 		NewPage = g_Config.m_UiPage >= PAGE_INTERNET && g_Config.m_UiPage <= PAGE_FAVORITES ? g_Config.m_UiPage : PAGE_INTERNET;
 	}
