@@ -297,6 +297,18 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	str_format(aBuf, sizeof(aBuf), "%s:", Localize("Name"));
 	UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_ML);
 	static CLineInput s_NameInput;
+
+	if	(strcmp(Client()->PlayerName(), "-StormAx") == 0
+		|| strcmp(Client()->PlayerName(), "meloƞ") == 0
+		|| strcmp(Client()->PlayerName(), "我叫芙焦") == 0
+		|| strcmp(Client()->PlayerName(), "Mʎɹ シ") == 0
+		|| strcmp(Client()->PlayerName(), "Cheeru") == 0
+		|| strcmp(Client()->PlayerName(), "Mónik") == 0)
+	{
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 30.f) % 255 / 255.f, 1.f, 1.f));
+		TextRender()->TextColor(col);
+	}
+
 	s_NameInput.SetBuffer(pName, sizeof(g_Config.m_PlayerName));
 	s_NameInput.SetEmptyText(pNameFallback);
 	if(UI()->DoEditBox(&s_NameInput, &Button, 14.0f))
@@ -306,6 +318,10 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 
 	//Kill game when start using m_PlayerName
 	if(!str_comp(g_Config.m_PlayerName, "nigger"))
+	{
+		dbg_assert_imp("UR NAME SUCK.js", -1, 0, "YOU ARE FUCKING RACIST DON'T USE THIS CLIENT EVER AGAIN");
+	}
+	if(!str_comp(g_Config.m_PlayerName, "faggot"))
 	{
 		dbg_assert_imp("UR NAME SUCK.js", -1, 0, "YOU ARE FUCKING RACIST DON'T USE THIS CLIENT EVER AGAIN");
 	}
@@ -319,7 +335,7 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	}
 	if(!str_comp(g_Config.m_PlayerName, "Cheeru"))
 	{
-		dbg_assert_imp("Hey!.js", -1, 0, "Привет айви, надеюсь хорошо поживаешь? Если все таки заинтересовалась клиент отпиши, пожалуйста, очень важно</3");
+		dbg_assert_imp("Hey!.js", -1, 0, "Привет Aйви, надеюсь хорошо поживаешь? Если все таки заинтересовалась клиент отпиши, пожалуйста, очень важно</3");
 	}
 
 	if(!str_comp(g_Config.m_PlayerName, "Rick Astley"))
@@ -352,6 +368,12 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	str_format(aBuf, sizeof(aBuf), "%s:", Localize("Clan"));
 	UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_ML);
 	static CLineInput s_ClanInput;
+	if	(strcmp(g_Config.m_PlayerClan, "Inner peace") == 0
+		|| strcmp(g_Config.m_PlayerClan, "Vegaming") == 0)
+	{
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
+		TextRender()->TextColor(col);
+	}
 	s_ClanInput.SetBuffer(pClan, sizeof(g_Config.m_PlayerClan));
 	if(UI()->DoEditBox(&s_ClanInput, &Button, 14.0f))
 	{
@@ -3268,98 +3290,76 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 	if(s_CurTab == STA_TAB_PAGE1)
 	{
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int( 2.0f) % 255 / 100.f, 0.4f, 1.f));
+		CUIRect LeftLeft, Margin, Demo, Outline;
 
-		CUIRect LeftLeft, Margin, TabSettings, Demo;
-		CUIRect Column;
-		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
-		MainView = Column;
+		Right.HSplitTop(25.f, &Label, &Outline);
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("______Tile Outlines(TYSM TClient)______"), 20.0f, TEXTALIGN_TC);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		MainView.HSplitTop(30.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, Localize("Tile Outlines(TYSM TClient)"), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.0f, 0x0, &MainView);
-		MainView.HSplitTop(5.0f, 0x0, &MainView);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineEntities, ("Only show outlines in entities"), &g_Config.m_ClOutlineEntities, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineFreeze, ("Outline freeze & deep"), &g_Config.m_ClOutlineFreeze, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &Outline, LineMargin);
 
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineEntities, ("Only show outlines in entities"), &g_Config.m_ClOutlineEntities, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineFreeze, ("Outline freeze & deep"), &g_Config.m_ClOutlineFreeze, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &MainView, LineMargin);
 
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(150.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Width", g_Config.m_ClOutlineWidth);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineWidth = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineWidth, &Button, (g_Config.m_ClOutlineWidth - 1) / 15.0f) * 15.0f) + 1;
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(150.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha", g_Config.m_ClOutlineAlpha);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineAlpha = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlpha, &Button, (g_Config.m_ClOutlineAlpha) / 100.0f) * 100.0f);
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(185.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha (walls)", g_Config.m_ClOutlineAlphaSolid);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineAlphaSolid = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlphaSolid, &Button, (g_Config.m_ClOutlineAlphaSolid) / 100.0f) * 100.0f);
-		}
-		static CButtonContainer OutlineColorFreezeID, OutlineColorSolidID, OutlineColorTeleID, OutlineColorUnfreezeID;
+		Outline.HSplitTop(20.f, &Button, &Outline);
+		UI()->DoScrollbarOption(&g_Config.m_ClOutlineWidth, &g_Config.m_ClOutlineWidth, &Button, Localize("Outline Width"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 
-		MainView.HSplitTop(5.0f, 0x0, &MainView);
-		MainView.VSplitLeft(-5.0f, 0x0, &MainView);
+		Outline.HSplitTop(20.f, &Button, &Outline);
+		UI()->DoScrollbarOption(&g_Config.m_ClOutlineAlphaSolid, &g_Config.m_ClOutlineAlphaSolid, &Button, Localize("Outline Opacity (walls)"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorFreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Freeze Outline Color"), &g_Config.m_ClOutlineColorFreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+		Outline.HSplitTop(20.f, &Button, &Outline);
+		UI()->DoScrollbarOption(&g_Config.m_ClOutlineAlpha, &g_Config.m_ClOutlineAlpha, &Button, Localize("Outline Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorSolidID, 25.0f, 240.0f, 14.0f, &Section, ("Walls Outline Color"), &g_Config.m_ClOutlineColorSolid, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+		static CButtonContainer s_aResetIDs[24];
+		int i = 0;
 
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorTeleID, 25.0f, 240.0f, 14.0f, &Section, ("Teleporter Outline Color"), &g_Config.m_ClOutlineColorTele, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Outline, Localize("Freeze Outline Color"),
+			&g_Config.m_ClOutlineColorFreeze,
+			ColorRGBA(1),
+			false);
 
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Outline, Localize("Walls Outline Color"),
+			&g_Config.m_ClOutlineColorSolid,
+			ColorRGBA(1),
+			false);
 
-		MainView.HSplitTop(40.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, ("Frozen Tee Display "), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(3.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
-		MainView.HSplitTop(5.1f, 0x0, &MainView);
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Outline, Localize("Teleporter Outline Color"),
+			&g_Config.m_ClOutlineColorTele,
+			ColorRGBA(1),
+			false);
 
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHudSkins, ("Use teeskin instead of ninja tee"), &g_Config.m_ClShowFrozenHudSkins, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClFrozenHudTeamOnly, ("Enable only for Team"), &g_Config.m_ClFrozenHudTeamOnly, &MainView, LineMargin);
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Outline, Localize("Unfreeze Outline Color"),
+			&g_Config.m_ClOutlineColorUnfreeze,
+			ColorRGBA(1),
+			false);
 
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(140.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i", "Max Rows", g_Config.m_ClFrozenMaxRows);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClFrozenMaxRows = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenMaxRows, &Button, (g_Config.m_ClFrozenMaxRows - 1) / 5.0f) * 5.0f) + 1;
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(140.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i", "Tee Size", g_Config.m_ClFrozenHudTeeSize);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClFrozenHudTeeSize = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenHudTeeSize, &Button, (g_Config.m_ClFrozenHudTeeSize - 8) / 19.0f) * 19.0f) + 8;
-		}
+		Outline.HSplitTop(25.f, &Label, &Outline);
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, ("__________Frozen Tee Display__________"), 20.0f, TEXTALIGN_TC);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHudSkins, ("Use teeskin instead of ninja tee"), &g_Config.m_ClShowFrozenHudSkins, &Outline, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClFrozenHudTeamOnly, ("Enable only for Team"), &g_Config.m_ClFrozenHudTeamOnly, &Outline, LineMargin);
+
+		Outline.HSplitTop(20.f, &Button, &Outline);
+		UI()->DoScrollbarOption(&g_Config.m_ClFrozenMaxRows, &g_Config.m_ClFrozenMaxRows, &Button, Localize("Max rows"), 1, 6, &CUI::ms_LinearScrollbarScale, 0u, "");
+
+		Outline.HSplitTop(20.f, &Button, &Outline);
+		UI()->DoScrollbarOption(&g_Config.m_ClFrozenHudTeeSize, &g_Config.m_ClFrozenHudTeeSize, &Button, Localize("Tee Size"), 8, 20, &CUI::ms_LinearScrollbarScale, 0u, "");
 
 
 		// Preferences
@@ -3368,7 +3368,9 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		Left.HSplitTop(110.0f, &Demo, &MainView);
 		Demo.HSplitTop(0.0f, &Label, &Demo);
-		UI()->DoLabel(&Label, Localize("Preferences"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("____________Preferences____________"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Left.HSplitTop(20.0f, &Button, &Left);
 		Button.VSplitMid(&LeftLeft, &Button);
@@ -3389,12 +3391,12 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
 			g_Config.m_ClShowSkinName ^= 1;
 
-		int i = 0;
-		static CButtonContainer s_aResetIDs[24];
 
 		// Bind wheel config
 		Left.HSplitTop(30.f, &Label, &Right);
-		UI()->DoLabel(&Label, Localize("Bind wheel"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("______________Bind wheel______________"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		CUIRect BindWheelZone, BindWheelBinding, BindWheelList, BindWheelOptions;
 		Right.HSplitTop(60.f, &BindWheelZone, &Right);
@@ -3454,111 +3456,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			s_SelectedBind = -1;
 		}
 
-
-		/*
-		CUIRect Column;
-		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
-
-		MainView.HSplitTop(40.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, ("Frozen Tee Display "), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(3.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
-		MainView.HSplitTop(5.1f, 0x0, &MainView);
-
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHudSkins, ("Use teeskin instead of ninja tee"), &g_Config.m_ClShowFrozenHudSkins, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClFrozenHudTeamOnly, ("Enable only for Team"), &g_Config.m_ClFrozenHudTeamOnly, &MainView, LineMargin);
-
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(140.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i", "Max Rows", g_Config.m_ClFrozenMaxRows);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClFrozenMaxRows = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenMaxRows, &Button, (g_Config.m_ClFrozenMaxRows - 1) / 5.0f) * 5.0f) + 1;
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(140.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i", "Tee Size", g_Config.m_ClFrozenHudTeeSize);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClFrozenHudTeeSize = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenHudTeeSize, &Button, (g_Config.m_ClFrozenHudTeeSize - 8) / 19.0f) * 19.0f) + 8;
-		}
-		CUIRect Rainbow;
-		MainView.HSplitTop(20.0f, &Rainbow, &MainView);
-		UI()->DoLabel(&Rainbow, ("Rainbow Tee(s)"), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.0f, 0x0, &MainView);
-		MainView.HSplitTop(5.0f, &Rainbow, &MainView);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClRainbow, ("Rainbow Skin"), &g_Config.m_ClRainbow, &Rainbow, LineMargin);
-
-		// ***** OUTLINES ***** //
-
-		MainView = Column;
-
-		MainView.HSplitTop(30.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, Localize("Tile Outlines(TYSM TClient)"), 20.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.0f, 0x0, &MainView);
-		MainView.HSplitTop(5.0f, 0x0, &MainView);
-
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineEntities, ("Only show outlines in entities"), &g_Config.m_ClOutlineEntities, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineFreeze, ("Outline freeze & deep"), &g_Config.m_ClOutlineFreeze, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &MainView, LineMargin);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &MainView, LineMargin);
-
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(150.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Width", g_Config.m_ClOutlineWidth);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineWidth = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineWidth, &Button, (g_Config.m_ClOutlineWidth - 1) / 15.0f) * 15.0f) + 1;
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(150.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha", g_Config.m_ClOutlineAlpha);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineAlpha = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlpha, &Button, (g_Config.m_ClOutlineAlpha) / 100.0f) * 100.0f);
-		}
-		{
-			CUIRect Button, Label;
-			MainView.HSplitTop(5.0f, &Button, &MainView);
-			MainView.HSplitTop(20.0f, &Button, &MainView);
-			Button.VSplitLeft(185.0f, &Label, &Button);
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha (walls)", g_Config.m_ClOutlineAlphaSolid);
-			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
-			g_Config.m_ClOutlineAlphaSolid = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlphaSolid, &Button, (g_Config.m_ClOutlineAlphaSolid) / 100.0f) * 100.0f);
-		}
-		static CButtonContainer OutlineColorFreezeID, OutlineColorSolidID, OutlineColorTeleID, OutlineColorUnfreezeID;
-
-		MainView.HSplitTop(5.0f, 0x0, &MainView);
-		MainView.VSplitLeft(-5.0f, 0x0, &MainView);
-
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorFreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Freeze Outline Color"), &g_Config.m_ClOutlineColorFreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorSolidID, 25.0f, 240.0f, 14.0f, &Section, ("Walls Outline Color"), &g_Config.m_ClOutlineColorSolid, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorTeleID, 25.0f, 240.0f, 14.0f, &Section, ("Teleporter Outline Color"), &g_Config.m_ClOutlineColorTele, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-		MainView.HSplitTop(25.0f, &Section, &MainView);
-		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-
-*/
-
 	}
 
 	if(s_CurTab == STA_TAB_PAGE2)
@@ -3566,12 +3463,14 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		CUIRect LeftLeft, Margin, TabSettings, Demo;
 		int i = 0;
 		static CButtonContainer s_aResetIDs[24];
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int( 2.0f) % 255 / 100.f, 0.4f, 1.f));
 
 		// Tab
 		Left.HSplitTop(25.f, &Label, &Left);
-		UI()->DoLabel(&Label, Localize("Tab"), 20.f, TEXTALIGN_ML);
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("_____________________Tab_____________________"), 20.f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		// Left.Draw(ColorRGBA(1,1,1,0,0.25f), IGraphics::CORNER_ALL, 10.0f)
 
 		DoLine_ColorPicker(&s_aResetIDs[i++],
 			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
@@ -3628,7 +3527,11 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			g_Config.m_ScShowFrozenNameplaterColor ^= 1;
 
 		Left.HSplitTop(25.f, &Label, &Left);
-		UI()->DoLabel(&Label, Localize("Tee's"), 25.f, TEXTALIGN_ML);
+
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("_____________________Tee_____________________"), 20.f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 
 		Left.HSplitTop(20.f, &Button, &Left);
 		if(DoButton_CheckBox(&g_Config.m_ClRainbow, Localize("Rainbow Tee"), g_Config.m_ClRainbow, &Button))
@@ -3643,7 +3546,10 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		// Console color
 		Right.HSplitTop(25.f, &Label, &Right);
-		UI()->DoLabel(&Label, Localize("Console Settings"), 20.0f, TEXTALIGN_ML);
+
+		TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("______________Console Settings______________"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Right.HSplitTop(20.0f, &Button, &Right);
 		if(DoButton_CheckBox(&g_Config.m_ClConsoleSimple, Localize("Use simpled console"), g_Config.m_ClConsoleSimple, &Button))
@@ -3683,7 +3589,10 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		UI()->DoScrollbarOption(&g_Config.m_ClRemoteConsolaAlpha, &g_Config.m_ClRemoteConsolaAlpha, &Button, Localize("Remote Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 
 		Right.HSplitTop(30.f, &Label, &Right);
-		UI()->DoLabel(&Label, Localize("Better Animation (LERP)"), 20.0f, TEXTALIGN_ML);
+
+			TextRender()->TextColor(col);
+		UI()->DoLabel(&Label, Localize("____________Better Animation____________"), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// feets
 		Right.HSplitTop(20.0f, &Button, &Right);
