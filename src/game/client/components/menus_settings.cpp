@@ -3243,9 +3243,9 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 	static CButtonContainer s_aPageTabs[NUMBER_OF_STA_TABS] = {};
 
-	if(DoButton_MenuTab(&s_aPageTabs[STA_TAB_PAGE1], Localize("1st PAGE"), s_CurTab == STA_TAB_PAGE1, &Page1Tab, IGraphics::CORNER_L, NULL, NULL, NULL, NULL, 4))
+	if(DoButton_MenuTab(&s_aPageTabs[STA_TAB_PAGE1], Localize("Options"), s_CurTab == STA_TAB_PAGE1, &Page1Tab, IGraphics::CORNER_L, NULL, NULL, NULL, NULL, 4))
 		s_CurTab = STA_TAB_PAGE1;
-	if(DoButton_MenuTab(&s_aPageTabs[STA_TAB_PAGE2], Localize("Ext Chat"), s_CurTab == STA_TAB_PAGE2, &Page2Tab, 0, NULL, NULL, NULL, NULL, 4))
+	if(DoButton_MenuTab(&s_aPageTabs[STA_TAB_PAGE2], Localize("Customization"), s_CurTab == STA_TAB_PAGE2, &Page2Tab, 0, NULL, NULL, NULL, NULL, 4))
 		s_CurTab = STA_TAB_PAGE2;
 	if(DoButton_MenuTab(&s_aPageTabs[STA_TAB_PAGE3], Localize("3rd PAGE"), s_CurTab == STA_TAB_PAGE3, &Page3Tab, 0, NULL, NULL, NULL, NULL, 4))
 		s_CurTab = STA_TAB_PAGE3;
@@ -3268,144 +3268,132 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 	if(s_CurTab == STA_TAB_PAGE1)
 	{
+
 		CUIRect LeftLeft, Margin, TabSettings, Demo;
+		CUIRect Column;
+		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
+		MainView = Column;
+
+		MainView.HSplitTop(30.0f, &Section, &MainView);
+		UI()->DoLabel(&Section, Localize("Tile Outlines(TYSM TClient)"), 20.0f, TEXTALIGN_LEFT);
+		MainView.VSplitLeft(5.0f, 0x0, &MainView);
+		MainView.HSplitTop(5.0f, 0x0, &MainView);
+
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineEntities, ("Only show outlines in entities"), &g_Config.m_ClOutlineEntities, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineFreeze, ("Outline freeze & deep"), &g_Config.m_ClOutlineFreeze, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &MainView, LineMargin);
+
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(150.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Width", g_Config.m_ClOutlineWidth);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineWidth = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineWidth, &Button, (g_Config.m_ClOutlineWidth - 1) / 15.0f) * 15.0f) + 1;
+		}
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(150.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha", g_Config.m_ClOutlineAlpha);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineAlpha = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlpha, &Button, (g_Config.m_ClOutlineAlpha) / 100.0f) * 100.0f);
+		}
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(5.0f, &Button, &MainView);
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(185.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i ", "Outline Alpha (walls)", g_Config.m_ClOutlineAlphaSolid);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClOutlineAlphaSolid = (int)(UI()->DoScrollbarH(&g_Config.m_ClOutlineAlphaSolid, &Button, (g_Config.m_ClOutlineAlphaSolid) / 100.0f) * 100.0f);
+		}
+		static CButtonContainer OutlineColorFreezeID, OutlineColorSolidID, OutlineColorTeleID, OutlineColorUnfreezeID;
+
+		MainView.HSplitTop(5.0f, 0x0, &MainView);
+		MainView.VSplitLeft(-5.0f, 0x0, &MainView);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorFreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Freeze Outline Color"), &g_Config.m_ClOutlineColorFreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorSolidID, 25.0f, 240.0f, 14.0f, &Section, ("Walls Outline Color"), &g_Config.m_ClOutlineColorSolid, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorTeleID, 25.0f, 240.0f, 14.0f, &Section, ("Teleporter Outline Color"), &g_Config.m_ClOutlineColorTele, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(25.0f, &Section, &MainView);
+		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+		MainView.HSplitTop(40.0f, &Section, &MainView);
+		UI()->DoLabel(&Section, ("Frozen Tee Display "), 20.0f, TEXTALIGN_LEFT);
+		MainView.VSplitLeft(3.1f, 0x0, &MainView); // i splitted it 5.1, because 5.0 is not perfectly centered for some fckn reason - DDNET FIX YOUR CODE
+		MainView.HSplitTop(5.1f, 0x0, &MainView);
+
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHudSkins, ("Use teeskin instead of ninja tee"), &g_Config.m_ClShowFrozenHudSkins, &MainView, LineMargin);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClFrozenHudTeamOnly, ("Enable only for Team"), &g_Config.m_ClFrozenHudTeamOnly, &MainView, LineMargin);
+
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(140.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i", "Max Rows", g_Config.m_ClFrozenMaxRows);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClFrozenMaxRows = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenMaxRows, &Button, (g_Config.m_ClFrozenMaxRows - 1) / 5.0f) * 5.0f) + 1;
+		}
+		{
+			CUIRect Button, Label;
+			MainView.HSplitTop(20.0f, &Button, &MainView);
+			Button.VSplitLeft(140.0f, &Label, &Button);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s: %i", "Tee Size", g_Config.m_ClFrozenHudTeeSize);
+			UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_LEFT);
+			g_Config.m_ClFrozenHudTeeSize = (int)(UI()->DoScrollbarH(&g_Config.m_ClFrozenHudTeeSize, &Button, (g_Config.m_ClFrozenHudTeeSize - 8) / 19.0f) * 19.0f) + 8;
+		}
+
+
+		// Preferences
+		Left.HSplitTop(20.0f, &Button, &Left);
+		Button.VSplitMid(&LeftLeft, &Button);
+
+		Left.HSplitTop(110.0f, &Demo, &MainView);
+		Demo.HSplitTop(0.0f, &Label, &Demo);
+		UI()->DoLabel(&Label, Localize("Preferences"), 20.0f, TEXTALIGN_ML);
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		Button.VSplitMid(&LeftLeft, &Button);
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClShowfps, Localize("Show FPS"), g_Config.m_ClShowfps, &Button))
+			g_Config.m_ClShowfps ^= 1;
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClShowpred, Localize("Show ping(predict)"), g_Config.m_ClShowpred, &Button))
+			g_Config.m_ClShowpred ^= 1;
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Server Auto Whitelist"), g_Config.m_ClAutoVerify, &Button))
+			g_Config.m_ClAutoVerify ^= 1;
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
+			g_Config.m_ClShowSkinName ^= 1;
+
 		int i = 0;
 		static CButtonContainer s_aResetIDs[24];
 
-		// Tab
-		Left.HSplitTop(25.f, &Label, &Left);
-		UI()->DoLabel(&Label, Localize("Tab"), 20.f, TEXTALIGN_ML);
-
-		// Left.Draw(ColorRGBA(1,1,1,0,0.25f), IGraphics::CORNER_ALL, 10.0f)
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Blacklisted player color"),
-			&g_Config.m_ScBlacklistPColor,
-			ColorRGBA(1.0f, 0.39f, 0.39f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Friends color"),
-			&g_Config.m_ScFriendColor,
-			ColorRGBA(0.45f, 1.0f, 0.91f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Сlanmates color"),
-			&g_Config.m_ClSameClanColor,
-			ColorRGBA(0.2f, 0.7f, 1.0f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Staff player color(f2)"),
-			&g_Config.m_ClAuthedPlayerColor,
-			ColorRGBA(1.f, 0.25f, 0.6f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Own player color"),
-			&g_Config.m_ScPlayerOwnColor,
-			ColorRGBA(1.0f, 1.0f, 1.0f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Left, Localize("Frozen Tee Color"),
-			&g_Config.m_ScFrozenTeeColor,
-			ColorRGBA(1.0f, 1.0f, 1.0f),
-			false);
-
-		Left.HSplitTop(20.f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ScShowBlacklistNameplaterColor, Localize("Display Blacklisted Color in Nameplates"), g_Config.m_ScShowBlacklistNameplaterColor, &Button))
-			g_Config.m_ScShowBlacklistNameplaterColor ^= 1;
-
-		Left.HSplitTop(20.f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ScShowFriendsNameplatesColor, Localize("Display Friend Color in Nameplates"), g_Config.m_ScShowFriendsNameplatesColor, &Button))
-			g_Config.m_ScShowFriendsNameplatesColor ^= 1;
-
-		Left.HSplitTop(20.f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ScShowFrozenNameplaterColor, Localize("Display Frozen Tee's Color in Nameplates"), g_Config.m_ScShowFrozenNameplaterColor, &Button))
-			g_Config.m_ScShowFrozenNameplaterColor ^= 1;
-
-		// Console color
-		Right.HSplitTop(25.f, &Label, &Right);
-		UI()->DoLabel(&Label, Localize("Console Settings"), 20.0f, TEXTALIGN_ML);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Right, Localize("Local console color"),
-			&g_Config.m_ScLocalConsoleColor,
-			ColorRGBA(0.2f, 0.2f, 0.2f),
-			false);
-
-		DoLine_ColorPicker(&s_aResetIDs[i++],
-			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-			&Right, Localize("Remote console color"),
-			&g_Config.m_ScRemoteConsoleColor,
-			ColorRGBA(0.4f, 0.2f, 0.2f),
-			false);
-
-		if(g_Config.m_ClConsoleBarSimple == 1)
-		{
-			DoLine_ColorPicker(&s_aResetIDs[i++],
-				ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
-				&Right, Localize("Simpled console bar color"),
-				&g_Config.m_ScConsoleBarColor,
-				ColorRGBA(8883654),
-				false);
-		}
-
-		Right.HSplitTop(20.f, &Button, &Right);
-		UI()->DoScrollbarOption(&g_Config.m_ClLocalConsolaAlpha, &g_Config.m_ClLocalConsolaAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
-		Right.HSplitTop(20.f, &Button, &Right);
-		UI()->DoScrollbarOption(&g_Config.m_ClRemoteConsolaAlpha, &g_Config.m_ClRemoteConsolaAlpha, &Button, Localize("Remote Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
-
-		Right.HSplitTop(30.f, &Label, &Right);
-		UI()->DoLabel(&Label, Localize("Better Animation (LERP)"), 20.0f, TEXTALIGN_ML);
-
-		// feets
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(DoButton_CheckBox(&g_Config.m_ClAnimFeetSpeed, Localize("Enable Feet LERP"), g_Config.m_ClAnimFeetSpeed < 100, &Button))
-			g_Config.m_ClAnimFeetSpeed = g_Config.m_ClAnimFeetSpeed < 100 ? 100 : 1;
-
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(g_Config.m_ClAnimFeetSpeed > 0 && g_Config.m_ClAnimFeetSpeed < 100)
-			UI()->DoScrollbarOption(&g_Config.m_ClAnimFeetSpeed, &g_Config.m_ClAnimFeetSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
-
-		// guns
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(DoButton_CheckBox(&g_Config.m_ClAnimGunsSpeed, Localize("Enable Guns LERP"), g_Config.m_ClAnimGunsSpeed < 100, &Button))
-			g_Config.m_ClAnimGunsSpeed = g_Config.m_ClAnimGunsSpeed < 100 ? 100 : 1;
-
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(g_Config.m_ClAnimGunsSpeed > 0 && g_Config.m_ClAnimGunsSpeed < 100)
-			UI()->DoScrollbarOption(&g_Config.m_ClAnimGunsSpeed, &g_Config.m_ClAnimGunsSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
-
-		// hammer
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(DoButton_CheckBox(&g_Config.m_ClAnimHammerSpeed, Localize("Enable Hammer LERP"), g_Config.m_ClAnimHammerSpeed < 100, &Button))
-			g_Config.m_ClAnimHammerSpeed = g_Config.m_ClAnimHammerSpeed < 100 ? 100 : 1;
-
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(g_Config.m_ClAnimHammerSpeed > 0 && g_Config.m_ClAnimHammerSpeed < 100)
-			UI()->DoScrollbarOption(&g_Config.m_ClAnimHammerSpeed, &g_Config.m_ClAnimHammerSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
-
-		// ninja
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(DoButton_CheckBox(&g_Config.m_ClAnimNinjaSpeed, Localize("Enable Ninja LERP"), g_Config.m_ClAnimNinjaSpeed < 100, &Button))
-			g_Config.m_ClAnimNinjaSpeed = g_Config.m_ClAnimNinjaSpeed < 100 ? 100 : 1;
-
-		Right.HSplitTop(20.0f, &Button, &Right);
-		if(g_Config.m_ClAnimNinjaSpeed > 0 && g_Config.m_ClAnimNinjaSpeed < 100)
-			UI()->DoScrollbarOption(&g_Config.m_ClAnimNinjaSpeed, &g_Config.m_ClAnimNinjaSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
-
 		// Bind wheel config
-		Right.HSplitTop(30.f, &Label, &Right);
+		Left.HSplitTop(30.f, &Label, &Right);
 		UI()->DoLabel(&Label, Localize("Bind wheel"), 20.0f, TEXTALIGN_ML);
 
 		CUIRect BindWheelZone, BindWheelBinding, BindWheelList, BindWheelOptions;
@@ -3466,54 +3454,8 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			s_SelectedBind = -1;
 		}
 
-		// Preferences
-		Left.HSplitTop(20.0f, &Button, &Left);
-		Button.VSplitMid(&LeftLeft, &Button);
 
-		Left.HSplitTop(110.0f, &Demo, &MainView);
-		Demo.HSplitTop(0.0f, &Label, &Demo);
-		UI()->DoLabel(&Label, Localize("Preferences"), 20.0f, TEXTALIGN_ML);
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		Button.VSplitMid(&LeftLeft, &Button);
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClShowfps, Localize("Show FPS"), g_Config.m_ClShowfps, &Button))
-			g_Config.m_ClShowfps ^= 1;
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClShowpred, Localize("Show ping(predict)"), g_Config.m_ClShowpred, &Button))
-			g_Config.m_ClShowpred ^= 1;
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClAutoVerify, Localize("Server Auto Whitelist"), g_Config.m_ClAutoVerify, &Button))
-			g_Config.m_ClAutoVerify ^= 1;
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
-			g_Config.m_ClShowSkinName ^= 1;
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClConsoleSimple, Localize("Use simpled console"), g_Config.m_ClConsoleSimple, &Button))
-			g_Config.m_ClConsoleSimple ^= 1;
-
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_ClConsoleBarSimple, Localize("Use simpled console bar"), g_Config.m_ClConsoleBarSimple, &Button))
-			g_Config.m_ClConsoleBarSimple ^= 1;
-	}
-
-	if(s_CurTab == STA_TAB_PAGE2)
-	{
-		CUIRect Column;
-		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
-
-		MainView.HSplitTop(40.0f, &Section, &MainView);
-		UI()->DoLabel(&Section, ("GO TO Appearence->Chat "), 40.0f, TEXTALIGN_LEFT);
-		MainView.VSplitLeft(5.1f, 0x0, &MainView);
-		MainView.HSplitTop(5.1f, 0x0, &MainView);
-	}
-	if(s_CurTab == STA_TAB_PAGE3)
-	{
+		/*
 		CUIRect Column;
 		MainView.VSplitLeft(MainView.w * 0.5, &MainView, &Column);
 
@@ -3613,6 +3555,178 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		MainView.HSplitTop(25.0f, &Section, &MainView);
 		DoLine_ColorPicker(&OutlineColorUnfreezeID, 25.0f, 240.0f, 14.0f, &Section, ("Unfreeze Outline Color"), &g_Config.m_ClOutlineColorUnfreeze, ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+
+*/
+
+	}
+
+	if(s_CurTab == STA_TAB_PAGE2)
+	{
+		CUIRect LeftLeft, Margin, TabSettings, Demo;
+		int i = 0;
+		static CButtonContainer s_aResetIDs[24];
+
+		// Tab
+		Left.HSplitTop(25.f, &Label, &Left);
+		UI()->DoLabel(&Label, Localize("Tab"), 20.f, TEXTALIGN_ML);
+
+		// Left.Draw(ColorRGBA(1,1,1,0,0.25f), IGraphics::CORNER_ALL, 10.0f)
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Blacklisted player color"),
+			&g_Config.m_ScBlacklistPColor,
+			ColorRGBA(1.0f, 0.39f, 0.39f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Friends color"),
+			&g_Config.m_ScFriendColor,
+			ColorRGBA(0.45f, 1.0f, 0.91f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Сlanmates color"),
+			&g_Config.m_ClSameClanColor,
+			ColorRGBA(0.2f, 0.7f, 1.0f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Staff player color(f2)"),
+			&g_Config.m_ClAuthedPlayerColor,
+			ColorRGBA(1.f, 0.25f, 0.6f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Own player color"),
+			&g_Config.m_ScPlayerOwnColor,
+			ColorRGBA(1.0f, 1.0f, 1.0f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Left, Localize("Frozen Tee Color"),
+			&g_Config.m_ScFrozenTeeColor,
+			ColorRGBA(1.0f, 1.0f, 1.0f),
+			false);
+
+		Left.HSplitTop(20.f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ScShowBlacklistNameplaterColor, Localize("Display Blacklisted Color in Nameplates"), g_Config.m_ScShowBlacklistNameplaterColor, &Button))
+			g_Config.m_ScShowBlacklistNameplaterColor ^= 1;
+
+		Left.HSplitTop(20.f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ScShowFriendsNameplatesColor, Localize("Display Friend Color in Nameplates"), g_Config.m_ScShowFriendsNameplatesColor, &Button))
+			g_Config.m_ScShowFriendsNameplatesColor ^= 1;
+
+		Left.HSplitTop(20.f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ScShowFrozenNameplaterColor, Localize("Display Frozen Tee's Color in Nameplates"), g_Config.m_ScShowFrozenNameplaterColor, &Button))
+			g_Config.m_ScShowFrozenNameplaterColor ^= 1;
+
+		Left.HSplitTop(25.f, &Label, &Left);
+		UI()->DoLabel(&Label, Localize("Tee's"), 25.f, TEXTALIGN_ML);
+
+		Left.HSplitTop(20.f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClRainbow, Localize("Rainbow Tee"), g_Config.m_ClRainbow, &Button))
+			g_Config.m_ClRainbow ^= 1;
+		if(g_Config.m_ClRainbow == 1)
+		{
+			Left.HSplitTop(20.f, &Button, &Left);
+			UI()->DoScrollbarOption(&g_Config.m_ClRainbowSpeed, &g_Config.m_ClRainbowSpeed, &Button, Localize("Rainbow Speed"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
+		}
+
+
+
+		// Console color
+		Right.HSplitTop(25.f, &Label, &Right);
+		UI()->DoLabel(&Label, Localize("Console Settings"), 20.0f, TEXTALIGN_ML);
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClConsoleSimple, Localize("Use simpled console"), g_Config.m_ClConsoleSimple, &Button))
+			g_Config.m_ClConsoleSimple ^= 1;
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClConsoleBarSimple, Localize("Use simpled console bar"), g_Config.m_ClConsoleBarSimple, &Button))
+			g_Config.m_ClConsoleBarSimple ^= 1;
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Right, Localize("Local console color"),
+			&g_Config.m_ScLocalConsoleColor,
+			ColorRGBA(0.2f, 0.2f, 0.2f),
+			false);
+
+		DoLine_ColorPicker(&s_aResetIDs[i++],
+			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+			&Right, Localize("Remote console color"),
+			&g_Config.m_ScRemoteConsoleColor,
+			ColorRGBA(0.4f, 0.2f, 0.2f),
+			false);
+
+		if(g_Config.m_ClConsoleBarSimple == 1)
+		{
+			DoLine_ColorPicker(&s_aResetIDs[i++],
+				ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+				&Right, Localize("Simpled console bar color"),
+				&g_Config.m_ScConsoleBarColor,
+				ColorRGBA(8883654),
+				false);
+		}
+
+		Right.HSplitTop(20.f, &Button, &Right);
+		UI()->DoScrollbarOption(&g_Config.m_ClLocalConsolaAlpha, &g_Config.m_ClLocalConsolaAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
+		Right.HSplitTop(20.f, &Button, &Right);
+		UI()->DoScrollbarOption(&g_Config.m_ClRemoteConsolaAlpha, &g_Config.m_ClRemoteConsolaAlpha, &Button, Localize("Remote Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
+
+		Right.HSplitTop(30.f, &Label, &Right);
+		UI()->DoLabel(&Label, Localize("Better Animation (LERP)"), 20.0f, TEXTALIGN_ML);
+
+		// feets
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClAnimFeetSpeed, Localize("Enable Feet LERP"), g_Config.m_ClAnimFeetSpeed < 100, &Button))
+			g_Config.m_ClAnimFeetSpeed = g_Config.m_ClAnimFeetSpeed < 100 ? 100 : 1;
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(g_Config.m_ClAnimFeetSpeed > 0 && g_Config.m_ClAnimFeetSpeed < 100)
+			UI()->DoScrollbarOption(&g_Config.m_ClAnimFeetSpeed, &g_Config.m_ClAnimFeetSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
+
+		// guns
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClAnimGunsSpeed, Localize("Enable Guns LERP"), g_Config.m_ClAnimGunsSpeed < 100, &Button))
+			g_Config.m_ClAnimGunsSpeed = g_Config.m_ClAnimGunsSpeed < 100 ? 100 : 1;
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(g_Config.m_ClAnimGunsSpeed > 0 && g_Config.m_ClAnimGunsSpeed < 100)
+			UI()->DoScrollbarOption(&g_Config.m_ClAnimGunsSpeed, &g_Config.m_ClAnimGunsSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
+
+		// hammer
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClAnimHammerSpeed, Localize("Enable Hammer LERP"), g_Config.m_ClAnimHammerSpeed < 100, &Button))
+			g_Config.m_ClAnimHammerSpeed = g_Config.m_ClAnimHammerSpeed < 100 ? 100 : 1;
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(g_Config.m_ClAnimHammerSpeed > 0 && g_Config.m_ClAnimHammerSpeed < 100)
+			UI()->DoScrollbarOption(&g_Config.m_ClAnimHammerSpeed, &g_Config.m_ClAnimHammerSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
+
+		// ninja
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(DoButton_CheckBox(&g_Config.m_ClAnimNinjaSpeed, Localize("Enable Ninja LERP"), g_Config.m_ClAnimNinjaSpeed < 100, &Button))
+			g_Config.m_ClAnimNinjaSpeed = g_Config.m_ClAnimNinjaSpeed < 100 ? 100 : 1;
+
+		Right.HSplitTop(20.0f, &Button, &Right);
+		if(g_Config.m_ClAnimNinjaSpeed > 0 && g_Config.m_ClAnimNinjaSpeed < 100)
+			UI()->DoScrollbarOption(&g_Config.m_ClAnimNinjaSpeed, &g_Config.m_ClAnimNinjaSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
+
+	}
+	if(s_CurTab == STA_TAB_PAGE3)
+	{
+		Left.HSplitTop(25.f, &Label, &Left);
+		UI()->DoLabel(&Label, Localize("Why are you looking right here?:o"), 20.f, TEXTALIGN_ML);
+
 	}
 }
 void CMenus::RenderSettingsProfiles(CUIRect MainView)

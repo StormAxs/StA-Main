@@ -8,7 +8,7 @@
 enum
 {
 	BIND_WHEEL_MAX_NAME = 64,
-	BIND_WHEEL_MAX_BIND = 256
+	BIND_WHEEL_MAX_BIND = 40
 };
 
 class CBindWheel : public CComponent
