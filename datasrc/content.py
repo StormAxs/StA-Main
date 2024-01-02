@@ -256,6 +256,9 @@ container.images.Add(image_strongweak)
 container.images.Add(image_hud)
 container.images.Add(image_extras)
 container.images.Add(Image("raceflag", "race_flag.png"))
+container.images.Add(Image("console_bar_simple", "console_bar_simple.png"))
+container.images.Add(Image("console_simple", "console_simple.png"))
+
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))

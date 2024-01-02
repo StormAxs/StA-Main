@@ -691,6 +691,7 @@ MACRO_CONFIG_INT(ClFrozenHudTeamOnly, sc_frozen_tees_only_inteam, 0, 0, 1, CFGFL
 
 MACRO_CONFIG_COL(ScPlayerOwnColor, sc_player_own_color, 6684927, CFGFLAG_CLIENT | CFGFLAG_SAVE, "You'r color in TAB list")
 MACRO_CONFIG_COL(ScLocalConsoleColor, sc_local_console_color, 51, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Local console color")
+MACRO_CONFIG_COL(ScConsoleBarColor, sc_console_bar_color, 8883654, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Console bar color")
 MACRO_CONFIG_COL(ScRemoteConsoleColor, sc_remote_console_color, 21837, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Remote console color")
 MACRO_CONFIG_INT(ClLocalConsolaAlpha, cl_local_console_alpha, 90, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Opacity of local console")
 MACRO_CONFIG_INT(ClRemoteConsolaAlpha, cl_remote_console_alpha, 90, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Opacity of remote console")
@@ -742,6 +743,9 @@ MACRO_CONFIG_COL(ClOutlineColorUnfreeze, sc_outline_color_unfreeze, 0, CFGFLAG_C
 MACRO_CONFIG_INT(ClRainbow, sc_rainbow, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow urself")
 MACRO_CONFIG_INT(ClRainbowSpeed, sc_rainbow_speed, 20, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow speed")
 MACRO_CONFIG_INT(ClRainbowEveryone, sc_rainbow_all, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow all")
+MACRO_CONFIG_INT(ClShowStateChangeCountdown, sc_stars, 1, 1, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Rainbow all")
 
 //tee skin name
-MACRO_CONFIG_INT(ClShowSkinName, cl_nameplates_skin_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
+MACRO_CONFIG_INT(ClShowSkinName, sc_nameplates_skin_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
+MACRO_CONFIG_INT(ClConsoleSimple, sc_console_simple, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
+MACRO_CONFIG_INT(ClConsoleBarSimple, cl_consolebar_simple, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")

@@ -1055,7 +1055,9 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Show entities"), "toggle cl_overlay_entities 0 100", 0, 0},
 		{Localizable("Show HUD"), "toggle cl_showhud 0 1", 0, 0},
 		{Localizable("BindWheel"), "+bind_wheel", 0, 0},
-		{Localizable("45° AIM"), "+toggle cl_mouse_max_distance 2 400; +showhookcoll", 0, 0},
+		{Localizable("45° AIM"), "+toggle cl_mouse_max_distance 2 400; +toggle inp_mousesens 1; +showhookcoll", 0, 0, },
+		//TODO: Make it work
+		//{Localizable("Toggle dummy deep fly"), "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\" ;cl_message_client_color green; echo Deep Fly ON; bind x \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF;""" , 0, 0},
 };
 
 void CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View)
@@ -3347,6 +3349,17 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			&g_Config.m_ScRemoteConsoleColor,
 			ColorRGBA(0.4f, 0.2f, 0.2f),
 			false);
+
+		if(g_Config.m_ClConsoleBarSimple == 1)
+		{
+			DoLine_ColorPicker(&s_aResetIDs[i++],
+				ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+				&Right, Localize("Simpled console bar color"),
+				&g_Config.m_ScConsoleBarColor,
+				ColorRGBA(8883654),
+				false);
+		}
+
 		Right.HSplitTop(20.f, &Button, &Right);
 		UI()->DoScrollbarOption(&g_Config.m_ClLocalConsolaAlpha, &g_Config.m_ClLocalConsolaAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 		Right.HSplitTop(20.f, &Button, &Right);
@@ -3479,6 +3492,14 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Left.HSplitTop(20.0f, &Button, &Left);
 		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
 			g_Config.m_ClShowSkinName ^= 1;
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClConsoleSimple, Localize("Use simpled console"), g_Config.m_ClConsoleSimple, &Button))
+			g_Config.m_ClConsoleSimple ^= 1;
+
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClConsoleBarSimple, Localize("Use simpled console bar"), g_Config.m_ClConsoleBarSimple, &Button))
+			g_Config.m_ClConsoleBarSimple ^= 1;
 	}
 
 	if(s_CurTab == STA_TAB_PAGE2)
