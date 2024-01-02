@@ -821,7 +821,7 @@ void CGameConsole::OnRender()
 	float MaxConsoleHeight = Screen.h * 3 / 5.0f;
 	float ConsoleHeight;
 
-	float Progress = (Client()->LocalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration  / 2;
+	float Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration / 2;
 
 	if(Progress >= 1.0f)
 	{
