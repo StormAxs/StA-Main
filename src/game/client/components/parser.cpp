@@ -50,6 +50,36 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 
 	pStatsDest->Points = PointsTotal.u.integer;
 
+	const json_value &PointsRankCategories = PlayerStats["points"];
+	const json_value &PointsRankCategory = PointsRankCategories["rankpoints"];
+	const json_value &RankPoints = PointsRankCategory["total"];
+	const json_value &RankPointsTotal = RankPoints["points"];
+
+	pStatsDest->RankPoints = RankPointsTotal.u.integer;
+
 	json_value_free(pPlayerStats);
 	pStatsDest->StatsParsed = true;
+
+
+
+/*
+ 	//same for ddnet.org
+	json_value *pPlayerDDNet = pStatsDest->m_pGetStatsDDNet->ResultJson();
+	if(!pPlayerDDNet)
+	{
+		dbg_msg("stats", "Invalid JSON received");
+		return;
+	}
+
+	json_value &PlayerDDNet = *pPlayerDDNet;
+	//since player is in the first column - do it like this:
+	const json_value &PlayerD = PlayerDDNet["player"];
+	str_copy(pStatsDest->aPlayer, PlayerD);
+
+
+	const json_value &LastFinishes = PlayerD["last_finishes"];
+
+	json_value_free(pPlayerDDNet);
+	pStatsDest->StatsParsed = true;
+*/
 }

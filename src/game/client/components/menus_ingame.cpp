@@ -942,7 +942,6 @@ void CMenus::RenderStats(CUIRect MainView)
 		int Emote = m_Dummy ? g_Config.m_ClDummyDefaultEyes : g_Config.m_ClPlayerDefaultEyes;
 		RenderTools()->RenderTee(pIdleState, &OwnSkinInfo, Emote, vec2(1, 0), TeeRenderPos);
 
-		StALogo.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		WB.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		CP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		LF.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
@@ -953,28 +952,90 @@ void CMenus::RenderStats(CUIRect MainView)
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
 
 		char Welcome[128];
-		const char *names[] =
-			{
-				"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"};
+		// TODO: fix it somewhen
+		/*
+const char *names[] =
+	{
+		"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"
+	};
 
-		for(int i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+  for(int i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+  {
+	  if(strcmp(Client()->PlayerName(), names[i]) == 0)
+	  {
+		  break;
+	  }
+	  else
+	  {
+		  ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
+		  TextRender()->TextColor(col);
+	  }
+  }
+  */
+
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
+
+		static CStatsPlayer s_StatsPlayer;
+
+		CStatsPlayer statsPlayer;
+		CUIRect FetchButton;
+		static CButtonContainer s_FetchButton;
+
+
+
+		if(strcmp(Client()->PlayerName(), "-StormAx") == 0 || strcmp(Client()->PlayerName(), "meloƞ") == 0 || strcmp(Client()->PlayerName(), "我叫芙焦") == 0 || strcmp(Client()->PlayerName(), "Mʎɹ シ") == 0 || strcmp(Client()->PlayerName(), "Cheeru") == 0 || strcmp(Client()->PlayerName(), "Mónik") == 0)
 		{
-			if(strcmp(Client()->PlayerName(), names[i]) == 0)
-			{
-				break;
-			}
 			ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
 			TextRender()->TextColor(col);
 		}
 
-		static CStatsPlayer s_StatsPlayer;
+		static bool IsParsed = false; // Make it a static variable to prevent it from be resassigned to false every time.
+		const char *pName = Client()->PlayerName();
+		if(!IsParsed)
+		{
+			if(!s_StatsPlayer.m_pGetStatsDDStats) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
+				m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
 
-		str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
+			if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING) // check if download is still in progress.
+				return;
+
+			// Once the download is finished.
+			if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
+			{
+				IsParsed = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+				m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
+				return;
+			}
+		}
+
+		// render logo
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ACLOGO].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1, 1, 1, 1);
+		IGraphics::CQuadItem QuadItem(MainView.w / 2 + 95, 80, 390, 160);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+
+
+	str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
 		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		str_format(Welcome, sizeof(Welcome), " Current points: %d", s_StatsPlayer.Points);
-		UI()->DoLabel(&CP, Welcome, 40.0f, TEXTALIGN_ML);
+
+
+		char pts[120];
+		int playerPoints = s_StatsPlayer.Points;
+		str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
+		UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
+
+		int RankPoints = s_StatsPlayer.RankPoints;
+		str_format(pts, sizeof(pts), " Current Rank Point: %d", RankPoints);
+		UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
+
+
+		char abuf[126];
+
+
 	}
 	else if(s_StatsPage == 1)
 	{

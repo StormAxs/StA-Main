@@ -1544,6 +1544,7 @@ set(EXPECTED_DATA
         menuimages/settings.png
         particles.png
         race_flag.png
+        AcLogo.png
         console_bar_simple.png
         console_simple.png
         shader/pipeline.frag

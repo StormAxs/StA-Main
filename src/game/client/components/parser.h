@@ -16,6 +16,7 @@ public:
 	char aPlayer[MAX_NAME_LENGTH];
 	int Points;
 	bool StatsParsed = false;
+	int RankPoints;
 };
 
 class CStats : public CComponent
