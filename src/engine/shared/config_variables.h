@@ -749,3 +749,6 @@ MACRO_CONFIG_INT(ClShowStateChangeCountdown, sc_stars, 1, 1, 2, CFGFLAG_CLIENT |
 MACRO_CONFIG_INT(ClShowSkinName, sc_nameplates_skin_name, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
 MACRO_CONFIG_INT(ClConsoleSimple, sc_console_simple, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
 MACRO_CONFIG_INT(ClConsoleBarSimple, cl_consolebar_simple, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
+// Old ninja mode
+MACRO_CONFIG_INT(ClOldFreezeMode, cl_old_freeze_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "OldNinjaMode")
+MACRO_CONFIG_INT(ClFrozenWeapon, cl_frozen_weapon, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Give frozen tees their weapon")

@@ -3391,6 +3391,9 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		if(DoButton_CheckBox(&g_Config.m_ClShowSkinName, Localize("Display skin name in nameplates"), g_Config.m_ClShowSkinName, &Button))
 			g_Config.m_ClShowSkinName ^= 1;
 
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClOldFreezeMode, Localize("Old Freeze Mode"), g_Config.m_ClOldFreezeMode, &Button))
+			g_Config.m_ClOldFreezeMode ^= 1;
 
 		// Bind wheel config
 		Left.HSplitTop(30.f, &Label, &Right);

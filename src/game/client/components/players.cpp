@@ -449,9 +449,15 @@ void CPlayers::RenderPlayer(
 			State.Add(&g_pData->m_aAnimations[ANIM_WALK], WalkTime, 1.0f);
 	}
 
-	if(Player.m_Weapon == WEAPON_HAMMER)
+	int CurrentWeapon = clamp(Player.m_Weapon, 0, NUM_WEAPONS - 1);
+	if(m_pClient->m_aClients[ClientID].m_FreezeEnd)
+	{
+		CurrentWeapon = WEAPON_NINJA;
+	}
+
+	if(CurrentWeapon == WEAPON_HAMMER)
 		State.Add(&g_pData->m_aAnimations[ANIM_HAMMER_SWING], clamp(LastAttackTime * 5.0f, 0.0f, 1.0f), 1.0f);
-	if(Player.m_Weapon == WEAPON_NINJA)
+	if(CurrentWeapon == WEAPON_NINJA)
 		State.Add(&g_pData->m_aAnimations[ANIM_NINJA_SWING], clamp(LastAttackTime * 2.0f, 0.0f, 1.0f), 1.0f);
 
 	// do skidding
@@ -493,6 +499,7 @@ void CPlayers::RenderPlayer(
 
 		if(!(RenderInfo.m_TeeRenderFlags & TEE_NO_WEAPON))
 		{
+
 			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 			Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle * pi * 2 + Angle);
 
@@ -500,7 +507,7 @@ void CPlayers::RenderPlayer(
 				Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.5f);
 
 			// normal weapons
-			int CurrentWeapon = clamp(Player.m_Weapon, 0, NUM_WEAPONS - 1);
+
 			Graphics()->TextureSet(GameClient()->m_GameSkin.m_aSpriteWeapons[CurrentWeapon]);
 			int QuadOffset = CurrentWeapon * 2 + (Direction.x < 0 ? 1 : 0);
 
@@ -511,7 +518,7 @@ void CPlayers::RenderPlayer(
 			vec2 WeaponPosition;
 			bool IsSit = Inactive && !InAir && Stationary;
 
-			if(Player.m_Weapon == WEAPON_HAMMER)
+			if(CurrentWeapon == WEAPON_HAMMER)
 			{
 				// static position for hammer
 				WeaponPosition = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
@@ -538,8 +545,10 @@ void CPlayers::RenderPlayer(
 
 				Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, WeaponPosition.x, WeaponPosition.y);
 			}
-			else if(Player.m_Weapon == WEAPON_NINJA)
+			else if(CurrentWeapon == WEAPON_NINJA)
 			{
+
+
 				WeaponPosition = Position;
 				WeaponPosition.y += g_pData->m_Weapons.m_aId[CurrentWeapon].m_Offsety;
 				if(IsSit)
@@ -563,7 +572,7 @@ void CPlayers::RenderPlayer(
 
 				Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, WeaponPosition.x, WeaponPosition.y);
 
-				// HADOKEN
+				// NO HADOKEN ;(
 				if(AttackTime <= 1 / 6.f && g_pData->m_Weapons.m_aId[CurrentWeapon].m_NumSpriteMuzzles)
 				{
 					int IteX = rand() % g_pData->m_Weapons.m_aId[CurrentWeapon].m_NumSpriteMuzzles;
@@ -631,7 +640,7 @@ void CPlayers::RenderPlayer(
 				Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, WeaponPosition.x, WeaponPosition.y);
 			}
 
-			if(Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN)
+			if(CurrentWeapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN)
 			{
 				// check if we're firing stuff
 				if(g_pData->m_Weapons.m_aId[CurrentWeapon].m_NumSpriteMuzzles) // prev.attackticks)
@@ -674,6 +683,8 @@ void CPlayers::RenderPlayer(
 					}
 				}
 			}
+
+
 			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 			Graphics()->QuadsSetRotation(0);
 
@@ -793,40 +804,63 @@ void CPlayers::OnRender()
 {
 	CTeeRenderInfo aRenderInfo[MAX_CLIENTS];
 
-	// update RenderInfo for ninja
-	bool IsTeamplay = false;
-	if(m_pClient->m_Snap.m_pGameInfoObj)
-		IsTeamplay = (m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS) != 0;
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		aRenderInfo[i] = m_pClient->m_aClients[i].m_RenderInfo;
-		aRenderInfo[i].m_TeeRenderFlags = 0;
-		if(m_pClient->m_aClients[i].m_FreezeEnd != 0)
-			aRenderInfo[i].m_TeeRenderFlags |= TEE_EFFECT_FROZEN | TEE_NO_WEAPON;
-		if(m_pClient->m_aClients[i].m_LiveFrozen)
-			aRenderInfo[i].m_TeeRenderFlags |= TEE_EFFECT_FROZEN;
+	CNetObj_Character Player;
 
-		const CGameClient::CSnapState::CCharacterInfo &CharacterInfo = m_pClient->m_Snap.m_aCharacters[i];
-		const bool Frozen = CharacterInfo.m_HasExtendedData && CharacterInfo.m_ExtendedData.m_FreezeEnd != 0;
-		if((CharacterInfo.m_Cur.m_Weapon == WEAPON_NINJA || (Frozen && !m_pClient->m_GameInfo.m_NoSkinChangeForFrozen)) && g_Config.m_ClShowNinja)
+		// update RenderInfo for ninja
+		bool IsTeamplay = false;
+		if(m_pClient->m_Snap.m_pGameInfoObj)
+		IsTeamplay = (m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS) != 0;
+		for(int i = 0; i < MAX_CLIENTS; ++i)
 		{
+
+		aRenderInfo[i] = m_pClient->m_aClients[i].m_RenderInfo;
+		//aRenderInfo[i].m_ShineDecoration = m_pClient->m_aClients[i].m_LiveFrozen;
+
+		aRenderInfo[i].m_TeeRenderFlags = 0;
+
+
+		CGameClient::CSnapState::CCharacterInfo &CharacterInfo = m_pClient->m_Snap.m_aCharacters[i];
+		const bool Frozen = CharacterInfo.m_HasExtendedData && CharacterInfo.m_ExtendedData.m_FreezeEnd != 0;
+		if(g_Config.m_ClOldFreezeMode == 1)
+		{
+			if(m_pClient->m_aClients[i].m_FreezeEnd != 0)
+			{
+				aRenderInfo[i].m_TeeRenderFlags |= TEE_EFFECT_FROZEN;
+			}
+		}
+		else
+		{
+			if(m_pClient->m_aClients[i].m_FreezeEnd != 0)
+			{
+				aRenderInfo[i].m_TeeRenderFlags |= TEE_EFFECT_FROZEN | TEE_NO_WEAPON;
+			}
+		}
+			if(m_pClient->m_aClients[i].m_LiveFrozen)
+			{
+				aRenderInfo[i].m_TeeRenderFlags |= TEE_EFFECT_FROZEN;
+			}
+
+		if((CharacterInfo.m_Cur.m_Weapon == WEAPON_NINJA || (Frozen && !m_pClient->m_GameInfo.m_NoSkinChangeForFrozen)) && g_Config.m_ClShowNinja)
+			{
 			// change the skin for the player to the ninja
 			const auto *pSkin = m_pClient->m_Skins.FindOrNullptr("x_ninja");
 			if(pSkin != nullptr)
-			{
-				aRenderInfo[i].m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-				aRenderInfo[i].m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-				aRenderInfo[i].m_BloodColor = pSkin->m_BloodColor;
-				aRenderInfo[i].m_SkinMetrics = pSkin->m_Metrics;
-				aRenderInfo[i].m_CustomColoredSkin = IsTeamplay;
-				if(!IsTeamplay)
 				{
-					aRenderInfo[i].m_ColorBody = ColorRGBA(1, 1, 1);
-					aRenderInfo[i].m_ColorFeet = ColorRGBA(1, 1, 1);
+					aRenderInfo[i].m_OriginalRenderSkin = pSkin->m_OriginalSkin;
+					aRenderInfo[i].m_ColorableRenderSkin = pSkin->m_ColorableSkin;
+					aRenderInfo[i].m_BloodColor = pSkin->m_BloodColor;
+					aRenderInfo[i].m_SkinMetrics = pSkin->m_Metrics;
+					aRenderInfo[i].m_CustomColoredSkin = IsTeamplay;
+					if(!IsTeamplay)
+					{
+						aRenderInfo[i].m_ColorBody = ColorRGBA(1, 1, 1);
+						aRenderInfo[i].m_ColorFeet = ColorRGBA(1, 1, 1);
+					}
 				}
 			}
 		}
-	}
+
+
 	const CSkin *pSkin = m_pClient->m_Skins.Find("x_spec");
 	CTeeRenderInfo RenderInfoSpec;
 	RenderInfoSpec.m_OriginalRenderSkin = pSkin->m_OriginalSkin;

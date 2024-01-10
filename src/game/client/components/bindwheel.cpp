@@ -122,6 +122,8 @@ void CBindWheel::OnRender()
 {
 	if(!m_Active)
 	{
+		g_Config.m_ClOutline == 0;
+
 		if(m_WasActive && !m_vBinds.empty() && m_Choose != -1)
 			UseBind();
 		m_WasActive = false;
@@ -175,7 +177,7 @@ void CBindWheel::OnRender()
 	}
 	else
 	{
-		const char *pEmpty = "Empty. Example of adding new bind(in f1): bind_wheel \"Text\" \"say hi t-client :D\"";
+		const char *pEmpty = "Empty";
 		float W = TextRender()->TextWidth(8.f, pEmpty);
 		TextRender()->Text(Screen.w / 2.f - W / 2.f, Screen.h / 2.f - 12.f, 8.f, pEmpty);
 	}
