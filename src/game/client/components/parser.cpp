@@ -50,6 +50,16 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 
 	pStatsDest->Points = PointsTotal.u.integer;
 
+/*
+	json_value &MostPlayedMaps = *pPlayerStats;
+	//get the total points of the PointsCategory in DDStats
+	const json_value &MPM = MostPlayedMaps["mostPlayedMaps"];
+	const json_value &FirstMap = MPM["map"];
+
+	pStatsDest->aMap = FirstMap.u.object;
+*/
+
+//rankpoints
 	const json_value &PointsRankCategories = PlayerStats["points"];
 	const json_value &PointsRankCategory = PointsRankCategories["rankpoints"];
 	const json_value &RankPoints = PointsRankCategory["total"];
@@ -58,6 +68,7 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	pStatsDest->RankPoints = RankPointsTotal.u.integer;
 
 	json_value_free(pPlayerStats);
+
 	pStatsDest->StatsParsed = true;
 
 

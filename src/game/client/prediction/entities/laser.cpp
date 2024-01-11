@@ -21,6 +21,7 @@ CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_Bounces = 0;
 	m_EvalTick = 0;
 	m_Type = Type;
+	m_WasTele = false;
 	m_ZeroEnergyBounceInLastTick = false;
 	m_TuneZone = GameWorld()->m_WorldConfig.m_UseTuneZones ? Collision()->IsTune(Collision()->GetMapIndex(m_Pos)) : 0;
 	GameWorld()->InsertEntity(this);
@@ -114,6 +115,7 @@ void CLaser::DoBounce()
 			vec2 TempPos = m_Pos;
 			vec2 TempDir = m_Dir * 4.0f;
 
+			int z;
 			int f = 0;
 			if(Res == -1)
 			{
@@ -140,8 +142,18 @@ void CLaser::DoBounce()
 			}
 			m_ZeroEnergyBounceInLastTick = Distance == 0.0f;
 
-			m_Bounces++;
-
+			if(!GameWorld()->m_pTeleOuts->at(z - 1).empty() && Res == TILE_TELEINWEAPON)
+			{
+				uint64_t aSeed[2] = {static_cast<uint64_t>(GameWorld()->GameTick()), static_cast<uint64_t>(GetOwner())};
+				int TeleOut = g_Config.m_ClTeleportSeeded ? GameWorld()->m_Core.SeededRandomOr0(GameWorld()->m_pTeleOuts->at(z - 1).size(), aSeed) : GameWorld()->m_Core.RandomOr0(GameWorld()->m_pTeleOuts->at(z - 1).size());
+				m_TelePos = GameWorld()->m_pTeleOuts->at(z - 1)[TeleOut];
+				m_WasTele = true;
+			}
+			else
+			{
+				m_Bounces++;
+				m_WasTele = false;
+			}
 			int BounceNum = GetTuning(m_TuneZone)->m_LaserBounceNum;
 
 			if(m_Bounces > BounceNum)

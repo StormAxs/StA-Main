@@ -49,8 +49,11 @@ public:
 	void HandleNinja();
 	void HandleJetpack();
 
+	void SetTeleports(std::map<int, std::vector<vec2>> *pTeleOuts, std::map<int, std::vector<vec2>> *pTeleCheckOuts);
+
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
+	void ResetHook();
 	void ResetInput();
 	void FireWeapon();
 
@@ -68,6 +71,7 @@ public:
 	bool UnFreeze();
 	void GiveAllWeapons();
 	int Team();
+	void ResetPickups();
 	bool CanCollide(int ClientID);
 	bool SameTeam(int ClientID);
 	bool m_NinjaJetpack;
@@ -158,6 +162,9 @@ private:
 
 	// the player core for the physics
 	CCharacterCore m_Core;
+
+	std::map<int, std::vector<vec2>> *m_pTeleOuts = nullptr;
+	std::map<int, std::vector<vec2>> *m_pTeleCheckOuts = nullptr;
 
 	// DDRace
 

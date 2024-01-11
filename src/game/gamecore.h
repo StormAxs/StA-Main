@@ -209,6 +209,17 @@ public:
 		return m_pPrng->RandomBits() % BelowThis;
 	}
 
+	int SeededRandomOr0(int BelowThis, uint64_t aSeed[2])
+	{
+		if(BelowThis <= 1)
+			return 0;
+		aSeed[0] = 0xf989fe135994390f ^ aSeed[0];
+		aSeed[1] = 0x8ca60f712e344ee0 ^ aSeed[1];
+		CPrng Prng;
+		Prng.Seed(aSeed);
+		return Prng.RandomBits() % BelowThis;
+	}
+
 	CTuningParams m_aTuning[2];
 	class CCharacterCore *m_apCharacters[MAX_CLIENTS];
 	CPrng *m_pPrng;
@@ -219,9 +230,7 @@ public:
 
 class CCharacterCore
 {
-	CWorldCore *m_pWorld = nullptr;
 	CCollision *m_pCollision;
-	std::map<int, std::vector<vec2>> *m_pTeleOuts;
 
 public:
 	static constexpr float PhysicalSize() { return 28.0f; };
@@ -282,6 +291,7 @@ public:
 
 	// DDRace
 	int m_Id;
+	int m_Tick;
 	bool m_Reset;
 	CCollision *Collision() { return m_pCollision; }
 
@@ -312,6 +322,10 @@ public:
 	bool m_DeepFrozen;
 	bool m_LiveFrozen;
 	CTuningParams m_Tuning;
+
+	std::map<int, std::vector<vec2>> *m_pTeleOuts;
+
+	CWorldCore *m_pWorld = nullptr;
 
 private:
 	CTeamsCore *m_pTeams;
