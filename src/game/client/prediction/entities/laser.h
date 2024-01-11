@@ -33,6 +33,8 @@ private:
 	float m_Energy;
 	int m_Bounces;
 	int m_EvalTick;
+	bool m_WasTele;
+	vec2 m_TelePos;
 	int m_Owner;
 	bool m_ZeroEnergyBounceInLastTick;
 

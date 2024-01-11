@@ -16,7 +16,10 @@ public:
 	char aPlayer[MAX_NAME_LENGTH];
 	int Points;
 	bool StatsParsed = false;
+	int timestamp;
+	char aMap[MOST_PLAYED_LENGTH];
 	int RankPoints;
+
 };
 
 class CStats : public CComponent

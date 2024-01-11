@@ -937,6 +937,7 @@ void CPlayers::OnRender()
 	}
 }
 
+
 void CPlayers::OnInit()
 {
 	m_WeaponEmoteQuadContainerIndex = Graphics()->CreateQuadContainer(false);

@@ -2193,7 +2193,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 		UI()->DoLabel(&RestartWarning, Localize("DDNet Client needs to be restarted to complete update!"), 14.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	else if(m_NeedRestartGeneral || m_NeedRestartSkins || m_NeedRestartGraphics || m_NeedRestartSound || m_NeedRestartDDNet)
+	else if(m_NeedRestartGeneral || m_NeedRestartSkins || m_NeedRestartGraphics || m_NeedRestartSound || m_NeedRestartDDNet || m_NeedRestartStA)
 		UI()->DoLabel(&RestartWarning, Localize("You must restart the game for all settings to take effect."), 14.0f, TEXTALIGN_ML);
 }
 
@@ -3395,6 +3395,10 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		if(DoButton_CheckBox(&g_Config.m_ClOldFreezeMode, Localize("Old Freeze Mode"), g_Config.m_ClOldFreezeMode, &Button))
 			g_Config.m_ClOldFreezeMode ^= 1;
 
+		Left.HSplitTop(20.0f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_CLTeleportPredict, Localize("Antiping: Teleport predict (Requires restastar the game(Might be bugged))"), g_Config.m_CLTeleportPredict, &Button))
+			g_Config.m_CLTeleportPredict ^= 1;
+
 		// Bind wheel config
 		Left.HSplitTop(30.f, &Label, &Right);
 		TextRender()->TextColor(col);
@@ -3458,6 +3462,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			vBindsList.erase(vBindsList.begin() + s_SelectedBind);
 			s_SelectedBind = -1;
 		}
+
 
 	}
 
