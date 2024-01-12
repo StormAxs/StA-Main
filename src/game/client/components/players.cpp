@@ -720,6 +720,14 @@ void CPlayers::RenderPlayer(
 		RenderInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f));
 
 	RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, true, ClientID, InAir);
+/*
+	//Hitbox
+	if(g_Config.m_CLShowPlayersHitbox && ClientID != GameClient()->m_aLocalIDs[g_Config.m_ClDummy])
+	{
+		Graphics()->TextureClear();
+		RenderTools()->DrawLines(Position.x - 14, Position.y - 14, 28, 28, ColorRGBA(1.f, 1.f, 1.f), 0.f);
+	}
+*/
 
 	float TeeAnimScale, TeeBaseSize;
 	RenderTools()->GetRenderTeeAnimScaleAndBaseSize(&RenderInfo, TeeAnimScale, TeeBaseSize);
@@ -799,6 +807,7 @@ inline bool CPlayers::IsPlayerInfoAvailable(int ClientID) const
 	const void *pInfo = Client()->SnapFindItem(IClient::SNAP_CURRENT, NETOBJTYPE_PLAYERINFO, ClientID);
 	return pPrevInfo && pInfo;
 }
+
 
 void CPlayers::OnRender()
 {

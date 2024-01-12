@@ -437,3 +437,54 @@ void CRenderTools::MapScreenToInterface(float CenterX, float CenterY)
 		0, 0, Graphics()->ScreenAspect(), 1.0f, aPoints);
 	Graphics()->MapScreen(aPoints[0], aPoints[1], aPoints[2], aPoints[3]);
 }
+
+void CRenderTools::DrawLines(float x, float y, float w, float h, ColorRGBA Col, float Size)
+{
+	if(Size > 0)
+	{
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(Col);
+
+		const vec2 Lines0[4] = {
+			vec2(x, y),
+			vec2(x + w, y),
+			vec2(x + w, y + h),
+			vec2(x, y + h)
+		};
+		const vec2 Lines1[4] = {
+			vec2(x + w, y),
+			vec2(x + w, y + h),
+			vec2(x, y + h),
+			vec2(x, y)
+		};
+
+		const float LineWidth = 0.5f + (float)(Size - 1) * 0.25f;
+
+		IGraphics::CFreeformItem Quads[4];
+		for(int i = 0; i < 4; i++)
+		{
+			vec2 Pos0 = Lines0[i] - vec2(LineWidth, LineWidth);
+			vec2 Pos1 = Lines0[i] + vec2(LineWidth, LineWidth);
+			vec2 Pos2 = Lines1[i] - vec2(LineWidth, LineWidth);
+			vec2 Pos3 = Lines1[i] + vec2(LineWidth, LineWidth);
+			IGraphics::CFreeformItem FreeformItem(Pos0.x, Pos0.y, Pos1.x, Pos1.y, Pos2.x, Pos2.y, Pos3.x, Pos3.y);
+			Quads[i] = FreeformItem;
+		}
+
+		Graphics()->QuadsDrawFreeform(Quads, 4);
+		Graphics()->QuadsEnd();
+	}
+	else
+	{
+		IGraphics::CLineItem Lines[4] = {
+			IGraphics::CLineItem(x, y, x + w, y),
+			IGraphics::CLineItem(x + w, y, x + w, y + h),
+			IGraphics::CLineItem(x + w, y + h, x, y + h),
+			IGraphics::CLineItem(x, y + h, x, y)};
+
+		Graphics()->LinesBegin();
+		Graphics()->SetColor(Col);
+		Graphics()->LinesDraw(Lines, 4);
+		Graphics()->LinesEnd();
+	}
+}

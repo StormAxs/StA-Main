@@ -755,3 +755,5 @@ MACRO_CONFIG_INT(ClOldStarCounter, cl_frozen_weapon, 0, 0, 1, CFGFLAG_CLIENT | C
 //tp pred
 MACRO_CONFIG_INT(ClTeleportSeeded, cl_teleport_seeded, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Seed Teleport to allow for accurate client prediction")
 MACRO_CONFIG_INT(CLTeleportPredict, cl_teleport_predict, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Antiping: Predict teleport")
+//show if possible to hook an player
+MACRO_CONFIG_INT(CLShowPlayersHitbox, cl_show_player_hitbox, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Displaying player hitboxes")

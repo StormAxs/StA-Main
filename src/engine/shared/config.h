@@ -18,7 +18,6 @@
 #define AUTOEXEC_FILE "autoexec.cfg"
 #define AUTOEXEC_CLIENT_FILE "autoexec_client.cfg"
 #define AUTOEXEC_SERVER_FILE "autoexec_server.cfg"
-#define TCONFIG_FILE "settings_sta.cfg"
 class CConfig
 {
 public:

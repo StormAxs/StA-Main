@@ -1078,6 +1078,10 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Show HUD"), "toggle cl_showhud 0 1", 0, 0},
 		{Localizable("BindWheel"), "+bind_wheel", 0, 0},
 		{Localizable("45° AIM"), "+toggle cl_mouse_max_distance 2 400; +toggle inp_mousesens 1; +showhookcoll", 0, 0, },
+		{Localizable("Antiping toggle"), "toggle cl_antiping 0 1", 0, 0, },
+		{Localizable("Strong-Weak Display"), "+toggle cl_nameplates_strong 1 0", 0, 0, },
+		{Localizable("exec: DeepFly"), "exec StA/ConfigDir/deepfly.cfg", 0, 0, },
+
 		//TODO: Make it work
 		//{Localizable("Toggle dummy deep fly"), "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\" ;cl_message_client_color green; echo Deep Fly ON; bind x \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF;""" , 0, 0},
 };
@@ -1517,7 +1521,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	// sta
 	{
 		BindWheelSettings.HSplitTop(Margin, nullptr, &BindWheelSettings);
-		BindWheelSettings.HSplitTop(80.0f, &BindWheelSettings, 0);
+		BindWheelSettings.HSplitTop(145.0f, &BindWheelSettings, 0);
 		if(s_ScrollRegion.AddRect(BindWheelSettings))
 		{
 			BindWheelSettings.Draw(vec4(1, 1, 1, 0.15f), IGraphics::CORNER_ALL, 10.0f);
@@ -1526,7 +1530,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 			BindWheelSettings.HSplitTop(HeaderHeight, &Button, &BindWheelSettings);
 			UI()->DoLabel(&Button, Localize("StA"), FontSize, TEXTALIGN_ML);
 
-			DoSettingsControlsButtons(44, 46, BindWheelSettings);
+			DoSettingsControlsButtons(44, 49, BindWheelSettings);
 		}
 	}
 
