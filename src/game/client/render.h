@@ -188,7 +188,6 @@ public:
 
 
 	//asshole
-	void DrawLines(float x, float y, float w, float h, ColorRGBA Col, float Size = 0.f);
 };
 
 #endif

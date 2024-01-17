@@ -25,6 +25,7 @@
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
+
 #include "menus.h"
 #include "motd.h"
 #include "voting.h"
@@ -863,7 +864,8 @@ void CMenus::RenderStats(CUIRect MainView)
 		float FontSize_BodyLeft = 25.0f;
 		float FontSize_HeadLeft = 40.0f;
 
-		CUIRect WB, StALogo, RT1, RT2, CP, LF, rank, MP1, MP2, LP, PointsS, button, text;
+		CUIRect WB, StALogo, RT1, RT2, CP, LF, Tpoints, Tpoints2,Tpoints3, MP1, MP2, LP, PointsS, button, text, GR, GRP, PP;
+		CUIRect RefreshButton;
 
 		WB.x = 0;
 		WB.y = 0;
@@ -889,26 +891,40 @@ void CMenus::RenderStats(CUIRect MainView)
 
 		MainView.HSplitTop(MainView.h / 3, &WB, &MainView);
 		WB.VSplitRight(WB.w / 2 - 50, &WB, &StALogo);
-		WB.HSplitTop(WB.h / 2 + 30, &WB, &CP);
+		WB.HSplitTop(WB.h / 2 + 50, &WB, &CP);
 		WB.Margin(1.0f, &WB);
 		CP.VSplitLeft(120.0f, &RT1, &CP);
+		CP.VSplitLeft(200.0f, &CP, &GRP);
 		MainView.HSplitTop(MainView.h / 2, &LF, &PointsS);
-		LF.VSplitRight(LF.w / 3 - 70, &LF, &LP);
-		LF.HSplitTop(LF.h / 2 - 30.0f, &LF, &rank);
+		LF.VSplitRight(LF.w / 3 - 65, &LF, &LP);
+		LF.HSplitTop(LF.h / 2 - 50.0f, &LF, &Tpoints);
 		LF.VSplitLeft(120.0f, &RT2, &LF);
-		rank.VSplitLeft(240.0f, &MP1, &rank);
+		LF.VSplitLeft(250.0f, &LF, &GR);
+		Tpoints.VSplitLeft(240.0f, &MP1, &Tpoints);
+		Tpoints.VSplitLeft(Tpoints.w / 2 + 10, &Tpoints, &PP);
 		MP1.HSplitTop(MP1.h, nullptr, &MP2);
 		PointsS.VSplitLeft(240.0f, &MP2, &PointsS);
+		Tpoints.HSplitTop(Tpoints.h / 3, &Tpoints, &Tpoints2);
+		Tpoints2.HSplitTop(Tpoints2.h / 2, &Tpoints2, &Tpoints3);
+		PointsS.VSplitRight(70.0f, &PointsS, &RefreshButton);
+		RefreshButton.HSplitTop(30.0f, &RefreshButton, nullptr);//TODO:change nullptr to other CUIRECT
 
 		// rendering margin
 		PointsS.Margin(1.0f, &PointsS);
-		rank.Margin(1.0f, &rank);
+		Tpoints.Margin(1.0f, &Tpoints);
 		LP.Margin(1.0f, &LP);
 		CP.Margin(1.0f, &CP);
 		StALogo.Margin(1.5f, &StALogo);
 		LF.Margin(1.0f, &LF);
+		GR.Margin(1.0f, &GR);
+		GRP.Margin(1.0f, &GRP);
 		MP1.VMargin(1.0f, &MP1);
 		MP2.VMargin(1.0f, &MP2);
+		PP.Margin(1.0f, &PP);
+		Tpoints2.Margin(1.0f, &Tpoints2);
+		Tpoints3.Margin(1.0f, &Tpoints3);
+
+
 
 		const float LineMargin = 22.0f;
 		char *pSkinName = g_Config.m_ClPlayerSkin;
@@ -933,7 +949,7 @@ void CMenus::RenderStats(CUIRect MainView)
 			OwnSkinInfo.m_ColorBody = ColorRGBA(1.0f, 1.0f, 1.0f);
 			OwnSkinInfo.m_ColorFeet = ColorRGBA(1.0f, 1.0f, 1.0f);
 		}
-		OwnSkinInfo.m_Size = 90.0f;
+		OwnSkinInfo.m_Size = 70.0f;
 
 		const CAnimState *pIdleState = CAnimState::GetIdle();
 		vec2 OffsetToMid;
@@ -944,12 +960,115 @@ void CMenus::RenderStats(CUIRect MainView)
 
 		WB.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		CP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		GR.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		GRP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		LF.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		LP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
-		rank.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		Tpoints.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		Tpoints2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		Tpoints3.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_T, 2.0f);
 		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
+		PP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		static CStatsPlayer s_StatsPlayer;
+
+		const auto &&SetIconMode = [&](bool Enable) {
+			if(Enable)
+			{
+				TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+				TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+			}
+			else
+			{
+				TextRender()->SetRenderFlags(0);
+				TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+			}
+		};
+
+		const char *pName = Client()->PlayerName();
+		static bool IsParsed = false; // Make it a static variable to prevent it from be resassigned to false every time.
+		static bool IsParsedDDN = false;
+
+		if(!IsParsed)
+		{
+			if(!s_StatsPlayer.m_pGetStatsDDStats) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
+				m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
+
+			if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING) // check if download is still in progress.
+				return;
+
+			// Once the download is finished.
+			if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
+			{
+				IsParsed = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+				m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
+				return;
+			}
+		}
+		if(!IsParsedDDN)
+		{
+			if(!s_StatsPlayer.m_pGetStatsDDNet) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
+				m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
+
+			if(s_StatsPlayer.m_pGetStatsDDNet->State() == s_StatsPlayer.m_pGetStatsDDNet->STATE_PENDING) // check if download is still in progress.
+				return;
+
+			// Once the download is finished.
+			if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDNet->State() == s_StatsPlayer.m_pGetStatsDDNet->STATE_DONE)
+			{
+				IsParsedDDN = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+				m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
+				return;
+			}
+			//dont u dare to touch this bullshit
+		}
+		SetIconMode(true);
+		static CButtonContainer s_RefreshButton;
+		if(DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton) || Input()->KeyPress(KEY_F5) || (Input()->KeyPress(KEY_R) && Input()->ModifierIsPressed()))
+		{
+				bool parseNEWstats = false;
+				bool parseNEWstatsDDn = false;
+
+				if(!parseNEWstats)
+				{
+					if(!s_StatsPlayer.m_pGetStatsDDStats) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
+						m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
+
+					if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING) // check if download is still in progress.
+						return;
+
+					// Once the download is finished.
+					if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
+					{
+						parseNEWstats = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+						m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
+						return;
+					}
+				}
+
+				if(!parseNEWstatsDDn)
+				{
+					if(!s_StatsPlayer.m_pGetStatsDDNet) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
+						m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
+
+					if(s_StatsPlayer.m_pGetStatsDDNet->State() == s_StatsPlayer.m_pGetStatsDDNet->STATE_PENDING) // check if download is still in progress.
+						return;
+
+					// Once the download is finished.
+					if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDNet->State() == s_StatsPlayer.m_pGetStatsDDNet->STATE_DONE)
+					{
+						parseNEWstatsDDn = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+						m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
+						return;
+					}
+					//dont u dare to touch this bullshit
+				}
+
+
+		}
+		SetIconMode(false);
+
 
 		char Welcome[128];
 		// TODO: fix it somewhen
@@ -975,7 +1094,6 @@ const char *names[] =
 
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
 
-		static CStatsPlayer s_StatsPlayer;
 
 		CStatsPlayer statsPlayer;
 		CUIRect FetchButton;
@@ -989,24 +1107,7 @@ const char *names[] =
 			TextRender()->TextColor(col);
 		}
 
-		static bool IsParsed = false; // Make it a static variable to prevent it from be resassigned to false every time.
-		const char *pName = Client()->PlayerName();
-		if(!IsParsed)
-		{
-			if(!s_StatsPlayer.m_pGetStatsDDStats) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
-				m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
 
-			if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING) // check if download is still in progress.
-				return;
-
-			// Once the download is finished.
-			if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
-			{
-				IsParsed = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
-				m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
-				return;
-			}
-		}
 
 		// render logo
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ACLOGO].m_Id);
@@ -1017,27 +1118,81 @@ const char *names[] =
 		Graphics()->QuadsEnd();
 
 
+
+
 	str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
 		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 
 
-		char pts[32];
+		char pts[256];
 		int playerPoints = s_StatsPlayer.Points;
 		str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
 		UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
 
 		int RankPoints = s_StatsPlayer.RankPoints;
-		str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
-		UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
-/*
-		char *FirstMap = s_StatsPlayer.aMap;
-		str_format(pts, sizeof(pts), "Most Played Maps \n %s", FirstMap);
-		UI()->DoLabel(&MP1, pts, 25.0f, TEXTALIGN_TC);
-*/
+		if(RankPoints == 0)
+		{
+			str_format(pts, sizeof(pts), " No Rank Points Yet");
+			UI()->DoLabel(&LF, pts, 28.0f, TEXTALIGN_MIDDLE);
+		}
+		else
+		{
+				str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
+				UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
+		}
+
+		UI()->DoLabel(&MP1, "Most Played Maps", 24.0f, TEXTALIGN_TC);
+		MP1.HSplitTop(30.0f, nullptr, &MP1);
+		int PlayerTime;
+		for(int i = 0; i < 11; ++i)
+		{
+			str_format(pts, sizeof(pts), " %s - %.0f hrs.", s_StatsPlayer.aMap[i], s_StatsPlayer.aTime[i]);
+			UI()->DoLabel(&MP1, pts, 18.0f, TEXTALIGN_TL);
+			MP1.HSplitTop(23.0f, nullptr, &MP1);
+		}
+		//DDNET============================
+		//blyat
+		str_format(pts, sizeof(pts), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
+		UI()->DoLabel(&GRP, pts, 35.0f, TEXTALIGN_ML);
+
+		if (s_StatsPlayer.RankInWorld == 0)
+		{
+			str_format(pts, sizeof(pts), " Not Ranked");
+			UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+
+		}
+		else
+		{
+			str_format(pts, sizeof(pts), " World Rank: #%d ", s_StatsPlayer.RankInWorld);
+			UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+		}
+		//Last FINISHED???______________________KURWA
+		UI()->DoLabel(&LP, "Last Finished Maps", 20.0f, TEXTALIGN_TC);
+		LP.HSplitTop(21.0f, nullptr, &LP);
+		for(int i = 0; i < 7; ++i)
+		{
+			str_format(pts, sizeof(pts), " %s - %s", s_StatsPlayer.LastFinish[i], s_StatsPlayer.aJson[i]);
+			UI()->DoLabel(&LP, pts, 17.0f, TEXTALIGN_TL);
+			LP.HSplitTop(18.0f, nullptr, &LP);
+		}
+
+		//TEAMMETES============================================
+		UI()->DoLabel(&PP, "Best Teammates", 20.0f, TEXTALIGN_TC);
+		PP.HSplitTop(27.0f, nullptr, &PP);
+		for(int i = 0; i < 5; ++i)
+		{
+			str_format(pts, sizeof(pts), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
+			UI()->DoLabel(&PP, pts, 17.0f, TEXTALIGN_TL);
+			PP.HSplitTop(18.0f, nullptr, &PP);
+		}
+
+
+
+
 	}
-	else if(s_StatsPage == 1)
+		else if(s_StatsPage == 1)
 	{
 	}
 

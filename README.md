@@ -9,13 +9,14 @@ StA client is an extended version of the DDNet client that includes new ingame f
 
 - ✅Auto login on specific DDNet and KoG Servers (GER10 for DDNet | GER3 for KoG)
 - ✅Better Animation using LERP
-- ✅Custom color and opacity settings for console
+- ✅Custom Console settings
 
-  ![png](https://i.imgur.com/QAPSvSr.png)
+  ![png](https://i.imgur.com/wGpbSo6.png)
+- ![png](https://i.imgur.com/B0tQqm8.png)
 
 - ✅Custom colors in the TAB Player View
 
-  ![png](https://i.imgur.com/A9wGGtb.png)
+  ![png](https://i.imgur.com/ccn2vA8.png)
 - ✅PlayerAssets(Profiles from T-Client)
   ![png](https://i.imgur.com/agtBLGU.jpeg)
 - ✅BindWheel allows to bind multiple commands and use them
@@ -29,9 +30,14 @@ StA client is an extended version of the DDNet client that includes new ingame f
   ![png](https://i.imgur.com/Ml3TyBZ.png)
   ![png](https://i.imgur.com/FoVW4Ho.png)
 
+### ✅ Some old features that was removed from game
+
+- ✅ Old freeze - bring back katana to tees 
+
+
 - ✅ Custom StA Binds (more to come soon!)
 
- ![png](https://i.imgur.com/w0dnoJQ.png)
+ ![png](https://i.imgur.com/yxNsmd7.png)
 
 ![install](https://cdn.discordapp.com/attachments/1056897504211370004/1182862820161892403/INSTALL.png?ex=65863dd8&is=6573c8d8&hm=584ca3907f28a8c792267748108e4c8fcd78c530b4c3a9aa80b993c37c30aa73&)
 
@@ -44,7 +50,16 @@ you can also just write me a DM: **stormaxd**
 
 Telegram - @StormArq
 
+# DOCUMENTATION ABOUT EXEC FILES
+In client Setting->Controls you might see a keybinding type exec:DeepFly etc.
 
+if you want them to work, open client folder and go to data->StA->ConfigDir. You can see some .cfg files in it, before make exactly bind in controls make sure that you have all keys are prepared  to bind.
+
+For exaple we have a deepfly.cfg file, and i want to bind it for T key on my keyboard, so we are going on client files and going to data/StA/ConfigDir. Then opens file that we want to bind
+
+bind <span style="color:red">**x**</span> "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\";cl_message_client_color green; echo Deep Fly ON; bind <span style="color:red">**x**</span>. \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF; exec StA/ConfigDir/deepfly.cfg\""
+
+Overwrite all <span style="color:red">**x**</span> key to any you want to bind (my case is <span style="color:green">**T**</span> Key)
 
 
 

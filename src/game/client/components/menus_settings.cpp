@@ -1081,6 +1081,7 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Antiping toggle"), "toggle cl_antiping 0 1", 0, 0, },
 		{Localizable("Strong-Weak Display"), "+toggle cl_nameplates_strong 1 0", 0, 0, },
 		{Localizable("exec: DeepFly"), "exec StA/ConfigDir/deepfly.cfg", 0, 0, },
+		//{Localizable("exec: HookFly"), "exec StA/ConfigDir/hookfly.cfg", 0, 0, },
 
 		//TODO: Make it work
 		//{Localizable("Toggle dummy deep fly"), "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\" ;cl_message_client_color green; echo Deep Fly ON; bind x \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF;""" , 0, 0},
@@ -1530,7 +1531,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 			BindWheelSettings.HSplitTop(HeaderHeight, &Button, &BindWheelSettings);
 			UI()->DoLabel(&Button, Localize("StA"), FontSize, TEXTALIGN_ML);
 
-			DoSettingsControlsButtons(44, 49, BindWheelSettings);
+			DoSettingsControlsButtons(44, 50 - 1, BindWheelSettings);
 		}
 	}
 
@@ -3299,7 +3300,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		Right.HSplitTop(25.f, &Label, &Outline);
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("______Tile Outlines(TYSM TClient)______"), 20.0f, TEXTALIGN_TC);
+		UI()->DoLabel(&Label, Localize("Tile Outlines(TYSM TClient)"), 20.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutline, ("Show any enabled outlines"), &g_Config.m_ClOutline, &Outline, LineMargin);
@@ -3352,7 +3353,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		Outline.HSplitTop(25.f, &Label, &Outline);
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, ("__________Frozen Tee Display__________"), 20.0f, TEXTALIGN_TC);
+		UI()->DoLabel(&Label, ("Frozen Tee Display"), 20.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShowFrozenHud, ("Enable Frozen Tee Display"), &g_Config.m_ClShowFrozenHud, &Outline, LineMargin);
@@ -3373,7 +3374,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Left.HSplitTop(110.0f, &Demo, &MainView);
 		Demo.HSplitTop(0.0f, &Label, &Demo);
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("____________Preferences____________"), 20.0f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Preferences"), 20.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Left.HSplitTop(20.0f, &Button, &Left);
@@ -3406,7 +3407,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		// Bind wheel config
 		Left.HSplitTop(30.f, &Label, &Right);
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("______________Bind wheel______________"), 20.0f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Bind wheel"), 20.0f, TEXTALIGN_BC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		CUIRect BindWheelZone, BindWheelBinding, BindWheelList, BindWheelOptions;
@@ -3480,7 +3481,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		// Tab
 		Left.HSplitTop(25.f, &Label, &Left);
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("_____________________Tab_____________________"), 20.f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Tab"), 20.f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 
@@ -3541,7 +3542,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Left.HSplitTop(25.f, &Label, &Left);
 
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("_____________________Tee_____________________"), 20.f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Tee"), 20.f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 
@@ -3560,7 +3561,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Right.HSplitTop(25.f, &Label, &Right);
 
 		TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("______________Console Settings______________"), 20.0f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Console Settings"), 20.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Right.HSplitTop(20.0f, &Button, &Right);
@@ -3603,7 +3604,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Right.HSplitTop(30.f, &Label, &Right);
 
 			TextRender()->TextColor(col);
-		UI()->DoLabel(&Label, Localize("____________Better Animation____________"), 20.0f, TEXTALIGN_ML);
+		UI()->DoLabel(&Label, Localize("Better Animation"), 20.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// feets
