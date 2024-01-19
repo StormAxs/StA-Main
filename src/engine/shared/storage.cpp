@@ -87,8 +87,6 @@ public:
 				CreateFolder("screenshots/auto", TYPE_SAVE);
 				CreateFolder("screenshots/auto/stats", TYPE_SAVE);
 				CreateFolder("maps", TYPE_SAVE);
-				CreateFolder("StA", TYPE_SAVE);
-				CreateFolder("StA/ConfigDir", TYPE_SAVE);
 				CreateFolder("maps/auto", TYPE_SAVE);
 				CreateFolder("mapres", TYPE_SAVE);
 				CreateFolder("downloadedmaps", TYPE_SAVE);
@@ -920,5 +918,3 @@ IStorage *CreateTempStorage(const char *pDirectory)
 	pStorage->AddPath(pDirectory);
 	return pStorage;
 }
-
-

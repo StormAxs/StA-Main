@@ -185,10 +185,6 @@ public:
 	void RenderSpeedupmap(CSpeedupTile *pSpeedup, int w, int h, float Scale, ColorRGBA Color, int RenderFlags);
 	void RenderSwitchmap(CSwitchTile *pSwitch, int w, int h, float Scale, ColorRGBA Color, int RenderFlags);
 	void RenderTunemap(CTuneTile *pTune, int w, int h, float Scale, ColorRGBA Color, int RenderFlags);
-
-
-	//asshole
-	void DrawLines(float x, float y, float w, float h, ColorRGBA Col, float Size = 0.f);
 };
 
 #endif

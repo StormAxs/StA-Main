@@ -1078,10 +1078,6 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Show HUD"), "toggle cl_showhud 0 1", 0, 0},
 		{Localizable("BindWheel"), "+bind_wheel", 0, 0},
 		{Localizable("45° AIM"), "+toggle cl_mouse_max_distance 2 400; +toggle inp_mousesens 1; +showhookcoll", 0, 0, },
-		{Localizable("Antiping toggle"), "toggle cl_antiping 0 1", 0, 0, },
-		{Localizable("Strong-Weak Display"), "+toggle cl_nameplates_strong 1 0", 0, 0, },
-		{Localizable("exec: DeepFly"), "exec StA/ConfigDir/deepfly.cfg", 0, 0, },
-
 		//TODO: Make it work
 		//{Localizable("Toggle dummy deep fly"), "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\" ;cl_message_client_color green; echo Deep Fly ON; bind x \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF;""" , 0, 0},
 };
@@ -1521,7 +1517,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	// sta
 	{
 		BindWheelSettings.HSplitTop(Margin, nullptr, &BindWheelSettings);
-		BindWheelSettings.HSplitTop(145.0f, &BindWheelSettings, 0);
+		BindWheelSettings.HSplitTop(80.0f, &BindWheelSettings, 0);
 		if(s_ScrollRegion.AddRect(BindWheelSettings))
 		{
 			BindWheelSettings.Draw(vec4(1, 1, 1, 0.15f), IGraphics::CORNER_ALL, 10.0f);
@@ -1530,7 +1526,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 			BindWheelSettings.HSplitTop(HeaderHeight, &Button, &BindWheelSettings);
 			UI()->DoLabel(&Button, Localize("StA"), FontSize, TEXTALIGN_ML);
 
-			DoSettingsControlsButtons(44, 49, BindWheelSettings);
+			DoSettingsControlsButtons(44, 46, BindWheelSettings);
 		}
 	}
 
@@ -2197,7 +2193,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 		UI()->DoLabel(&RestartWarning, Localize("DDNet Client needs to be restarted to complete update!"), 14.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	else if(m_NeedRestartGeneral || m_NeedRestartSkins || m_NeedRestartGraphics || m_NeedRestartSound || m_NeedRestartDDNet || m_NeedRestartStA)
+	else if(m_NeedRestartGeneral || m_NeedRestartSkins || m_NeedRestartGraphics || m_NeedRestartSound || m_NeedRestartDDNet)
 		UI()->DoLabel(&RestartWarning, Localize("You must restart the game for all settings to take effect."), 14.0f, TEXTALIGN_ML);
 }
 
@@ -3399,10 +3395,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		if(DoButton_CheckBox(&g_Config.m_ClOldFreezeMode, Localize("Old Freeze Mode"), g_Config.m_ClOldFreezeMode, &Button))
 			g_Config.m_ClOldFreezeMode ^= 1;
 
-		Left.HSplitTop(20.0f, &Button, &Left);
-		if(DoButton_CheckBox(&g_Config.m_CLTeleportPredict, Localize("Antiping: Teleport predict (Requires restastar the game(Might be bugged))"), g_Config.m_CLTeleportPredict, &Button))
-			g_Config.m_CLTeleportPredict ^= 1;
-
 		// Bind wheel config
 		Left.HSplitTop(30.f, &Label, &Right);
 		TextRender()->TextColor(col);
@@ -3466,7 +3458,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			vBindsList.erase(vBindsList.begin() + s_SelectedBind);
 			s_SelectedBind = -1;
 		}
-
 
 	}
 

@@ -751,9 +751,4 @@ MACRO_CONFIG_INT(ClConsoleSimple, sc_console_simple, 1, 0, 1, CFGFLAG_CLIENT | C
 MACRO_CONFIG_INT(ClConsoleBarSimple, cl_consolebar_simple, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display name skin in nameplates")
 // Old ninja mode
 MACRO_CONFIG_INT(ClOldFreezeMode, cl_old_freeze_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "OldNinjaMode")
-MACRO_CONFIG_INT(ClOldStarCounter, cl_frozen_weapon, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use old DDNet HUD")
-//tp pred
-MACRO_CONFIG_INT(ClTeleportSeeded, cl_teleport_seeded, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Seed Teleport to allow for accurate client prediction")
-MACRO_CONFIG_INT(CLTeleportPredict, cl_teleport_predict, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Antiping: Predict teleport")
-//show if possible to hook an player
-MACRO_CONFIG_INT(CLShowPlayersHitbox, cl_show_player_hitbox, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Displaying player hitboxes")
+MACRO_CONFIG_INT(ClFrozenWeapon, cl_frozen_weapon, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Give frozen tees their weapon")

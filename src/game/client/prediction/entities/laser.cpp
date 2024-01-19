@@ -21,7 +21,6 @@ CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_Bounces = 0;
 	m_EvalTick = 0;
 	m_Type = Type;
-	m_WasTele = false;
 	m_ZeroEnergyBounceInLastTick = false;
 	m_TuneZone = GameWorld()->m_WorldConfig.m_UseTuneZones ? Collision()->IsTune(Collision()->GetMapIndex(m_Pos)) : 0;
 	GameWorld()->InsertEntity(this);

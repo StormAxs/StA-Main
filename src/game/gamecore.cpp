@@ -78,7 +78,6 @@ void CCharacterCore::Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore
 
 	m_pTeams = pTeams;
 	m_Id = -1;
-	m_Tick = -1;
 
 	// fail safe, if core's tuning didn't get updated at all, just fallback to world tuning.
 	m_Tuning = m_pWorld->m_aTuning[g_Config.m_ClDummy];
@@ -334,15 +333,7 @@ void CCharacterCore::Tick(bool UseInput, bool DoDeferredTick)
 				SetHookedPlayer(-1);
 
 				m_NewHook = true;
-				int RandomOut = 0;
-				if(g_Config.m_ClTeleportSeeded && m_Tick != -1)
-				{
-					uint64_t aSeed[2] = {static_cast<uint64_t>(m_Tick), static_cast<uint64_t>(m_Id)};
-					RandomOut = m_pWorld->SeededRandomOr0((*m_pTeleOuts)[teleNr - 1].size(), aSeed);
-				}
-				else
-					RandomOut = m_pWorld->RandomOr0((*m_pTeleOuts)[teleNr - 1].size());
-
+				int RandomOut = m_pWorld->RandomOr0((*m_pTeleOuts)[teleNr - 1].size());
 				m_HookPos = (*m_pTeleOuts)[teleNr - 1][RandomOut] + TargetDirection * PhysicalSize() * 1.5f;
 				m_HookDir = TargetDirection;
 				m_HookTeleBase = m_HookPos;
@@ -483,8 +474,6 @@ void CCharacterCore::TickDeferred()
 	// clamp the velocity to something sane
 	if(length(m_Vel) > 6000)
 		m_Vel = normalize(m_Vel) * 6000;
-	else if(m_Tick != -1)
-		m_Tick++;
 }
 
 void CCharacterCore::Move()

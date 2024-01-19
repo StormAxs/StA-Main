@@ -26,10 +26,7 @@
 		Tells the server to start sending snapshots.
 		client_entergame and server_client_enter is called.
 */
-enum
-{
-	MOST_PLAYED_LENGTH = 128
-};
+
 enum
 {
 	NETMSG_EX = 0,

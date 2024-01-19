@@ -225,7 +225,6 @@ protected:
 	bool m_NeedRestartSound;
 	bool m_NeedRestartUpdate;
 	bool m_NeedRestartDDNet;
-	bool m_NeedRestartStA;
 	bool m_NeedSendinfo;
 	bool m_NeedSendDummyinfo;
 	int m_SettingPlayerPage;

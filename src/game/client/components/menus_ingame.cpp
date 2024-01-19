@@ -1023,7 +1023,7 @@ const char *names[] =
 
 
 
-		char pts[32];
+		char pts[8];
 		int playerPoints = s_StatsPlayer.Points;
 		str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
 		UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
@@ -1031,7 +1031,11 @@ const char *names[] =
 		int RankPoints = s_StatsPlayer.RankPoints;
 		str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
 		UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
-
+    /*
+		char *FirstMap = s_StatsPlayer.aMap;
+		str_format(pts, sizeof(pts), "Most Played Maps \n %s", FirstMap);
+		UI()->DoLabel(&MP1, pts, 25.0f, TEXTALIGN_TC);
+*/
 	}
 	else if(s_StatsPage == 1)
 	{
