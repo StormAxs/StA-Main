@@ -272,6 +272,7 @@ public:
 		TYPE_LAN,
 		TYPE_FAVORITES,
 		NUM_TYPES,
+
 	};
 
 	static constexpr const char *COMMUNITY_DDNET = "ddnet";

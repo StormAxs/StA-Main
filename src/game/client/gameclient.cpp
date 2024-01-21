@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <limits>
+#include <cstdlib>  // for rand()
 
 #include "engine/discord.h"
 #include <engine/client/checksum.h>
@@ -1092,8 +1093,17 @@ void CGameClient::HandleLanguageChanged()
 void CGameClient::RenderShutdownMessage()
 {
 	const char *pMessage = nullptr;
-	if(Client()->State() == IClient::STATE_QUITTING)
-		pMessage = Localize("Quitting. Please wait…");
+
+
+	if (Client()->State() == IClient::STATE_QUITTING) {
+		// Randomly decide whether to display "Goodbye..." (10% chance)
+		if (rand() % 20 == 0) {
+			pMessage = "Hope -StormAx gonna kill himself soon…";
+		} else {
+			pMessage = Localize("Quitting. Please wait…");
+		}
+	}
+
 	else if(Client()->State() == IClient::STATE_RESTARTING)
 		pMessage = Localize("Restarting. Please wait…");
 	else
