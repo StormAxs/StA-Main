@@ -1025,12 +1025,14 @@ void CMenus::RenderStats(CUIRect MainView)
 		}
 		SetIconMode(true);
 		static CButtonContainer s_RefreshButton;
-		if(DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton) || Input()->KeyPress(KEY_F5) || (Input()->KeyPress(KEY_R) && Input()->ModifierIsPressed()))
+		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton) || Input()->KeyPress(KEY_F5) || (Input()->KeyPress(KEY_R) && Input()->ModifierIsPressed()))
 		{
-			bool parseNEWstats = false;
-			bool parseNEWstatsDDn = false;
+			IsParsed = false;
+			IsParsedDDN = false;
+			s_StatsPlayer.Reset();
 
-			if(!parseNEWstats)
+
+			if(!IsParsed)
 			{
 				if(!s_StatsPlayer.m_pGetStatsDDStats) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
 					m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
@@ -1041,13 +1043,12 @@ void CMenus::RenderStats(CUIRect MainView)
 				// Once the download is finished.
 				if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
 				{
-					parseNEWstats = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+					IsParsed = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
 					m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
 					return;
 				}
 			}
-
-			if(!parseNEWstatsDDn)
+			if(!IsParsedDDN)
 			{
 				if(!s_StatsPlayer.m_pGetStatsDDNet) // Only run FetchPlayer, if s_StatsPlayer isn't initalized (The FetchPlayer() will initalize it).
 					m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, pName);
@@ -1058,15 +1059,15 @@ void CMenus::RenderStats(CUIRect MainView)
 				// Once the download is finished.
 				if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDNet->State() == s_StatsPlayer.m_pGetStatsDDNet->STATE_DONE)
 				{
-					parseNEWstatsDDn = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
+					IsParsedDDN = true; // Set it to true, so it won't run this if branch again. (untill you set IsParsed to false again and free s_StatsPlayer)
 					m_pClient->m_Stats.ParseJSON(&s_StatsPlayer); // parse the json.
 					return;
 				}
 				//dont u dare to touch this bullshit
+
 			}
-
-
 		}
+
 		SetIconMode(false);
 
 
