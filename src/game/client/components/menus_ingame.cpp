@@ -1038,6 +1038,8 @@ void CMenus::RenderStats(CUIRect MainView)
 		static CButtonContainer s_RefreshButton;
 		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton, 0, IGraphics::CORNER_R))
 		{
+
+			//PRAY TO GOD IT WILL WORK MELON
 			IsParsed = false;
 			IsParsedDDN = false;
 			s_StatsPlayer.Reset();
