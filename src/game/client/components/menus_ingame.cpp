@@ -865,7 +865,7 @@ void CMenus::RenderStats(CUIRect MainView)
 		float FontSize_HeadLeft = 40.0f;
 
 		CUIRect WB, StALogo, RT1, RT2, CP, LF, Tpoints, Tpoints2,Tpoints3, MP1, MP2, LP, PointsS, button, text, GR, GRP, PP;
-		CUIRect RefreshButton;
+		CUIRect RefreshButton, DDStatsButton, DDraceButton, DiscordButton, ABOUTButton;
 
 		WB.x = 0;
 		WB.y = 0;
@@ -907,10 +907,15 @@ void CMenus::RenderStats(CUIRect MainView)
 		Tpoints.HSplitTop(Tpoints.h / 3, &Tpoints, &Tpoints2);
 		Tpoints2.HSplitTop(Tpoints2.h / 2, &Tpoints2, &Tpoints3);
 		PointsS.VSplitRight(70.0f, &PointsS, &RefreshButton);
-		RefreshButton.HSplitTop(30.0f, &RefreshButton, nullptr);//TODO:change nullptr to other CUIRECT
+		RefreshButton.HSplitTop(33.0f, &RefreshButton, &DDStatsButton);
+		DDStatsButton.HSplitTop(33.0f, &DDStatsButton, &DDraceButton);
+		DDraceButton.HSplitTop(33.0f, &DDraceButton, &DiscordButton);
+		DiscordButton.HSplitTop(33.0f, &DiscordButton, &ABOUTButton);
+		ABOUTButton.HSplitTop(33.0f, &ABOUTButton, nullptr);
+
 
 		// rendering margin
-		PointsS.Margin(1.0f, &PointsS);
+		PointsS.HMargin(1.0f, &PointsS);
 		Tpoints.Margin(1.0f, &Tpoints);
 		LP.Margin(1.0f, &LP);
 		CP.Margin(1.0f, &CP);
@@ -923,6 +928,12 @@ void CMenus::RenderStats(CUIRect MainView)
 		PP.Margin(1.0f, &PP);
 		Tpoints2.Margin(1.0f, &Tpoints2);
 		Tpoints3.Margin(1.0f, &Tpoints3);
+		RefreshButton.HMargin(1.0f, &RefreshButton);
+		DDStatsButton.HMargin(1.0f, &DDStatsButton);
+		DDraceButton.HMargin(1.0f, &DDraceButton);
+		DiscordButton.HMargin(1.0f, &DiscordButton);
+		ABOUTButton.HMargin(1.0f, &ABOUTButton);
+
 
 
 
@@ -968,7 +979,7 @@ void CMenus::RenderStats(CUIRect MainView)
 		Tpoints2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		Tpoints3.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		MP1.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_T, 2.0f);
-		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+		PointsS.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_T | IGraphics::CORNER_B | IGraphics::CORNER_L, 2.0f);
 		MP2.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_B, 2.0f);
 		PP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		static CStatsPlayer s_StatsPlayer;
@@ -1025,7 +1036,7 @@ void CMenus::RenderStats(CUIRect MainView)
 		}
 		SetIconMode(true);
 		static CButtonContainer s_RefreshButton;
-		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton) || Input()->KeyPress(KEY_F5) || (Input()->KeyPress(KEY_R) && Input()->ModifierIsPressed()))
+		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton, 0, IGraphics::CORNER_R))
 		{
 			IsParsed = false;
 			IsParsedDDN = false;
@@ -1070,6 +1081,56 @@ void CMenus::RenderStats(CUIRect MainView)
 
 		SetIconMode(false);
 
+		static CButtonContainer s_DDStatsButton;
+		if (DoButton_Menu(&s_DDStatsButton, "DDStats", 0, &DDStatsButton, 0, IGraphics::CORNER_R))
+		{
+			const char* playerName = Client()->PlayerName();
+			char url[256];
+			str_format(url, sizeof(url), "https://ddstats.qwik.space/player/%s", playerName);
+
+			if (!open_link(url))
+			{
+				dbg_msg("menus", "Couldn't open link: %s", url);
+			}
+		}
+
+		static CButtonContainer s_DDRaceButton;
+		if (DoButton_Menu(&s_DDRaceButton, "DDNet", 0, &DDraceButton, 0, IGraphics::CORNER_R))
+		{
+			const char* playerName = Client()->PlayerName();
+			char url[256];
+			str_format(url, sizeof(url), "https://ddnet.org/players/%s", playerName);
+
+			if (!open_link(url))
+			{
+				dbg_msg("menus", "Couldn't open link: %s", url);
+			}
+		}
+
+		static CButtonContainer s_DiscordButton;
+		if (DoButton_Menu(&s_DiscordButton, "Discord", 0, &DiscordButton, 0, IGraphics::CORNER_R))
+		{
+			char url[256];
+			str_format(url, sizeof(url), "https://discord.gg/BhWXQXcgsT");
+
+			if (!open_link(url))
+			{
+				dbg_msg("menus", "Couldn't open link: %s", url);
+			}
+		}
+
+
+		static CButtonContainer s_AboutButton;
+		if (DoButton_Menu(&s_AboutButton, "About", 0, &ABOUTButton, 0, IGraphics::CORNER_R))
+		{
+			char url[256];
+			str_format(url, sizeof(url), "https://stormaxs.github.io/StA-site/");
+
+			if (!open_link(url))
+			{
+				dbg_msg("menus", "Couldn't open link: %s", url);
+			}
+		}
 
 		char Welcome[128];
 		// TODO: fix it somewhen
@@ -1118,119 +1179,126 @@ const char *names[] =
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 
-
-
-
-		str_format(Welcome, sizeof(Welcome), " Welcome Back, %s", Client()->PlayerName());
-		UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-
-
-		char pts[256];
-		int playerPoints = s_StatsPlayer.Points;
-		str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
-		UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
-
-		int RankPoints = s_StatsPlayer.RankPoints;
-		if(RankPoints == 0)
+		if (IsParsed == false | IsParsedDDN == false)
 		{
-			str_format(pts, sizeof(pts), " No Rank Points Yet");
-			UI()->DoLabel(&LF, pts, 28.0f, TEXTALIGN_MIDDLE);
+			str_format(Welcome, sizeof(Welcome), " Parsing Player Info \n Please wait...", Client()->PlayerName());
+			UI()->DoLabel(&PointsS, Welcome, 40.0f, TEXTALIGN_ML);
 		}
-		else
+
+		if (IsParsed == true | IsParsedDDN == true)
 		{
-			str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
-			UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
-		}
 
-		UI()->DoLabel(&MP1, "Most Played Maps", 24.0f, TEXTALIGN_TC);
-		MP1.HSplitTop(30.0f, nullptr, &MP1);
-		int PlayerTime;
-		for(int i = 0; i < 11; ++i)
-		{
-			str_format(pts, sizeof(pts), " %s - %.0f hrs.", s_StatsPlayer.aMap[i], s_StatsPlayer.aTime[i]);
-			UI()->DoLabel(&MP1, pts, 18.0f, TEXTALIGN_TL);
-			MP1.HSplitTop(23.0f, nullptr, &MP1);
-		}
+			str_format(Welcome, sizeof(Welcome), " Welcome Back %s", Client()->PlayerName());
+			UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
+			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		str_format(pts, sizeof(pts), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
 
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: EU");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: NA");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: AS:CN");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: AS");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: SA");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: UNKNOWN");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: OC");
-		}
-		if (strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0) {
-			str_format(pts, sizeof(pts), " Best Region: AF");
-		}
 
-		UI()->DoLabel(&Tpoints, pts, 24.0f, TEXTALIGN_ML);
+			char pts[256];
+			int playerPoints = s_StatsPlayer.Points;
+			str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
+			UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
 
-		int sum = 0;
+			int RankPoints = s_StatsPlayer.RankPoints;
+			if(RankPoints == 0)
+			{
+				str_format(pts, sizeof(pts), " No Rank Points Yet");
+				UI()->DoLabel(&LF, pts, 28.0f, TEXTALIGN_MIDDLE);
+			}
+			else
+			{
+				str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
+				UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
+			}
 
-		for (int i = 0; i < 15; ++i) {
-			sum += s_StatsPlayer.totalPlaytime[i];
+			UI()->DoLabel(&MP1, "Most Played Maps", 24.0f, TEXTALIGN_TC);
+			MP1.HSplitTop(30.0f, nullptr, &MP1);
+			int PlayerTime;
+			for(int i = 0; i < 11; ++i)
+			{
+				str_format(pts, sizeof(pts), " %s - %.0f hrs.", s_StatsPlayer.aMap[i], s_StatsPlayer.aTime[i]);
+				UI()->DoLabel(&MP1, pts, 18.0f, TEXTALIGN_TL);
+				MP1.HSplitTop(23.0f, nullptr, &MP1);
+			}
+
+			str_format(pts, sizeof(pts), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
+
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: EU");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: NA");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: AS:CN");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: AS");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: SA");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: UNKNOWN");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: OC");
+			}
+			if (strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0) {
+				str_format(pts, sizeof(pts), " Best Region: AF");
+			}
+
+			UI()->DoLabel(&Tpoints, pts, 24.0f, TEXTALIGN_ML);
+
+			int sum = 0;
+
+			for (int i = 0; i < 15; ++i) {
+				sum += s_StatsPlayer.totalPlaytime[i];
+			}
+
+			str_format(pts, sizeof(pts), " Total Hours Played: %d hrs", sum);
+			UI()->DoLabel(&Tpoints3, pts, 30.0f, TEXTALIGN_ML);
+
+			//DDNET============================
+			//blyat
+			str_format(pts, sizeof(pts), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
+			UI()->DoLabel(&GRP, pts, 35.0f, TEXTALIGN_ML);
+
+			if (s_StatsPlayer.RankInWorld == 0)
+			{
+				str_format(pts, sizeof(pts), " Not Ranked");
+				UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+
+			}
+			else
+			{
+				str_format(pts, sizeof(pts), " World Rank: #%d ", s_StatsPlayer.RankInWorld);
+				UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+			}
+			//Last FINISHED???______________________KURWA
+			UI()->DoLabel(&LP, "Last Finished Maps", 20.0f, TEXTALIGN_TC);
+			LP.HSplitTop(21.0f, nullptr, &LP);
+			for(int i = 0; i < 7; ++i)
+			{
+				str_format(pts, sizeof(pts), " %s - %s", s_StatsPlayer.LastFinish[i], s_StatsPlayer.aJson[i]);
+				UI()->DoLabel(&LP, pts, 17.0f, TEXTALIGN_TL);
+				LP.HSplitTop(18.0f, nullptr, &LP);
+			}
+
+			//TEAMMETES============================================
+			UI()->DoLabel(&PP, "Best Teammates", 20.0f, TEXTALIGN_TC);
+			PP.HSplitTop(27.0f, nullptr, &PP);
+			for(int i = 0; i < 5; ++i)
+			{
+				str_format(pts, sizeof(pts), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
+				UI()->DoLabel(&PP, pts, 17.0f, TEXTALIGN_TL);
+				PP.HSplitTop(18.0f, nullptr, &PP);
+			}
+
+			str_format(pts, sizeof(pts), " Point Last Month: %d", s_StatsPlayer.PLM);
+			UI()->DoLabel(&Tpoints2, pts, 20.0f, TEXTALIGN_ML);
+
 		}
-
-		str_format(pts, sizeof(pts), " Total Hours Played: %d hrs", sum);
-		UI()->DoLabel(&Tpoints3, pts, 30.0f, TEXTALIGN_ML);
-
-		//DDNET============================
-		//blyat
-		str_format(pts, sizeof(pts), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
-		UI()->DoLabel(&GRP, pts, 35.0f, TEXTALIGN_ML);
-
-		if (s_StatsPlayer.RankInWorld == 0)
-		{
-			str_format(pts, sizeof(pts), " Not Ranked");
-			UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
-
-		}
-		else
-		{
-			str_format(pts, sizeof(pts), " World Rank: #%d ", s_StatsPlayer.RankInWorld);
-			UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
-		}
-		//Last FINISHED???______________________KURWA
-		UI()->DoLabel(&LP, "Last Finished Maps", 20.0f, TEXTALIGN_TC);
-		LP.HSplitTop(21.0f, nullptr, &LP);
-		for(int i = 0; i < 7; ++i)
-		{
-			str_format(pts, sizeof(pts), " %s - %s", s_StatsPlayer.LastFinish[i], s_StatsPlayer.aJson[i]);
-			UI()->DoLabel(&LP, pts, 17.0f, TEXTALIGN_TL);
-			LP.HSplitTop(18.0f, nullptr, &LP);
-		}
-
-		//TEAMMETES============================================
-		UI()->DoLabel(&PP, "Best Teammates", 20.0f, TEXTALIGN_TC);
-		PP.HSplitTop(27.0f, nullptr, &PP);
-		for(int i = 0; i < 5; ++i)
-		{
-			str_format(pts, sizeof(pts), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
-			UI()->DoLabel(&PP, pts, 17.0f, TEXTALIGN_TL);
-			PP.HSplitTop(18.0f, nullptr, &PP);
-		}
-
-		str_format(pts, sizeof(pts), " Point Last Month: %d", s_StatsPlayer.PLM);
-		UI()->DoLabel(&Tpoints2, pts, 20.0f, TEXTALIGN_ML);
-
 
 
 
