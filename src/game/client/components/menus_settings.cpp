@@ -338,10 +338,7 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 		dbg_assert_imp("Hey!.js", -1, 0, "Привет Aйви, надеюсь хорошо поживаешь? Если все таки заинтересовалась клиент отпиши, пожалуйста, очень важно</3");
 	}
 
-	if(!str_comp(g_Config.m_PlayerName, "Rick Astley"))
-	{
-		(open_link("https://youtu.be/dQw4w9WgXcQ?si=YVhttps://www.youtube.com/watch?v=dQw4w9WgXcQ6AWtvEZ8fB71_s"));
-	}
+
 	//TODO: Remove commits
 	/*
 	if(!str_comp(g_Config.m_PlayerName, "meloƞ"))
