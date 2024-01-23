@@ -1039,7 +1039,7 @@ void CMenus::RenderStats(CUIRect MainView)
 		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton, 0, IGraphics::CORNER_R))
 		{
 
-			//PRAY TO GOD IT WILL WORK MELON
+			//PRAY TO GOD IT WILL WORK LOL
 			IsParsed = false;
 			IsParsedDDN = false;
 			s_StatsPlayer.Reset();
@@ -1196,21 +1196,24 @@ const char *names[] =
 
 
 
-			char pts[256];
 			int playerPoints = s_StatsPlayer.Points;
-			str_format(pts, sizeof(pts), " Current points: %d", playerPoints);
-			UI()->DoLabel(&CP, pts, 35.0f, TEXTALIGN_ML);
-
+			{
+				char aBuf[32];
+			str_format(aBuf, sizeof(aBuf), " Current points: %d", playerPoints);
+			UI()->DoLabel(&CP, aBuf, 35.0f, TEXTALIGN_ML);
+			}
 			int RankPoints = s_StatsPlayer.RankPoints;
 			if(RankPoints == 0)
 			{
-				str_format(pts, sizeof(pts), " No Rank Points Yet");
-				UI()->DoLabel(&LF, pts, 28.0f, TEXTALIGN_MIDDLE);
+				char aBuf[16];
+				str_format(aBuf, sizeof(aBuf), " No Rank Points Yet");
+				UI()->DoLabel(&LF, aBuf, 28.0f, TEXTALIGN_MIDDLE);
 			}
 			else
 			{
-				str_format(pts, sizeof(pts), " Current Rank Points: %d", RankPoints);
-				UI()->DoLabel(&LF, pts, 35.0f, TEXTALIGN_ML);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " Current Rank Points: %d", RankPoints);
+				UI()->DoLabel(&LF, aBuf, 35.0f, TEXTALIGN_ML);
 			}
 
 			UI()->DoLabel(&MP1, "Most Played Maps", 24.0f, TEXTALIGN_TC);
@@ -1218,72 +1221,84 @@ const char *names[] =
 			int PlayerTime;
 			for(int i = 0; i < 11; ++i)
 			{
-				str_format(pts, sizeof(pts), " %s - %.0f hrs.", s_StatsPlayer.aMap[i], s_StatsPlayer.aTime[i]);
-				UI()->DoLabel(&MP1, pts, 18.0f, TEXTALIGN_TL);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " %s - %.0f hrs.", s_StatsPlayer.aMap[i], s_StatsPlayer.aTime[i]);
+				UI()->DoLabel(&MP1, aBuf, 18.0f, TEXTALIGN_TL);
 				MP1.HSplitTop(23.0f, nullptr, &MP1);
 			}
 
-			str_format(pts, sizeof(pts), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
 
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: EU");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: NA");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: AS:CN");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: AS");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: SA");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: UNKNOWN");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: OC");
-			}
-			if (strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0) {
-				str_format(pts, sizeof(pts), " Best Region: AF");
+				char aBuf[32];
+
+				str_format(aBuf, sizeof(aBuf), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
+
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: EU");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: NA");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: AS:CN");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: AS");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: SA");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: UNKNOWN");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: OC");
+				}
+				if (strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0) {
+					str_format(aBuf, sizeof(aBuf), " Best Region: AF");
 			}
 
-			UI()->DoLabel(&Tpoints, pts, 24.0f, TEXTALIGN_ML);
-
+			UI()->DoLabel(&Tpoints, aBuf, 24.0f, TEXTALIGN_ML);
+			}
+			{
 			int sum = 0;
+			char THP[32];
+			for (int i = 0; i < 15; ++i)
+			{
 
-			for (int i = 0; i < 15; ++i) {
 				sum += s_StatsPlayer.totalPlaytime[i];
+				str_format(THP, sizeof(THP), " Total Hours Played: %d hrs", sum);
 			}
-
-			str_format(pts, sizeof(pts), " Total Hours Played: %d hrs", sum);
-			UI()->DoLabel(&Tpoints3, pts, 30.0f, TEXTALIGN_ML);
+			UI()->DoLabel(&Tpoints3, THP, 30.0f, TEXTALIGN_ML);
 
 			//DDNET============================
 			//blyat
-			str_format(pts, sizeof(pts), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
-			UI()->DoLabel(&GRP, pts, 35.0f, TEXTALIGN_ML);
+			{
+				char aBuf[32];
 
+				str_format(aBuf, sizeof(aBuf), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
+				UI()->DoLabel(&GRP, aBuf, 35.0f, TEXTALIGN_ML);
+			}
 			if (s_StatsPlayer.RankInWorld == 0)
 			{
-				str_format(pts, sizeof(pts), " Not Ranked");
-				UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+				char aBuf[16];
+				str_format(aBuf, sizeof(aBuf), " Not Ranked");
+				UI()->DoLabel(&GR, aBuf, 28.0f, TEXTALIGN_MIDDLE);
 
 			}
 			else
 			{
-				str_format(pts, sizeof(pts), " World Rank: #%d ", s_StatsPlayer.RankInWorld);
-				UI()->DoLabel(&GR, pts, 28.0f, TEXTALIGN_MIDDLE);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " World Rank: #%d ", s_StatsPlayer.RankInWorld);
+				UI()->DoLabel(&GR, aBuf, 28.0f, TEXTALIGN_MIDDLE);
 			}
 			//Last FINISHED???______________________KURWA
 			UI()->DoLabel(&LP, "Last Finished Maps", 20.0f, TEXTALIGN_TC);
 			LP.HSplitTop(21.0f, nullptr, &LP);
 			for(int i = 0; i < 7; ++i)
 			{
-				str_format(pts, sizeof(pts), " %s - %s", s_StatsPlayer.LastFinish[i], s_StatsPlayer.aJson[i]);
-				UI()->DoLabel(&LP, pts, 17.0f, TEXTALIGN_TL);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " %s - %s", s_StatsPlayer.LastFinish[i], s_StatsPlayer.aJson[i]);
+				UI()->DoLabel(&LP, aBuf, 17.0f, TEXTALIGN_TL);
 				LP.HSplitTop(18.0f, nullptr, &LP);
 			}
 
@@ -1292,14 +1307,16 @@ const char *names[] =
 			PP.HSplitTop(27.0f, nullptr, &PP);
 			for(int i = 0; i < 5; ++i)
 			{
-				str_format(pts, sizeof(pts), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
-				UI()->DoLabel(&PP, pts, 17.0f, TEXTALIGN_TL);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
+				UI()->DoLabel(&PP, aBuf, 17.0f, TEXTALIGN_TL);
 				PP.HSplitTop(18.0f, nullptr, &PP);
 			}
-
-			str_format(pts, sizeof(pts), " Point Last Month: %d", s_StatsPlayer.PLM);
-			UI()->DoLabel(&Tpoints2, pts, 20.0f, TEXTALIGN_ML);
-
+			{
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " Point Last Month: %d", s_StatsPlayer.PLM);
+				UI()->DoLabel(&Tpoints2, aBuf, 20.0f, TEXTALIGN_ML);
+			}
 		}
 
 

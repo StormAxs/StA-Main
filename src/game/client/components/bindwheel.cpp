@@ -122,7 +122,7 @@ void CBindWheel::OnRender()
 {
 	if(!m_Active)
 	{
-		g_Config.m_ClOutline == 0;
+		g_Config.m_ClOutline = 0;
 
 		if(m_WasActive && !m_vBinds.empty() && m_Choose != -1)
 			UseBind();

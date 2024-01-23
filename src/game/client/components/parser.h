@@ -37,7 +37,7 @@ public:
 	char dPlayer[MAX_NAME_LENGTH];
 	int PLM;
 	int PointCategoryDDR;
-	char RankInWorld;
+	int RankInWorld;
 	char LastFinish[7][MOST_PLAYED_LENGTH];
 	float LastFinishTime[7];
 	char FavouritePartners[5][MAX_NAME_LENGTH];
