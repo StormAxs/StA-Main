@@ -883,7 +883,6 @@ void CGameConsole::OnRender()
 
 	ColorRGBA ScConsoleBarColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_ScConsoleBarColor));
 
-
 	if(g_Config.m_ClConsoleSimple == 1)
 	{
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_SIMPLE].m_Id);
@@ -923,24 +922,23 @@ void CGameConsole::OnRender()
 	// do the lower bar
 	if(g_Config.m_ClConsoleBarSimple == 1)
 	{
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BAR_SIMPLE].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(ScConsoleBarColor);
-	Graphics()->QuadsSetSubset(0, 0.1f, Screen.w * 0.015f, 1 - 0.1f);
-	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 10.0f, Screen.w, 10.0f);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BAR_SIMPLE].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(ScConsoleBarColor);
+		Graphics()->QuadsSetSubset(0, 0.1f, Screen.w * 0.015f, 1 - 0.1f);
+		QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 10.0f, Screen.w, 10.0f);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
 	}
 	else
 	{
-
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BAR].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.9f);
-	Graphics()->QuadsSetSubset(0, 0.1f, Screen.w * 0.015f, 1 - 0.1f);
-	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 10.0f, Screen.w, 10.0f);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BAR].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.9f);
+		Graphics()->QuadsSetSubset(0, 0.1f, Screen.w * 0.015f, 1 - 0.1f);
+		QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 10.0f, Screen.w, 10.0f);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
 	}
 	ConsoleHeight -= 22.0f;
 

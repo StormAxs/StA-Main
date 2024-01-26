@@ -215,10 +215,10 @@ void CNamePlates::RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pP
 				TextRender()->RenderTextContainer(m_aNamePlates[ClientID].m_ClanNameTextContainerIndex, TColor, TOutlineColor, Position.x - m_aNamePlates[ClientID].m_ClanNameTextWidth / 2.0f, YOffset);
 		}
 		//tee skin name
-		if (g_Config.m_ClShowSkinName)
+		if(g_Config.m_ClShowSkinName)
 		{
-			const CGameClient::CClientData& ClientData = m_pClient->m_aClients[pPlayerInfo->m_ClientID];
-			const char* pSkinName = ClientData.m_aSkinName;
+			const CGameClient::CClientData &ClientData = m_pClient->m_aClients[pPlayerInfo->m_ClientID];
+			const char *pSkinName = ClientData.m_aSkinName;
 
 			YOffset -= FontSizeClan;
 			float XOffset = TextRender()->TextWidth(FontSize, pSkinName, -1, -1.0f) / 2.0f;

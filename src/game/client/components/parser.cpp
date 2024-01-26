@@ -2,8 +2,8 @@
 #include "base/system.h"
 #include "engine/engine.h"
 #include "engine/shared/http.h"
-#include <engine/external/json-parser/json.h>
 #include <chrono>
+#include <engine/external/json-parser/json.h>
 
 CStats::CStats() = default;
 
@@ -28,14 +28,13 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 	pStatsDest->StatsParsed = false;
 }
 
-
 void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 {
 	// TODO error type validation
 
 	json_value *pPlayerStats = pStatsDest->m_pGetStatsDDStats->ResultJson();
 
-	if (!pPlayerStats)
+	if(!pPlayerStats)
 	{
 		dbg_msg("stats", "Invalid JSON received");
 		return;
@@ -45,7 +44,6 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	// since player is in the first column - do it like this:
 	const json_value &Player = PlayerStats["player"];
 	str_copy(pStatsDest->aPlayer, Player);
-
 
 	// get the total points of the PointsCategory in DDStats
 	const json_value &PointsCategories = PlayerStats["points"];
@@ -57,7 +55,7 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	// MPM===============================================
 	const json_value &MostPlayedMaps = PlayerStats["mostPlayedMaps"];
 
-	for (int i = 0; i < 11; ++i)
+	for(int i = 0; i < 11; ++i)
 	{
 		const json_value &map = MostPlayedMaps[i];
 		str_copy(pStatsDest->aMap[i], map["map"].u.string.ptr);
@@ -75,7 +73,7 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	// total playtime
 	const json_value &PlayerTime = PlayerStats["playtimeGametypes"];
 
-	for (int i = 0; i < 15; i++)
+	for(int i = 0; i < 15; i++)
 	{
 		const json_value &pTime = PlayerTime[i];
 		pStatsDest->totalPlaytime[i] = pTime["Playtime"].u.integer;
@@ -84,11 +82,11 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	// F***ING
 	const json_value &PlayTimeLocateCategory = PlayerStats["playtimeLocation"];
 
-	if (PlayTimeLocateCategory.type == json_array)
+	if(PlayTimeLocateCategory.type == json_array)
 	{
 		const json_value &PlayTimeLoc = PlayTimeLocateCategory[0];
 
-		if (PlayTimeLoc["location"].type == json_string && PlayTimeLoc["location"].u.string.ptr != nullptr)
+		if(PlayTimeLoc["location"].type == json_string && PlayTimeLoc["location"].u.string.ptr != nullptr)
 		{
 			str_copy(pStatsDest->PlayTimeLocation, PlayTimeLoc["location"].u.string.ptr);
 		}
@@ -96,7 +94,7 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 
 	json_value *dPlayerStats = pStatsDest->m_pGetStatsDDNet->ResultJson();
 
-	if (!dPlayerStats)
+	if(!dPlayerStats)
 	{
 		dbg_msg("DDnet.org", "Invalid JSON received");
 		return;
@@ -117,7 +115,7 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	//PTS for last month
 	const json_value &PLM = dPlayerStat["points_last_month"];
 	const json_value &PointsMonth = PLM["points"];
-	pStatsDest->PLM = PointsMonth.u.integer;// pts last month
+	pStatsDest->PLM = PointsMonth.u.integer; // pts last month
 	// Last Finishes
 	json_value &LastFinishes = *dPlayerStats;
 	// get the total points of the PointsCategory in DDStats
@@ -153,10 +151,5 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 		const json_value &BestParner = FavPartners[i];
 		str_copy(pStatsDest->FavouritePartners[i], BestParner["name"].u.string.ptr);
 		pStatsDest->BestPartnerFinishes[i] = BestParner["finishes"].u.integer;
-
 	}
-
-
-
 }
-

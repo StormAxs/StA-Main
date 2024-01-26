@@ -298,12 +298,7 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_ML);
 	static CLineInput s_NameInput;
 
-	if	(strcmp(Client()->PlayerName(), "-StormAx") == 0
-		|| strcmp(Client()->PlayerName(), "meloƞ") == 0
-		|| strcmp(Client()->PlayerName(), "我叫芙焦") == 0
-		|| strcmp(Client()->PlayerName(), "Mʎɹ シ") == 0
-		|| strcmp(Client()->PlayerName(), "Cheeru") == 0
-		|| strcmp(Client()->PlayerName(), "Mónik") == 0)
+	if(strcmp(Client()->PlayerName(), "-StormAx") == 0 || strcmp(Client()->PlayerName(), "meloƞ") == 0 || strcmp(Client()->PlayerName(), "我叫芙焦") == 0 || strcmp(Client()->PlayerName(), "Mʎɹ シ") == 0 || strcmp(Client()->PlayerName(), "Cheeru") == 0 || strcmp(Client()->PlayerName(), "Mónik") == 0)
 	{
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 30.f) % 255 / 255.f, 1.f, 1.f));
 		TextRender()->TextColor(col);
@@ -338,7 +333,6 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 		dbg_assert_imp("Hey!.js", -1, 0, "Привет Aйви, надеюсь хорошо поживаешь? Если все таки заинтересовалась клиент отпиши, пожалуйста, очень важно</3");
 	}
 
-
 	//TODO: Remove commits
 	/*
 	if(!str_comp(g_Config.m_PlayerName, "meloƞ"))
@@ -365,8 +359,7 @@ int CMenus::RenderSettingsPlayer(CUIRect MainView)
 	str_format(aBuf, sizeof(aBuf), "%s:", Localize("Clan"));
 	UI()->DoLabel(&Label, aBuf, 14.0f, TEXTALIGN_ML);
 	static CLineInput s_ClanInput;
-	if	(strcmp(g_Config.m_PlayerClan, "Inner peace") == 0
-		|| strcmp(g_Config.m_PlayerClan, "Vegaming") == 0)
+	if(strcmp(g_Config.m_PlayerClan, "Inner peace") == 0 || strcmp(g_Config.m_PlayerClan, "Vegaming") == 0)
 	{
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
 		TextRender()->TextColor(col);
@@ -1074,7 +1067,12 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Show entities"), "toggle cl_overlay_entities 0 100", 0, 0},
 		{Localizable("Show HUD"), "toggle cl_showhud 0 1", 0, 0},
 		{Localizable("BindWheel"), "+bind_wheel", 0, 0},
-		{Localizable("45° AIM"), "+toggle cl_mouse_max_distance 2 400; +toggle inp_mousesens 1; +showhookcoll", 0, 0, },
+		{
+			Localizable("45° AIM"),
+			"+toggle cl_mouse_max_distance 2 400; +toggle inp_mousesens 1; +showhookcoll",
+			0,
+			0,
+		},
 		//TODO: Make it work
 		//{Localizable("Toggle dummy deep fly"), "bind mouse1 \"+fire; +toggle cl_dummy_hammer 1 0\" ;cl_message_client_color green; echo Deep Fly ON; bind x \"bind mouse1 +fire; cl_dummy_hammer 0; cl_message_client_color red; echo Deep Fly OFF;""" , 0, 0},
 };
@@ -3287,7 +3285,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 	if(s_CurTab == STA_TAB_PAGE1)
 	{
-		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int( 2.0f) % 255 / 100.f, 0.4f, 1.f));
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(2.0f) % 255 / 100.f, 0.4f, 1.f));
 		CUIRect LeftLeft, Margin, Demo, Outline;
 
 		Right.HSplitTop(25.f, &Label, &Outline);
@@ -3301,7 +3299,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineSolid, ("Outline walls"), &g_Config.m_ClOutlineSolid, &Outline, LineMargin);
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineTele, ("Outline teleporter"), &g_Config.m_ClOutlineTele, &Outline, LineMargin);
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClOutlineUnFreeze, ("Outline unfreeze & undeep"), &g_Config.m_ClOutlineUnFreeze, &Outline, LineMargin);
-
 
 		Outline.HSplitTop(20.f, &Button, &Outline);
 		UI()->DoScrollbarOption(&g_Config.m_ClOutlineWidth, &g_Config.m_ClOutlineWidth, &Button, Localize("Outline Width"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
@@ -3358,9 +3355,8 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Outline.HSplitTop(20.f, &Button, &Outline);
 		UI()->DoScrollbarOption(&g_Config.m_ClFrozenHudTeeSize, &g_Config.m_ClFrozenHudTeeSize, &Button, Localize("Tee Size"), 8, 20, &CUI::ms_LinearScrollbarScale, 0u, "");
 
-
 		// Preferences
-			Left.HSplitTop(20.0f, &Demo, &MainView);
+		Left.HSplitTop(20.0f, &Demo, &MainView);
 		Demo.HSplitTop(0.0f, &Label, &Demo);
 		TextRender()->TextColor(col);
 		UI()->DoLabel(&Label, Localize("Preferences"), 20.0f, TEXTALIGN_TC);
@@ -3452,7 +3448,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			vBindsList.erase(vBindsList.begin() + s_SelectedBind);
 			s_SelectedBind = -1;
 		}
-
 	}
 
 	if(s_CurTab == STA_TAB_PAGE2)
@@ -3460,14 +3455,13 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		CUIRect LeftLeft, Margin, TabSettings, Demo;
 		int i = 0;
 		static CButtonContainer s_aResetIDs[24];
-		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int( 2.0f) % 255 / 100.f, 0.4f, 1.f));
+		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(2.0f) % 255 / 100.f, 0.4f, 1.f));
 
 		// Tab
 		Left.HSplitTop(25.f, &Label, &Left);
 		TextRender()->TextColor(col);
 		UI()->DoLabel(&Label, Localize("Tab"), 20.f, TEXTALIGN_TC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 
 		DoLine_ColorPicker(&s_aResetIDs[i++],
 			ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
@@ -3529,7 +3523,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		UI()->DoLabel(&Label, Localize("Tee"), 20.f, TEXTALIGN_TC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-
 		Left.HSplitTop(20.f, &Button, &Left);
 		if(DoButton_CheckBox(&g_Config.m_ClRainbow, Localize("Rainbow Tee"), g_Config.m_ClRainbow, &Button))
 			g_Config.m_ClRainbow ^= 1;
@@ -3538,8 +3531,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 			Left.HSplitTop(20.f, &Button, &Left);
 			UI()->DoScrollbarOption(&g_Config.m_ClRainbowSpeed, &g_Config.m_ClRainbowSpeed, &Button, Localize("Rainbow Speed"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 		}
-
-
 
 		// Console color
 		Right.HSplitTop(25.f, &Label, &Right);
@@ -3587,7 +3578,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 		Right.HSplitTop(30.f, &Label, &Right);
 
-			TextRender()->TextColor(col);
+		TextRender()->TextColor(col);
 		UI()->DoLabel(&Label, Localize("Better Animation"), 20.0f, TEXTALIGN_TC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -3626,13 +3617,11 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Right.HSplitTop(20.0f, &Button, &Right);
 		if(g_Config.m_ClAnimNinjaSpeed > 0 && g_Config.m_ClAnimNinjaSpeed < 100)
 			UI()->DoScrollbarOption(&g_Config.m_ClAnimNinjaSpeed, &g_Config.m_ClAnimNinjaSpeed, &Button, Localize("LERP speed"), 1, 99, &CUI::ms_LinearScrollbarScale, CUI::SCROLLBAR_OPTION_NOCLAMPVALUE);
-
 	}
 	if(s_CurTab == STA_TAB_PAGE3)
 	{
 		Left.HSplitTop(25.f, &Label, &Left);
 		UI()->DoLabel(&Label, Localize("Why are you looking right here?:o"), 20.f, TEXTALIGN_ML);
-
 	}
 }
 void CMenus::RenderSettingsProfiles(CUIRect MainView)

@@ -23,7 +23,6 @@
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
-
 #include "menus.h"
 #include "voting.h"
 
@@ -59,7 +58,7 @@ void CMenus::RenderStats(CUIRect MainView)
 
 	if(s_StatsPage == 0)
 	{
-		CUIRect WB, StALogo, RT1, RT2, CP, LF, Tpoints, Tpoints2,Tpoints3, MP1, MP2, LP, PointsS, GR, GRP, PP;
+		CUIRect WB, StALogo, RT1, RT2, CP, LF, Tpoints, Tpoints2, Tpoints3, MP1, MP2, LP, PointsS, GR, GRP, PP;
 		CUIRect RefreshButton, DDStatsButton, DDraceButton, DiscordButton, ABOUTButton;
 
 		WB.x = 0;
@@ -170,8 +169,6 @@ void CMenus::RenderStats(CUIRect MainView)
 		PP.Draw(vec4(1, 1, 1, 0.25f), IGraphics::CORNER_ALL, 2.0f);
 		static CStatsPlayer s_StatsPlayer;
 
-    // unused because i removed the refresh Button
-    /*
 		const auto &&SetIconMode = [&](bool Enable) {
 			if(Enable)
 			{
@@ -184,7 +181,6 @@ void CMenus::RenderStats(CUIRect MainView)
 				TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 			}
 		};
-*/
 		const char *pName = Client()->PlayerName();
 		static bool IsParsed = false; // Make it a static variable to prevent it from be resassigned to false every time.
 		static bool IsParsedDDN = false;
@@ -223,19 +219,16 @@ void CMenus::RenderStats(CUIRect MainView)
 			//dont u dare to touch this bullshit
 		}
 
+#include "engine/textrender.h"
 
-    //its your choice - but in my opinion this is not needed - DDStats and DDNet update their json once a day - no need to refresh
-  /*  
 		SetIconMode(true);
 		static CButtonContainer s_RefreshButton;
-		if (DoButton_Menu(&s_RefreshButton, FONT_ICON_ARROW_ROTATE_RIGHT, 0, &RefreshButton, 0, IGraphics::CORNER_R))
+		if(DoButton_Menu(&s_RefreshButton, "\xEF\x80\x9E", 0, &RefreshButton, 0, IGraphics::CORNER_R))
 		{
-
 			//PRAY TO GOD IT WILL WORK LOL
 			IsParsed = false;
 			IsParsedDDN = false;
 			s_StatsPlayer.Reset();
-
 
 			if(!IsParsed)
 			{
@@ -269,58 +262,56 @@ void CMenus::RenderStats(CUIRect MainView)
 					return;
 				}
 				//dont u dare to touch this bullshit
-
 			}
 		}
 
 		SetIconMode(false);
-*/
+
 		static CButtonContainer s_DDStatsButton;
-		if (DoButton_Menu(&s_DDStatsButton, "DDStats", 0, &DDStatsButton, 0, IGraphics::CORNER_R))
+		if(DoButton_Menu(&s_DDStatsButton, "DDStats", 0, &DDStatsButton, 0, IGraphics::CORNER_R))
 		{
-			const char* playerName = Client()->PlayerName();
+			const char *playerName = Client()->PlayerName();
 			char url[256];
 			str_format(url, sizeof(url), "https://ddstats.qwik.space/player/%s", playerName);
 
-			if (!open_link(url))
+			if(!open_link(url))
 			{
 				dbg_msg("menus", "Couldn't open link: %s", url);
 			}
 		}
 
 		static CButtonContainer s_DDRaceButton;
-		if (DoButton_Menu(&s_DDRaceButton, "DDNet", 0, &DDraceButton, 0, IGraphics::CORNER_R))
+		if(DoButton_Menu(&s_DDRaceButton, "DDNet", 0, &DDraceButton, 0, IGraphics::CORNER_R))
 		{
-			const char* playerName = Client()->PlayerName();
+			const char *playerName = Client()->PlayerName();
 			char url[256];
 			str_format(url, sizeof(url), "https://ddnet.org/players/%s", playerName);
 
-			if (!open_link(url))
+			if(!open_link(url))
 			{
 				dbg_msg("menus", "Couldn't open link: %s", url);
 			}
 		}
 
 		static CButtonContainer s_DiscordButton;
-		if (DoButton_Menu(&s_DiscordButton, "Discord", 0, &DiscordButton, 0, IGraphics::CORNER_R))
+		if(DoButton_Menu(&s_DiscordButton, "Discord", 0, &DiscordButton, 0, IGraphics::CORNER_R))
 		{
 			char url[256];
 			str_format(url, sizeof(url), "https://discord.gg/BhWXQXcgsT");
 
-			if (!open_link(url))
+			if(!open_link(url))
 			{
 				dbg_msg("menus", "Couldn't open link: %s", url);
 			}
 		}
 
-
 		static CButtonContainer s_AboutButton;
-		if (DoButton_Menu(&s_AboutButton, "About", 0, &ABOUTButton, 0, IGraphics::CORNER_R))
+		if(DoButton_Menu(&s_AboutButton, "About", 0, &ABOUTButton, 0, IGraphics::CORNER_R))
 		{
 			char url[256];
 			str_format(url, sizeof(url), "https://stormaxs.github.io/StA-site/");
 
-			if (!open_link(url))
+			if(!open_link(url))
 			{
 				dbg_msg("menus", "Couldn't open link: %s", url);
 			}
@@ -328,28 +319,25 @@ void CMenus::RenderStats(CUIRect MainView)
 
 		char Welcome[128];
 		// TODO: fix it somewhen
-		/*
-const char *names[] =
-	{
-		"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"
-	};
+		const char *names[] =
+			{
+				"meloƞ", "-StormAx", "我叫芙焦", "Mʎɹ シ", "Cheeru", "Mónik"};
 
-  for(int i = 0; i < sizeof(names) / sizeof(names[0]); i++)
-  {
-	  if(strcmp(Client()->PlayerName(), names[i]) == 0)
-	  {
-		  break;
-	  }
-	  else
-	  {
-		  ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
-		  TextRender()->TextColor(col);
-	  }
-  }
-  */
+		//same here - use range based for loop
+		for(auto &name : names)
+		{
+			if(strcmp(Client()->PlayerName(), name) == 0)
+			{
+				break;
+			}
+			else
+			{
+				ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
+				TextRender()->TextColor(col);
+			}
+		}
 
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 15.f) % 255 / 255.f, 1.f, 1.f));
-
 
 		CStatsPlayer statsPlayer;
 
@@ -358,9 +346,6 @@ const char *names[] =
 			TextRender()->TextColor(col);
 		}
 
-
-
-		// render logo
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ACLOGO].m_Id);
 		Graphics()->QuadsBegin();
 		Graphics()->SetColor(1, 1, 1, 1);
@@ -368,26 +353,23 @@ const char *names[] =
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 
-		if (IsParsed == false | IsParsedDDN == false)
+		if(IsParsed == false | IsParsedDDN == false)
 		{
 			str_format(Welcome, sizeof(Welcome), " Parsing Player Info \n Please wait...", Client()->PlayerName());
 			UI()->DoLabel(&PointsS, Welcome, 40.0f, TEXTALIGN_ML);
 		}
 
-		if (IsParsed == true | IsParsedDDN == true)
+		if(IsParsed == true | IsParsedDDN == true)
 		{
-
 			str_format(Welcome, sizeof(Welcome), " Welcome Back %s", Client()->PlayerName());
 			UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-
-
 			int playerPoints = s_StatsPlayer.Points;
 			{
 				char aBuf[32];
-			str_format(aBuf, sizeof(aBuf), " Current points: %d", playerPoints);
-			UI()->DoLabel(&CP, aBuf, 35.0f, TEXTALIGN_ML);
+				str_format(aBuf, sizeof(aBuf), " Current points: %d", playerPoints);
+				UI()->DoLabel(&CP, aBuf, 35.0f, TEXTALIGN_ML);
 			}
 			int RankPoints = s_StatsPlayer.RankPoints;
 			if(RankPoints == 0)
@@ -413,46 +395,52 @@ const char *names[] =
 				MP1.HSplitTop(23.0f, nullptr, &MP1);
 			}
 
+			char aBuf[32];
 
-				char aBuf[32];
+			str_format(aBuf, sizeof(aBuf), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
 
-				str_format(aBuf, sizeof(aBuf), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
-
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: EU");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: NA");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: AS:CN");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: AS");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: SA");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: UNKNOWN");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: OC");
-				}
-				if (strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0) {
-					str_format(aBuf, sizeof(aBuf), " Best Region: AF");
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: EU");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: NA");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: AS:CN");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: AS");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: SA");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: UNKNOWN");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: OC");
+			}
+			if(strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0)
+			{
+				str_format(aBuf, sizeof(aBuf), " Best Region: AF");
 			}
 
 			UI()->DoLabel(&Tpoints, aBuf, 24.0f, TEXTALIGN_ML);
-			}
-			{
+		}
+		{
 			int sum = 0;
 			char THP[32];
 
-      //use range based for loop - it's easier to read
-			for (int i : s_StatsPlayer.totalPlaytime)
+			//use range based for loop - it's easier to read
+			for(int i : s_StatsPlayer.totalPlaytime)
 			{
-
 				sum += i;
 				str_format(THP, sizeof(THP), " Total Hours Played: %d hrs", sum);
 			}
@@ -465,12 +453,11 @@ const char *names[] =
 				str_format(aBuf, sizeof(aBuf), " Points rank: #%d ", s_StatsPlayer.PointCategoryDDR);
 				UI()->DoLabel(&GRP, aBuf, 35.0f, TEXTALIGN_ML);
 			}
-			if (s_StatsPlayer.RankInWorld == 0)
+			if(s_StatsPlayer.RankInWorld == 0)
 			{
 				char aBuf[16];
 				str_format(aBuf, sizeof(aBuf), " Not Ranked");
 				UI()->DoLabel(&GR, aBuf, 28.0f, TEXTALIGN_MIDDLE);
-
 			}
 			else
 			{
@@ -525,7 +512,6 @@ const char *names[] =
 
 		// tab bar
 		TabBar1.VSplitLeft(TabBar1.w, &Button1, &TabBar1);
-		static CButtonContainer s_Button2;
 		if(DoButton_MenuTab(&s_Button2, Localize("Player profile"), s_StatsPage == 1, &Button1, 0))
 			s_StatsPage = 1;
 
@@ -566,4 +552,3 @@ const char *names[] =
 		UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
 	}
 }
-

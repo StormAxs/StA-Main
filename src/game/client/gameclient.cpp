@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include <chrono>
+#include <cstdlib> // for rand()
 #include <limits>
-#include <cstdlib>  // for rand()
 
 #include "engine/discord.h"
 #include <engine/client/checksum.h>
@@ -1094,12 +1094,15 @@ void CGameClient::RenderShutdownMessage()
 {
 	const char *pMessage = nullptr;
 
-
-	if (Client()->State() == IClient::STATE_QUITTING) {
+	if(Client()->State() == IClient::STATE_QUITTING)
+	{
 		// Randomly decide whether to display "Goodbye..." (10% chance)
-		if (rand() % 20 == 0) {
+		if(rand() % 20 == 0)
+		{
 			pMessage = "Hope -StormAx gonna kill himself soon…";
-		} else {
+		}
+		else
+		{
 			pMessage = Localize("Quitting. Please wait…");
 		}
 	}

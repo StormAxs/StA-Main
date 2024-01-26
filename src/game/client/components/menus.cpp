@@ -629,13 +629,12 @@ int CMenus::RenderMenubar(CUIRect r)
 				NewPage = PAGE_FAVORITES;
 			}
 
-		//Box.VSplitLeft(100.0f, &Button, &Box);
-		//static CButtonContainer s_StatsButton;
-		//if(DoButton_MenuTab(&s_StatsButton, Localize("DDRace Stats"), m_ActivePage == PAGE_STATS, &Button, IGraphics::CORNER_T))
-		//{
-		//	NewPage = PAGE_STATS;
-		//}
-
+			//Box.VSplitLeft(100.0f, &Button, &Box);
+			//static CButtonContainer s_StatsButton;
+			//if(DoButton_MenuTab(&s_StatsButton, Localize("DDRace Stats"), m_ActivePage == PAGE_STATS, &Button, IGraphics::CORNER_T))
+			//{
+			//	NewPage = PAGE_STATS;
+			//}
 		}
 	}
 	else

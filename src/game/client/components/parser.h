@@ -7,7 +7,7 @@
 #include <engine/shared/jobs.h>
 #include <game/client/component.h>
 
-	enum
+enum
 {
 	MOST_PLAYED_LENGTH = 128
 };
@@ -19,7 +19,7 @@ class CStatsPlayer
 {
 public:
 	std::shared_ptr<CHttpRequest> m_pGetStatsDDStats; // profile and player stats
-	std::shared_ptr<CHttpRequest> m_pGetStatsDDNet;   // map tracking
+	std::shared_ptr<CHttpRequest> m_pGetStatsDDNet; // map tracking
 
 	char aPlayer[MAX_NAME_LENGTH];
 	int Points;
@@ -50,7 +50,6 @@ public:
 		m_pGetStatsDDStats.reset();
 		m_pGetStatsDDNet.reset();
 	}
-
 };
 
 class CStats : public CComponent

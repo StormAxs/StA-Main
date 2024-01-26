@@ -25,7 +25,6 @@
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
-
 #include "menus.h"
 #include "motd.h"
 #include "voting.h"
@@ -34,9 +33,7 @@
 #include <engine/keys.h>
 #include <engine/storage.h>
 
-#include "parser.h"
 #include <chrono>
-#include <thread>
 
 using namespace FontIcons;
 using namespace std::chrono_literals;
