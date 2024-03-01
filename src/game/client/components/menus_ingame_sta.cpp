@@ -394,46 +394,46 @@ void CMenus::RenderStats(CUIRect MainView)
 				MP1.HSplitTop(23.0f, nullptr, &MP1);
 			}
 
-			char aBuf[32];
+			char cBuf[32];
 
-			str_format(aBuf, sizeof(aBuf), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
+			str_format(cBuf, sizeof(cBuf), " Best Region: %s", s_StatsPlayer.PlayTimeLocation);
 
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "eu") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: EU");
+				str_format(cBuf, sizeof(cBuf), " Best Region: EU");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "na") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: NA");
+				str_format(cBuf, sizeof(cBuf), " Best Region: NA");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "as:cn") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: AS:CN");
+				str_format(cBuf, sizeof(cBuf), " Best Region: AS:CN");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "as") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: AS");
+				str_format(cBuf, sizeof(cBuf), " Best Region: AS");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "sa") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: SA");
+				str_format(cBuf, sizeof(cBuf), " Best Region: SA");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "unknown") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: UNKNOWN");
+				str_format(cBuf, sizeof(cBuf), " Best Region: UNKNOWN");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "oc") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: OC");
+				str_format(cBuf, sizeof(cBuf), " Best Region: OC");
 			}
 			if(strcmp(s_StatsPlayer.PlayTimeLocation, "af") == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), " Best Region: AF");
+				str_format(cBuf, sizeof(cBuf), " Best Region: AF");
 			}
 
-			UI()->DoLabel(&Tpoints, aBuf, 24.0f, TEXTALIGN_ML);
-		}
-		{
+			UI()->DoLabel(&Tpoints, cBuf, 24.0f, TEXTALIGN_ML);
+
+
 			int sum = 0;
 			char THP[32];
 

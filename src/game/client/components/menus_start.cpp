@@ -16,16 +16,48 @@
 #include <game/version.h>
 
 #include "menus.h"
+#include <vector>
+#include <string>
+#include <cstdlib> // For rand() and srand()
+#include <ctime>   // For time()
+
+std::vector<std::string> quotes = {
+	"Melon, keki4, and StormAxD",
+	"GAE",
+	"CHEEERYAAAAA",
+};
+
+// Function to get a random quote
+std::string GetRandomQuote() {
+	// Get a random index
+	int index = rand() % quotes.size();
+
+	// Return the random quote
+	return quotes[index];
+}
 
 void CMenus::RenderStartMenu(CUIRect MainView)
 {
-	// render logo
+	// Render logo
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(1, 1, 1, 1);
 	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 210, 50, 490, 103);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
+
+	// Get a random quote when the game starts
+	static bool firstTime = true;
+	static std::string randomQuote;
+
+	if (firstTime) {
+		srand(::time(nullptr)); // Seed the random number generator only once
+		randomQuote = GetRandomQuote();
+		firstTime = false;
+	}
+
+
+	
 
 	const float Rounding = 10.0f;
 	const float VMargin = MainView.w / 2 - 190.0f;
@@ -207,6 +239,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);
 
 #if defined(CONF_AUTOUPDATE)
+
 	char aBuf[64];
 	CUIRect Part;
 	int State = Updater()->GetCurrentState();
@@ -273,6 +306,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		ProgressBar.w = clamp((float)Updater()->GetCurrentPercent(), 10.0f, 100.0f);
 		ProgressBar.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f), IGraphics::CORNER_ALL, 5.0f);
 	}
+	/*
 #elif defined(CONF_INFORM_UPDATE)
 	if(str_comp(Client()->LatestVersion(), "0") != 0)
 	{
@@ -282,6 +316,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		UI()->DoLabel(&VersionUpdate, aBuf, 14.0f, TEXTALIGN_MC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
+*/
 #endif
 
 	UI()->DoLabel(&CurVersion, GAME_RELEASE_VERSION, 14.0f, TEXTALIGN_MR);
@@ -291,6 +326,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		m_MenuPage = NewPage;
 		m_ShowStart = false;
 	}
+
 }
 
 void CMenus::KillServer()

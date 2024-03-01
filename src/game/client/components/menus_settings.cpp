@@ -3241,9 +3241,6 @@ enum
 	STA_TAB_PAGE2 = 1,
 	STA_TAB_PAGE3 = 2,
 	NUMBER_OF_STA_TABS = 3,
-	STATS_TAB_PAGE1 = 0,
-	STATS_TAB_PAGE2 = 1,
-	NUMBER_OF_STATS_TABS = 2,
 };
 
 void CMenus::RenderSettingsStA(CUIRect MainView)

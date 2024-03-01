@@ -752,3 +752,4 @@ MACRO_CONFIG_INT(ClConsoleBarSimple, cl_consolebar_simple, 1, 0, 1, CFGFLAG_CLIE
 // Old ninja mode
 MACRO_CONFIG_INT(ClOldFreezeMode, cl_old_freeze_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "OldNinjaMode")
 MACRO_CONFIG_INT(ClFrozenWeapon, cl_frozen_weapon, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Give frozen tees their weapon")
+MACRO_CONFIG_INT(ClRainbowHook, cl_rainbow_hook, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "rainbow hook lmfao")

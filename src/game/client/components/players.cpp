@@ -314,7 +314,19 @@ void CPlayers::RenderHook(
 		Graphics()->QuadsSetRotation(angle(Dir) + pi);
 		// render head
 		int QuadOffset = NUM_WEAPONS * 2 + 2;
-		Graphics()->SetColor(1.0f, 1.0f, 1.0f, Alpha);
+		if(g_Config.m_ClRainbowHook == 0){
+
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, Alpha);
+		}
+		else
+		{
+			ColorHSVA ColorHSV(round_to_int(LocalTime() * g_Config.m_ClRainbowSpeed) % 255 / 255.f, 1.f, 1.f);
+			ColorRGBA ColorWithAlpha = color_cast<ColorRGBA>(ColorHSV);
+			ColorWithAlpha.a = Alpha;
+
+			Graphics()->SetColor(ColorWithAlpha);
+
+		}
 		Graphics()->RenderQuadContainerAsSprite(m_WeaponEmoteQuadContainerIndex, QuadOffset, HookPos.x, HookPos.y);
 
 		// render chain
@@ -406,7 +418,7 @@ void CPlayers::RenderPlayer(
 
 	m_pClient->m_Flow.Add(Position, Vel * 100.0f, 10.0f);
 
-	RenderInfo.m_GotAirJump = Player.m_Jumped & 2 ? false : true;
+	RenderInfo.m_GotAirJump = (Player.m_Jumped & 2) == 0;
 
 	RenderInfo.m_FeetFlipped = false;
 
@@ -884,6 +896,7 @@ void CPlayers::OnRender()
 		{
 			continue;
 		}
+
 		RenderHook(&m_pClient->m_aClients[ClientID].m_RenderPrev, &m_pClient->m_aClients[ClientID].m_RenderCur, &aRenderInfo[ClientID], ClientID);
 	}
 	if(LocalClientID != -1 && m_pClient->m_Snap.m_aCharacters[LocalClientID].m_Active && IsPlayerInfoAvailable(LocalClientID))

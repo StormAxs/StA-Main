@@ -396,7 +396,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 
 	char aBuf[1024];
 
-	// set view to use for all sub-modules
+	// set view to use for all submodules
 	MainView.Margin(10.0f, &View);
 
 	// serverinfo
