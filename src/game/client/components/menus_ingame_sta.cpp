@@ -219,7 +219,6 @@ void CMenus::RenderStats(CUIRect MainView)
 			//dont u dare to touch this bullshit
 		}
 
-#include "engine/textrender.h"
 
 		SetIconMode(true);
 		static CButtonContainer s_RefreshButton;
@@ -353,13 +352,13 @@ void CMenus::RenderStats(CUIRect MainView)
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 
-		if(IsParsed == false | IsParsedDDN == false)
+		if(!IsParsed | !IsParsedDDN)
 		{
 			str_format(Welcome, sizeof(Welcome), " Parsing Player Info \n Please wait...", Client()->PlayerName());
 			UI()->DoLabel(&PointsS, Welcome, 40.0f, TEXTALIGN_ML);
 		}
 
-		if(IsParsed == true | IsParsedDDN == true)
+		if(IsParsed | IsParsedDDN)
 		{
 			str_format(Welcome, sizeof(Welcome), " Welcome Back %s", Client()->PlayerName());
 			UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
@@ -476,20 +475,31 @@ void CMenus::RenderStats(CUIRect MainView)
 				LP.HSplitTop(18.0f, nullptr, &LP);
 			}
 
-			//TEAMMETES============================================
-			UI()->DoLabel(&PP, "Best Teammates", 20.0f, TEXTALIGN_TC);
-			PP.HSplitTop(27.0f, nullptr, &PP);
-			for(int i = 0; i < 5; ++i)
-			{
-				char aBuf[32];
-				str_format(aBuf, sizeof(aBuf), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
-				UI()->DoLabel(&PP, aBuf, 17.0f, TEXTALIGN_TL);
-				PP.HSplitTop(18.0f, nullptr, &PP);
-			}
+			// Assuming nullptr indicates an empty array
 			{
 				char aBuf[32];
 				str_format(aBuf, sizeof(aBuf), " Point Last Month: %d", s_StatsPlayer.PLM);
 				UI()->DoLabel(&Tpoints2, aBuf, 20.0f, TEXTALIGN_ML);
+			}
+
+			// TEAMMATES============================================
+			UI()->DoLabel(&PP, "Best Teammates", 20.0f, TEXTALIGN_TC);
+			PP.HSplitTop(27.0f, nullptr, &PP);
+			for(size_t i = 0; i < 5; ++i)
+			{
+				if(s_StatsPlayer.BestPartnerFinishes[i] > 0)
+				{
+					char aBuf[32];
+					snprintf(aBuf, sizeof(aBuf), " %s with %d ranks", s_StatsPlayer.FavouritePartners[i], s_StatsPlayer.BestPartnerFinishes[i]);
+					UI()->DoLabel(&PP, aBuf, 17.0f, TEXTALIGN_TL);
+					PP.HSplitTop(18.0f, nullptr, &PP);
+				}
+
+				if(s_StatsPlayer.BestPartnerFinishes[i] == 0)
+				{
+				char aBuf[32];
+				snprintf(aBuf, sizeof(aBuf), " No parters detected");
+				}
 			}
 		}
 	}

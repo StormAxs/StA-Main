@@ -146,10 +146,15 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 	json_value &Partner = *dPlayerStats;
 
 	const json_value &FavPartners = Partner["favorite_partners"];
-	for(int i = 0; i < 5; ++i)
+	for(int i = 0; i < 5 && i < FavPartners.u.array.length; ++i) // Ensure not to exceed array bounds
 	{
-		const json_value &BestParner = FavPartners[i];
-		str_copy(pStatsDest->FavouritePartners[i], BestParner["name"].u.string.ptr);
-		pStatsDest->BestPartnerFinishes[i] = BestParner["finishes"].u.integer;
+		const json_value &BestPartner = FavPartners[i];
+		if(BestPartner["name"].type == json_string && BestPartner["finishes"].type == json_integer)
+		{
+			str_copy(pStatsDest->FavouritePartners[i], BestPartner["name"].u.string.ptr);
+			pStatsDest->BestPartnerFinishes[i] = BestPartner["finishes"].u.integer;
+		}
+		else
+			pStatsDest->BestPartnerFinishes[i] = 0;
 	}
 }
