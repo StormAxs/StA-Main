@@ -776,5 +776,6 @@ private:
 	ColorHSLA RenderHSLScrollbars(CUIRect *pRect, unsigned int *pColor, bool Alpha = false, bool ClampedLight = false);
 
 	CServerProcess m_ServerProcess;
+	void RotateLabel(CUIRect rect, void *pVoid, const char *str, float d, ETextAlignment alignment, SLabelProperties properties, int i, void *pVoid1, float d1);
 };
 #endif

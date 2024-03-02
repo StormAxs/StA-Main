@@ -22,9 +22,61 @@
 #include <ctime>   // For time()
 
 std::vector<std::string> quotes = {
-	"Melon, keki4, and StormAxD",
-	"GAE",
-	"CHEEERYAAAAA",
+	"Client was made by -StormAx",
+	"don't use S-Client lol xD",
+	"Aslo try S-Client",
+	"Cook some maps today >:D",
+	"Hi!",
+	"Bye;c",
+	"You go gaming?",
+	"-StormAxD",
+	"Inner peace clan on top, isn't it?",
+	"The cake is lie :c",
+	"AH GG!!!!",
+	"YEPYEPYEPYEPYEP",
+	"My discord is 'stormaxd' go on!",
+	"Cheeru?",
+	"Cheeru!",
+	"Cheeru!?",
+	"Cheeru?!",
+	"The gamer is here!:D",
+	"OwO",
+	"UWU",
+	"QWQ",
+	"!ban 0.0.0.0-255.255.255.255",
+	"Me gamer :0, Me go hook random tees",
+	"PDGADHHAHDHAHAHADADAAAHAHAHAHAH",
+	"What is your best Grandma time? mine is 2:21:43",
+	"Со мной воюет сатана!!!!!!!",
+	"Never gonna give you.... forget it",
+	"AWwwwwww, you so cutie >.<",
+	"WhAt ThE...?",
+	"Kurw........Amach",
+	"Suka blyad'",
+	"Paxtell...",
+	"Number one roblox player",
+	"AYAYAAAAAA, ayakaaaaa",
+	"liga a camera ae!",
+	"Я рот ебал ваших ДДнетов",
+	"caos e regresso",
+	"Do HH right broh!",
+	"ПК это печь керамическая",
+	"melo melo melooon",
+	":gigachad:",
+	"-Dummygod was here",
+	"VAMO VER QM DA MAIS O RABO, PRA VER SE EU NUM GANHO!",
+	"muhehehehe",
+	"10/10",
+	"10010101010ERROR11010101010101010101011011010110ERROR101010011",
+	"voulez-vous couchez avec moi?!?",
+	"BlueMeww, Bluee... BlueMewing!... F*CK",
+	"ronyan'",
+	"W's in the shhhhhaaata :screamin':",
+	"W's in the shhhhhaaat :screamin':",
+
+
+
+
 };
 
 // Function to get a random quote
@@ -57,7 +109,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	}
 
 
-	
+
 
 	const float Rounding = 10.0f;
 	const float VMargin = MainView.w / 2 - 190.0f;
@@ -168,6 +220,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_LocalServerButton;
 
+
 	if(!is_process_alive(m_ServerProcess.m_Process))
 		KillServer();
 
@@ -237,6 +290,23 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 
 	VersionUpdate.VSplitRight(50.0f, &CurVersion, 0);
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);
+
+	CUIRect RandomText;
+	RandomText.x = 595.0f;
+	RandomText.y = 110.0f;
+	RandomText.w = 230.0f;
+	RandomText.h = 150.0f;
+	static bool Quote = false;
+
+	if (!Quote)
+	{
+		Quote = true;
+		dbg_msg("Quotes", "%s", randomQuote.c_str());
+	}
+
+	TextRender()->TextColor(1.0f, 1.0f, 0.0f, 1.0f);
+	UI()->DoLabel(&RandomText, randomQuote.c_str(), 20.0f, TEXTALIGN_ML);
+	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 #if defined(CONF_AUTOUPDATE)
 

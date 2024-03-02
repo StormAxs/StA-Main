@@ -1248,3 +1248,4 @@ void CMenus::RenderIngameHint()
 	TextRender()->Text(5, 280, 5, Localize("Menu opened. Press Esc key again to close menu."), -1.0f);
 	UI()->MapScreen();
 }
+

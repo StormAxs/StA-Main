@@ -3244,7 +3244,7 @@ enum
 };
 
 void CMenus::RenderSettingsStA(CUIRect MainView)
-{
+{//TODO: buttons before upd
 	char aBuf[128];
 	static int s_CurTab = 0;
 

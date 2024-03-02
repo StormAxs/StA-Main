@@ -678,6 +678,7 @@ void CUI::DoLabel(const CUIRect *pRect, const char *pText, float Size, int Align
 	TextRender()->TextEx(&Cursor, pText, -1);
 }
 
+
 void CUI::DoLabel(CUIElement::SUIElementRect &RectEl, const CUIRect *pRect, const char *pText, float Size, int Align, const SLabelProperties &LabelProps, int StrLen, const CTextCursor *pReadCursor) const
 {
 	const int Flags = GetFlagsForLabelProperties(LabelProps, pReadCursor);
