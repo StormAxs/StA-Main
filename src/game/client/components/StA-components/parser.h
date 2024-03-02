@@ -2,10 +2,10 @@
 #ifndef GAME_CLIENT_COMPONENTS_STATS_H
 #define GAME_CLIENT_COMPONENTS_STATS_H
 
+#include "engine/shared/http.h"
+#include "engine/shared/jobs.h"
 #include "engine/shared/protocol.h"
-#include <engine/shared/http.h>
-#include <engine/shared/jobs.h>
-#include <game/client/component.h>
+#include "game/client/component.h"
 
 enum
 {

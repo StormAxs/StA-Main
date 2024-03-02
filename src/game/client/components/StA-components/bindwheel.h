@@ -1,9 +1,9 @@
 #ifndef GAME_CLIENT_MACHO_BIND_WHEEL_H
 #define GAME_CLIENT_MACHO_BIND_WHEEL_H
 
-#include <base/vmath.h>
-#include <engine/console.h>
-#include <game/client/component.h>
+#include "base/vmath.h"
+#include "engine/console.h"
+#include "game/client/component.h"
 
 enum
 {

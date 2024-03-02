@@ -1,9 +1,9 @@
 #include "parser.h"
 #include "base/system.h"
 #include "engine/engine.h"
+#include "engine/external/json-parser/json.h"
 #include "engine/shared/http.h"
 #include <chrono>
-#include <engine/external/json-parser/json.h>
 
 CStats::CStats() = default;
 

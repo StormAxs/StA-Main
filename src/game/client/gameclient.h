@@ -19,7 +19,6 @@
 // components
 #include "components/background.h"
 #include "components/binds.h"
-#include "components/bindwheel.h"
 #include "components/broadcast.h"
 #include "components/camera.h"
 #include "components/chat.h"
@@ -31,7 +30,6 @@
 #include "components/effects.h"
 #include "components/emoticon.h"
 #include "components/flow.h"
-#include "components/freezebars.h"
 #include "components/ghost.h"
 #include "components/hud.h"
 #include "components/infomessages.h"
@@ -43,13 +41,10 @@
 #include "components/menus.h"
 #include "components/motd.h"
 #include "components/nameplates.h"
-#include "components/outlines.h"
-#include "components/parser.h"
 #include "components/particles.h"
 #include "components/players.h"
 #include "components/race_demo.h"
 #include "components/scoreboard.h"
-#include "components/skinprofiles.h"
 #include "components/skins.h"
 #include "components/sounds.h"
 #include "components/spectator.h"
@@ -57,6 +52,11 @@
 #include "components/tooltips.h"
 #include "components/verify.h"
 #include "components/voting.h"
+#include "game/client/components/StA-components/bindwheel.h"
+#include "game/client/components/StA-components/outlines.h"
+#include "game/client/components/StA-components/parser.h"
+#include "game/client/components/StA-components/skinprofiles.h"
+#include "game/client/components/freezebars.h"
 
 class CGameInfo
 {

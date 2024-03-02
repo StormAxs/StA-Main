@@ -2172,8 +2172,6 @@ if(CLIENT)
           components/background.h
           components/binds.cpp
           components/binds.h
-          components/bindwheel.cpp
-          components/bindwheel.h
           components/broadcast.cpp
           components/broadcast.h
           components/camera.cpp
@@ -2219,28 +2217,22 @@ if(CLIENT)
           components/menus_browser.cpp
           components/menus_demo.cpp
           components/menus_ingame.cpp
-          components/menus_ingame_sta.cpp
           components/menus_settings.cpp
           components/menus_settings_assets.cpp
           components/menus_start.cpp
           components/motd.cpp
           components/motd.h
           components/nameplates.cpp
-          components/outlines.cpp
-          components/outlines.h
           components/nameplates.h
           components/particles.cpp
           components/particles.h
-          components/parser.cpp
-          components/parser.h
+
           components/players.cpp
           components/players.h
           components/race_demo.cpp
           components/race_demo.h
           components/scoreboard.cpp
           components/scoreboard.h
-          components/skinprofiles.cpp
-          components/skinprofiles.h
           components/skins.cpp
           components/skins.h
           components/sounds.cpp
@@ -2249,6 +2241,15 @@ if(CLIENT)
           components/spectator.h
           components/statboard.cpp
           components/statboard.h
+          components/StA-components/bindwheel.cpp
+          components/StA-components/bindwheel.h
+          components/StA-components/menus_ingame_sta.cpp
+          components/StA-components/outlines.cpp
+          components/StA-components/outlines.h
+          components/StA-components/parser.cpp
+          components/StA-components/parser.h
+          components/StA-components/skinprofiles.cpp
+          components/StA-components/skinprofiles.h
           components/tooltips.cpp
           components/tooltips.h
           components/verify.cpp

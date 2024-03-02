@@ -73,7 +73,7 @@ std::vector<std::string> quotes = {
 	"ronyan'",
 	"W's in the shhhhhaaata :screamin':",
 	"W's in the shhhhhaaat :screamin':",
-	"SpinbrosTV... you'r onto something, you'r onto something man",
+	"SpinbrosTV... you're onto something, you'r onto something man",
 
 
 
@@ -291,6 +291,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	VersionUpdate.VSplitRight(50.0f, &CurVersion, 0);
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);
 
+
 	CUIRect RandomText;
 	RandomText.x = 595.0f;
 	RandomText.y = 110.0f;
@@ -307,7 +308,6 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	TextRender()->TextColor(1.0f, 1.0f, 0.0f, 1.0f);
 	UI()->DoLabel(&RandomText, randomQuote.c_str(), 20.0f, TEXTALIGN_ML);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 #if defined(CONF_AUTOUPDATE)
 
 	char aBuf[64];

@@ -62,7 +62,6 @@
 #include "components/menus.h"
 #include "components/motd.h"
 #include "components/nameplates.h"
-#include "components/parser.h"
 #include "components/particles.h"
 #include "components/players.h"
 #include "components/race_demo.h"
@@ -72,6 +71,7 @@
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/voting.h"
+#include "game/client/components/StA-components/parser.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
 

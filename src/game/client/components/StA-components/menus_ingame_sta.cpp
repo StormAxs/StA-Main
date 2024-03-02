@@ -1,33 +1,33 @@
-#include <base/math.h>
-#include <base/system.h>
+#include "base/math.h"
+#include "base/system.h"
 
-#include <engine/demo.h>
-#include <engine/favorites.h>
-#include <engine/friends.h>
-#include <engine/ghost.h>
-#include <engine/graphics.h>
-#include <engine/serverbrowser.h>
-#include <engine/shared/config.h>
-#include <engine/shared/localization.h>
-#include <engine/textrender.h>
+#include "engine/demo.h"
+#include "engine/favorites.h"
+#include "engine/friends.h"
+#include "engine/ghost.h"
+#include "engine/graphics.h"
+#include "engine/serverbrowser.h"
+#include "engine/shared/config.h"
+#include "engine/shared/localization.h"
+#include "engine/textrender.h"
 
-#include <game/generated/client_data.h>
-#include <game/generated/protocol.h>
+#include "game/generated/client_data.h"
+#include "game/generated/protocol.h"
 
-#include <game/client/animstate.h>
-#include <game/client/components/countryflags.h>
-#include <game/client/gameclient.h>
-#include <game/client/render.h>
-#include <game/client/ui.h>
-#include <game/client/ui_listbox.h>
-#include <game/client/ui_scrollregion.h>
-#include <game/localization.h>
+#include "game/client/animstate.h"
+#include "game/client/components/countryflags.h"
+#include "game/client/gameclient.h"
+#include "game/client/render.h"
+#include "game/client/ui.h"
+#include "game/client/ui_listbox.h"
+#include "game/client/ui_scrollregion.h"
+#include "game/localization.h"
 
-#include "menus.h"
-#include "voting.h"
+#include "game/client/components/menus.h"
+#include "game/client/components/voting.h"
 
-#include <engine/keys.h>
-#include <engine/storage.h>
+#include "engine/keys.h"
+#include "engine/storage.h"
 
 #include "parser.h"
 

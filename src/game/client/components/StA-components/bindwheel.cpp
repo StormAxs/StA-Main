@@ -1,10 +1,10 @@
 #include "bindwheel.h"
 
-#include <engine/shared/config.h>
-#include <engine/shared/datafile.h>
-#include <game/client/gameclient.h>
-#include <game/client/render.h>
-#include <game/client/ui.h>
+#include "engine/shared/config.h"
+#include "engine/shared/datafile.h"
+#include "game/client/gameclient.h"
+#include "game/client/render.h"
+#include "game/client/ui.h"
 
 // Concept by sjrc6
 // https://github.com/sjrc6/TaterClient-ddnet/blob/master/src/game/client/components/bindwheel.cpp
