@@ -11,7 +11,7 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 {
 	char aUrl_DDStats[256];
 	char aUrl_DDNet[256];
-	char aEscapedName[MAX_NAME_LENGTH];
+	char aEscapedName[MAX_NAME_LENGTH * 4];
 	EscapeUrl(aEscapedName, sizeof(aEscapedName), pPlayer);
 	str_format(aUrl_DDStats, sizeof(aUrl_DDStats), "%s%s", STATS_URL_DDSTATS, aEscapedName);
 	pStatsDest->m_pGetStatsDDStats = HttpGet(aUrl_DDStats);

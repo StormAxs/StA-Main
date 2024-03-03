@@ -75,6 +75,8 @@ std::vector<std::string> quotes = {
 	"W's in the shhhhhaaat :screamin':",
 	"SpinbrosTV... you'r onto something, you'r onto something man",
 	"Also try M-Client v3 :D",
+	"Choo-Choo",
+	"Super rare text you might see once in your life",
 
 
 
@@ -82,11 +84,19 @@ std::vector<std::string> quotes = {
 
 // Function to get a random quote
 std::string GetRandomQuote() {
-	// Get a random index
-	int index = rand() % quotes.size();
 
-	// Return the random quote
-	return quotes[index];
+	std::srand(std::time(nullptr));
+
+
+	int randomNum = std::rand() % 10000 + 1;
+
+	if (randomNum == 1) {
+		return quotes.back(); // Return the super rare quote
+	} else {
+
+		int index = std::rand() % quotes.size();
+		return quotes[index];
+	}
 }
 
 void CMenus::RenderStartMenu(CUIRect MainView)
@@ -293,10 +303,10 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);
 
 	CUIRect RandomText;
-	RandomText.x = 595.0f;
-	RandomText.y = 110.0f;
-	RandomText.w = 230.0f;
-	RandomText.h = 150.0f;
+	RandomText.x = 605.0f;
+	RandomText.y = 130.0f;
+	RandomText.w = 330.0f;
+	RandomText.h = 60.0f;
 	static bool Quote = false;
 
 	if (!Quote)
@@ -305,9 +315,21 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		dbg_msg("Quotes", "%s", randomQuote.c_str());
 	}
 
-	TextRender()->TextColor(1.0f, 1.0f, 0.0f, 1.0f);
-	UI()->DoLabel(&RandomText, randomQuote.c_str(), 20.0f, TEXTALIGN_ML);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	if(!str_comp(randomQuote.c_str(), "Super rare text you might see once in your life"))
+	{
+		ColorRGBA color = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 25) % 255 / 255.f, 1.f, 1.f));
+		color.a = 0.9f;
+		TextRender()->TextColor(color);
+		UI()->DoLabel(&RandomText, "Super rare text you might see once in your life", 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		TextRender()->TextColor(1.0f, 1.0f, 0.0f, 1.0f);
+		UI()->DoLabel(&RandomText, randomQuote.c_str(), 20.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	}
 
 #if defined(CONF_AUTOUPDATE)
 

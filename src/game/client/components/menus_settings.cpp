@@ -3307,6 +3307,8 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		UI()->DoScrollbarOption(&g_Config.m_ClOutlineAlpha, &g_Config.m_ClOutlineAlpha, &Button, Localize("Outline Opacity"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
 
 		static CButtonContainer s_aResetIDs[24];
+		static CUI::SDropDownState s_BackendDropDownState;
+		static CScrollRegion s_BackendDropDownScrollRegion;
 		int i = 0;
 
 		DoLine_ColorPicker(&s_aResetIDs[i++],
@@ -3401,8 +3403,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		for(auto &Bind : vBindsList)
 			vBindsName.push_back(Bind.m_aName);
 
-		static CUI::SDropDownState s_BackendDropDownState;
-		static CScrollRegion s_BackendDropDownScrollRegion;
 		s_BackendDropDownState.m_SelectionPopupContext.m_pScrollRegion = &s_BackendDropDownScrollRegion;
 		s_SelectedBind = UI()->DoDropDown(&BindWheelList, s_SelectedBind, vBindsName.data(), vBindsName.size(), s_BackendDropDownState);
 
