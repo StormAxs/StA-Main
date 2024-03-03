@@ -64,6 +64,31 @@ std::vector<std::string> quotes = {
 	"melo melo melooon",
 	":gigachad:",
 	"-Dummygod was here",
+	"PL is not poland, is PlantKnight",
+	"Im so in love with ddnet code c:",
+	"Loving Ayako",
+	"deen>all!!!",
+	"Blocker<all",
+	"Block is nuts, don't play it",
+	"Also try KoG",
+	"Also try BlockWords",
+	"Also try FNG",
+	"Also try to touch some grass",
+	"chillin'",
+	"Our old party was Kao, Draggory, Ayako, Tokly, -StormAx",
+	"first -StormAx name is - NEDEX",
+	"Why tf you are staring at me? >:C",
+	"Bro i love this game so much",
+	"testtext",
+	"220km/h :wheelchair:",
+	"YEP CLAN on top;p",
+	"no sex ;c",
+	"still no sex ;c",
+	"and still no sex ;c",
+	"pepega xD",
+	"Go play Luxis",
+	"Go play Stronghold 4",
+	"AOE is not a YT guy, its splash DMG",
 	"VAMO VER QM DA MAIS O RABO, PRA VER SE EU NUM GANHO!",
 	"muhehehehe",
 	"10/10",
@@ -76,6 +101,22 @@ std::vector<std::string> quotes = {
 	"SpinbrosTV... you'r onto something, you'r onto something man",
 	"Also try M-Client v3 :D",
 	"Choo-Choo",
+	"Hi Atsuko!",
+	"pinuuuuuuuu!",
+	"n9",
+	"gamer",
+	"Inner Sillyness",
+	"Better then S-Client",
+	"Im am the storm that is approaching!",
+	"Dev love Lukov so much<3",
+	"DDnet moderator with most bans - IZA 12k bans",
+	"Mewing insead of Meowing",
+	"Prepare to suffer",
+	"Did you saw ddnet describtion in Steam?",
+	"allleeeeeee, hopa!",
+	"std::string GetRandomQuote()",
+	"there's 0.0001% to get special rainbow text, gl^^",
+	"https://open.spotify.com/track/1SQDvOrbSykg0lP5y7EQ8o?si=a002ae00a4eb4935",
 	"Super rare text you might see once in your life",
 
 
@@ -314,7 +355,6 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		Quote = true;
 		dbg_msg("Quotes", "%s", randomQuote.c_str());
 	}
-
 
 	if(!str_comp(randomQuote.c_str(), "Super rare text you might see once in your life"))
 	{

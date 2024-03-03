@@ -3523,7 +3523,10 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		Left.HSplitTop(20.f, &Button, &Left);
 		if(DoButton_CheckBox(&g_Config.m_ClRainbow, Localize("Rainbow Tee"), g_Config.m_ClRainbow, &Button))
 			g_Config.m_ClRainbow ^= 1;
-		if(g_Config.m_ClRainbow == 1)
+		Left.HSplitTop(20.f, &Button, &Left);
+		if(DoButton_CheckBox(&g_Config.m_ClRainbowHook, Localize("Rainbow Hook"), g_Config.m_ClRainbowHook, &Button))
+			g_Config.m_ClRainbowHook ^= 1;
+		if(g_Config.m_ClRainbow == 1 || g_Config.m_ClRainbowHook == 1)
 		{
 			Left.HSplitTop(20.f, &Button, &Left);
 			UI()->DoScrollbarOption(&g_Config.m_ClRainbowSpeed, &g_Config.m_ClRainbowSpeed, &Button, Localize("Rainbow Speed"), 0, 100, &CUI::ms_LinearScrollbarScale, 0u, "%");
