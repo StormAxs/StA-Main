@@ -58,6 +58,7 @@ std::vector<std::string> quotes = {
 	"AYAYAAAAAA, ayakaaaaa",
 	"liga a camera ae!",
 	"Я рот ебал ваших ДДнетов",
+	"Я щас на атомы разорвусь",
 	"caos e regresso",
 	"Do HH right broh!",
 	"ПК это печь керамическая",
@@ -106,7 +107,6 @@ std::vector<std::string> quotes = {
 	"n9",
 	"gamer",
 	"Inner Sillyness",
-	"Better then S-Client",
 	"Im am the storm that is approaching!",
 	"Dev love Lukov so much<3",
 	"DDnet moderator with most bans - IZA 12k bans",
@@ -117,9 +117,8 @@ std::vector<std::string> quotes = {
 	"std::string GetRandomQuote()",
 	"there's 0.0001% to get special rainbow text, gl^^",
 	"https://open.spotify.com/track/1SQDvOrbSykg0lP5y7EQ8o?si=a002ae00a4eb4935",
+	"Don't use M-Client V3",
 	"Super rare text you might see once in your life",
-
-
 
 };
 
@@ -361,14 +360,30 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		ColorRGBA color = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 25) % 255 / 255.f, 1.f, 1.f));
 		color.a = 0.9f;
 		TextRender()->TextColor(color);
+
 		UI()->DoLabel(&RandomText, "Super rare text you might see once in your life", 20.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	else
 	{
 		TextRender()->TextColor(1.0f, 1.0f, 0.0f, 1.0f);
-		UI()->DoLabel(&RandomText, randomQuote.c_str(), 20.0f, TEXTALIGN_ML);
+
+
+		float animationFactor = sinf(LocalTime() * 10);
+
+		float animationFactorSmooth = animationFactor * animationFactor;
+
+		float baseSizeMin = 18.0f;
+		float baseSizeMax = 20.0f;
+
+		float scale = 0.5f;
+
+		float newSize = baseSizeMin + (baseSizeMax - baseSizeMin) * (0.5f + scale * animationFactorSmooth);
+
+		TextRender()->Text(605.0f, 130.0f, newSize, randomQuote.c_str());
+
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	}
 
 #if defined(CONF_AUTOUPDATE)

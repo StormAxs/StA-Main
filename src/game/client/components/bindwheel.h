@@ -14,7 +14,6 @@ enum
 class CBindWheel : public CComponent
 {
 	vec2 m_MousePos;
-	bool m_Active;
 	bool m_WasActive;
 	int m_Choose;
 
@@ -25,8 +24,8 @@ class CBindWheel : public CComponent
 	void UseBind();
 
 public:
+	bool m_Active;
 	virtual int Sizeof() const override { return sizeof(*this); }
-
 	struct SBind
 	{
 		char m_aName[BIND_WHEEL_MAX_NAME];

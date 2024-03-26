@@ -1307,7 +1307,6 @@ public:
 		pCursor->m_X = x;
 		pCursor->m_Y = y;
 	}
-
 	void Text(float x, float y, float Size, const char *pText, float LineWidth = -1.0f) override
 	{
 		CTextCursor Cursor;
@@ -1315,7 +1314,6 @@ public:
 		Cursor.m_LineWidth = LineWidth;
 		TextEx(&Cursor, pText, -1);
 	}
-
 	float TextWidth(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, int Flags = 0, const STextSizeProperties &TextSizeProps = {}) override
 	{
 		CTextCursor Cursor;

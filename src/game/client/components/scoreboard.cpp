@@ -517,6 +517,8 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		else
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+
+
 		tw = minimum(TextRender()->TextWidth(FontSize, m_pClient->m_aClients[pInfo->m_ClientID].m_aClan, -1, -1.0f), ClanLength);
 		TextRender()->SetCursor(&Cursor, ClanOffset + (ClanLength - tw) / 2, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
 		Cursor.m_LineWidth = ClanLength;
