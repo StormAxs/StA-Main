@@ -542,14 +542,20 @@ void CMenus::RenderStats(CUIRect MainView)
 			m_pClient->m_Stats.FetchPlayer(&s_StatsPlayer, m_StatsPlayerInput.GetString());
 		}
 
-		if(!s_StatsPlayer.m_pGetStatsDDStats)
-			return;
+		MainView.HSplitTop(20.0f, &Label, &MainView);
 
-		if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING)
-			return;
 
-		if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
-			return m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
+			if(!s_StatsPlayer.m_pGetStatsDDStats)
+				return;
+
+			if(s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_PENDING) // check if download is still in progress.
+				return;
+
+			if(!s_StatsPlayer.StatsParsed && s_StatsPlayer.m_pGetStatsDDStats->State() == s_StatsPlayer.m_pGetStatsDDStats->STATE_DONE)
+			{
+				m_pClient->m_Stats.ParseJSON(&s_StatsPlayer);
+			}
+
 
 		MainView.HSplitTop(20.0f, &Label, &MainView);
 		if(s_StatsPlayer.m_pGetStatsDDStats->State() == -1) // error (404)
@@ -557,8 +563,32 @@ void CMenus::RenderStats(CUIRect MainView)
 			UI()->DoLabel(&Label, "No player found.", 14.0f, TEXTALIGN_ML);
 			return;
 		}
-		char aPoints[128];
-		str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
-		UI()->DoLabel(&Label, aPoints, 14.0f, TEXTALIGN_ML);
+		//char aPoints[128];
+		//str_format(aPoints, sizeof(aPoints), "%s has %d points", s_StatsPlayer.aPlayer, s_StatsPlayer.Points);
+//
+		//float animationFactor = sinf(LocalTime() * 1);
+		//float animationFactorSmooth = animationFactor * animationFactor;
+//
+//
+//
+		//float newSize = 14 + animationFactorSmooth);
+//
+		//std::string animatedText = ""; // Initialize an empty string
+		//int numDots = 3; // Number of dots in the animation
+//
+		//// Loop to create the dots based on the animation factor
+		//for (int i = 0; i < numDots; ++i) {
+		//	if (animationFactorSmooth >= (float)i / numDots) {
+		//		animatedText += ".";
+		//	} else {
+		//		animatedText += " "; // Add space if dot should not be visible yet
+		//	}
+		//}
+
+		// Concatenate the animated dots with the text
+		//std::string finalText = aPoints;
+		//finalText += animatedText;
+		
+		//UI()->DoLabel(&Label, finalText.c_str(), newSize, TEXTALIGN_ML);
 	}
 }

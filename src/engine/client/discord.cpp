@@ -76,9 +76,76 @@ public:
 	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr, const char *pText, const char *pImage, const char *pPlayerName) override
 	{
 		DiscordActivity Activity;
+
 		mem_zero(&Activity, sizeof(DiscordActivity));
-		str_copy(Activity.assets.large_image, "150e4e96-9c83-4309-b692-b212c08e1934",
-			sizeof(Activity.assets.large_image));
+		if(strcmp(pMapName, "Stronghold") == 0)
+		{
+			str_copy(Activity.assets.large_image, "stronghold1",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Multeasymap") == 0)
+		{
+			str_copy(Activity.assets.large_image, "multeasy",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Multeasymap") == 0)
+		{
+			str_copy(Activity.assets.large_image, "multeasy",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Copy Love Box 2s") == 0)
+		{
+			str_copy(Activity.assets.large_image, "CLB2s",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Copy Love Box") == 0)
+		{
+			str_copy(Activity.assets.large_image, "CLB",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Tutorial") == 0)
+		{
+			str_copy(Activity.assets.large_image, "tutorial",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Simple Down") == 0)
+		{
+			str_copy(Activity.assets.large_image, "simpledown",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Baby Aim 1.0") == 0)
+		{
+			str_copy(Activity.assets.large_image, "babyaim1",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Baby Aim 2.0") == 0)
+		{
+			str_copy(Activity.assets.large_image, "babyaim2",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Baby Aim 3.0") == 0)
+		{
+			str_copy(Activity.assets.large_image, "babyaim3",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Back in Time 3") == 0)
+		{
+			str_copy(Activity.assets.large_image, "bit3",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Back in Time 3") == 0)
+		{
+			str_copy(Activity.assets.large_image, "bit3",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Grandma") == 0)
+		{
+			str_copy(Activity.assets.large_image, "grandma",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Luxis") == 0)
+		{
+			str_copy(Activity.assets.large_image, "luxis",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Stronghold 2") == 0)
+		{
+			str_copy(Activity.assets.large_image, "stronghold2",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Stronghold 3") == 0)
+		{
+			str_copy(Activity.assets.large_image, "stronghold3",sizeof(Activity.assets.large_image));
+		}
+		if(strcmp(pMapName, "Stronghold 4[Final]") == 0)
+		{
+			str_copy(Activity.assets.large_image, "strongholdF",sizeof(Activity.assets.large_image));
+		}
 		str_copy(Activity.assets.large_text, "StA-Client", sizeof(Activity.assets.large_text));
 		str_copy(Activity.assets.small_image, pImage, sizeof(Activity.assets.large_image));
 		str_copy(Activity.assets.small_text, pText, sizeof(Activity.assets.large_text));
@@ -86,6 +153,8 @@ public:
 		str_copy(Activity.state, pPlayerName);
 		str_copy(Activity.state, pMapName, sizeof(Activity.state));
 		m_pActivityManager->update_activity(m_pActivityManager, &Activity, 0, 0);
+
+
 	}
 };
 
