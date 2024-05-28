@@ -118,22 +118,27 @@ std::vector<std::string> quotes = {
 	"there's 0.0001% to get special rainbow text, gl^^",
 	"https://open.spotify.com/track/1SQDvOrbSykg0lP5y7EQ8o?si=a002ae00a4eb4935",
 	"Don't use M-Client V3",
-	"Super rare text you might see once in your life",
 
 };
 
+std::vector<std::string> rares = {
+	"no fucking way you read this..."
+};
+
+
 // Function to get a random quote
 std::string GetRandomQuote() {
+	// Seed the random number generator
+	std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-	std::srand(std::time(nullptr));
+	// Generate a random number between 0 and 9999
+	int randomNum = std::rand() % 10000;
 
-
-	int randomNum = std::rand() % 10000 + 1;
-
-	if (randomNum == 1) {
-		return quotes.back(); // Return the super rare quote
+	// Check if the random number falls in the 0.01% range
+	if (randomNum < 1) {
+		return rares[0]; // Return the super rare quote
 	} else {
-
+		// Otherwise, return a regular quote
 		int index = std::rand() % quotes.size();
 		return quotes[index];
 	}
@@ -355,13 +360,13 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 		dbg_msg("Quotes", "%s", randomQuote.c_str());
 	}
 
-	if(!str_comp(randomQuote.c_str(), "Super rare text you might see once in your life"))
+	if(!str_comp(randomQuote.c_str(), "no fucking way you read this..."))
 	{
 		ColorRGBA color = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 25) % 255 / 255.f, 1.f, 1.f));
 		color.a = 0.9f;
 		TextRender()->TextColor(color);
 
-		UI()->DoLabel(&RandomText, "Super rare text you might see once in your life", 20.0f, TEXTALIGN_ML);
+		UI()->DoLabel(&RandomText, "no fucking way you read this...", 20.0f, TEXTALIGN_ML);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	else

@@ -120,15 +120,32 @@ bool CBindWheel::OnCursorMove(float x, float y, IInput::ECursorType CursorType)
 
 void CBindWheel::OnRender()
 {
-	if(!m_Active)
+	//FUCK YOU!!!
 	{
-		if(m_WasActive && !m_vBinds.empty() && m_Choose != -1)
-			UseBind();
-		m_WasActive = false;
+		static int outliner = -1;
 
-		return;
+		if (!m_Active)
+		{
+			// Restore the original value only if it was altered
+			if (outliner != -1)
+			{
+				g_Config.m_ClOutline = outliner;
+				outliner = -1;
+			}
+			return;
+
+		}
+
+		if (m_Active)
+		{
+			if (outliner == -1)
+			{
+
+				outliner = g_Config.m_ClOutline;
+			}
+			g_Config.m_ClOutline = 0;
+		}
 	}
-	m_WasActive = true;
 
 	CUIRect Screen = *UI()->Screen();
 

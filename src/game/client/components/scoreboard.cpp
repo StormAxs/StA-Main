@@ -466,19 +466,18 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		// Set the cursor for the name rendering
 		TextRender()->SetCursor(&Cursor, NameOffset, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
 
-		// Check if the player is authorized and apply the authorization color if they are
+
 		if(m_pClient->m_aClients[pInfo->m_ClientID].m_AuthLevel)
 		{
 			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor));
 			TextRender()->TextColor(Color);
 		}
-		else if(m_pClient->m_aClients[pInfo->m_ClientID].m_Friend) // Check if the player is a friend only if they are not authorized
+		else if(m_pClient->m_aClients[pInfo->m_ClientID].m_Friend)
 		{
 			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ScFriendColor));
 			TextRender()->TextColor(Color);
 		}
 
-		//not fwends:3
 		TextRender()->SetCursor(&Cursor, NameOffset, y + (LineHeight - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
 		if(m_pClient->m_aClients[pInfo->m_ClientID].m_Foe)
 		{

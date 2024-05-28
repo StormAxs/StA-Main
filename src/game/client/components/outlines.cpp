@@ -8,12 +8,9 @@
 #include <game/generated/protocol.h>
 #include <game/mapitems.h>
 #include "outlines.h"
-#include "bindwheel.h"
 
 void COutlines::OnRender()
 {
-	if(CBindWheel().m_Active)
-		return;
 
 	if(GameClient()->m_MapLayersBackground.m_OnlineOnly && Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		return;
