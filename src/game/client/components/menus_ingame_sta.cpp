@@ -352,12 +352,6 @@ void CMenus::RenderStats(CUIRect MainView)
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 
-		if(!IsParsed | !IsParsedDDN)
-		{
-			str_format(Welcome, sizeof(Welcome), " Parsing Player Info \n Please wait...", Client()->PlayerName());
-			UI()->DoLabel(&PointsS, Welcome, 40.0f, TEXTALIGN_ML);
-		}
-
 		if(IsParsed | IsParsedDDN)
 		{
 			str_format(Welcome, sizeof(Welcome), " Welcome Back %s", Client()->PlayerName());

@@ -86,7 +86,7 @@ void CBindWheel::ConRemBindWheel(IConsole::IResult *pResult, void *pUserData)
 
 	const char *pArg = pResult->GetString(0);
 
-	for(int i = 0; i < pSelf->m_vBinds.size(); i++)
+	for(int i = 0; i < static_cast<int>(pSelf->m_vBinds.size()); i++)
 	{
 		const SBind &Bind = pSelf->m_vBinds[i];
 
@@ -177,7 +177,7 @@ void CBindWheel::OnRender()
 	{
 		const float Theta = pi * 2 / m_vBinds.size();
 
-		for(int i = 0; i < m_vBinds.size(); i++)
+		for(int i = 0; i < static_cast<int>(m_vBinds.size()); i++)
 		{
 			const SBind &Bind = m_vBinds[i];
 

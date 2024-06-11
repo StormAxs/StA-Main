@@ -812,8 +812,6 @@ void CPlayers::OnRender()
 {
 	CTeeRenderInfo aRenderInfo[MAX_CLIENTS];
 
-	CNetObj_Character Player;
-
 	// update RenderInfo for ninja
 	bool IsTeamplay = false;
 	if(m_pClient->m_Snap.m_pGameInfoObj)

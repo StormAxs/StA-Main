@@ -328,7 +328,6 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		if(DDTeam != -1 && DDTeam < TEAM_SUPER)
 			m_aTeamsCount[DDTeam]++;
 	}
-	m_aTeamsCount, sizeof(int) * 64;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -510,7 +509,9 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 			ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClSameClanColor));
 			TextRender()->TextColor(Color);
 			ColorRGBA special = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 20) % 255 / 255.f, 1.f, 1.f));
-			if(m_pClient->m_aClients[pInfo->m_ClientID].m_aClan == "Inner peace")
+			
+			std::string innerpeace = "Inner peace";
+			if(m_pClient->m_aClients[pInfo->m_ClientID].m_aClan == innerpeace)
 			{
 				TextRender()->TextColor(special);
 			}

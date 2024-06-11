@@ -1356,7 +1356,7 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	const float Margin = 10.0f;
 	const float HeaderHeight = FontSize + 5.0f + Margin;
 
-	CUIRect MouseSettings, StaSettings, MovementSettings, WeaponSettings, VotingSettings, ChatSettings, DummySettings, MiscSettings, BindWheelSettings, JoystickSettings, ResetButton, Button;
+	CUIRect MouseSettings, MovementSettings, WeaponSettings, VotingSettings, ChatSettings, DummySettings, MiscSettings, BindWheelSettings, JoystickSettings, ResetButton, Button;
 	MainView.VSplitMid(&MouseSettings, &VotingSettings);
 
 	// mouse settings
@@ -3245,10 +3245,9 @@ enum
 
 void CMenus::RenderSettingsStA(CUIRect MainView)
 {//TODO: buttons before upd
-	char aBuf[128];
 	static int s_CurTab = 0;
 
-	CUIRect TabBar, BindwheelSettings, Page1Tab, Page2Tab, Page3Tab, Left, Right, Section, Button, Label, ButtonVerify, EnableVerifySection;
+	CUIRect TabBar, Page1Tab, Page2Tab, Page3Tab, Left, Right, Button, Label;
 
 	MainView.HSplitTop(20, &TabBar, &MainView);
 	float TabsW = TabBar.w;
@@ -3268,22 +3267,15 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 	MainView.VSplitMid(&Left, &Right, 10.f);
 
 	const float LineMargin = 20.0f;
-	const float LineSize = 20.0f;
 	const float ColorPickerLineSize = 25.0f;
 	const float SectionMargin = 5.0f;
-	const float SectionTotalMargin = SectionMargin * 2;
-	const float HeadlineFontSize = 20.0f;
-	const float HeadlineAndVMargin = HeadlineFontSize + SectionTotalMargin;
-	const float MarginToNextSection = 5.0f;
-	const float SplitSpacing = 15.0f;
-
 	const float ColorPickerLabelSize = 13.0f;
 	const float ColorPickerLineSpacing = 5.0f;
 
 	if(s_CurTab == STA_TAB_PAGE1)
 	{
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(2.0f) % 255 / 100.f, 0.4f, 1.f));
-		CUIRect LeftLeft, Margin, Demo, Outline;
+		CUIRect LeftLeft, Demo, Outline;
 
 		Right.HSplitTop(25.f, &Label, &Outline);
 		TextRender()->TextColor(col);
@@ -3390,7 +3382,7 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 		UI()->DoLabel(&Label, Localize("Bind wheel"), 20.0f, TEXTALIGN_TC);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		CUIRect BindWheelZone, BindWheelBinding, BindWheelList, BindWheelOptions;
+		CUIRect BindWheelZone, BindWheelList, BindWheelOptions;
 		Right.HSplitTop(60.f, &BindWheelZone, &Right);
 		BindWheelZone.VSplitMid(&BindWheelList, &BindWheelOptions, 10.f);
 		BindWheelList.h = 20.f;
@@ -3449,7 +3441,6 @@ void CMenus::RenderSettingsStA(CUIRect MainView)
 
 	if(s_CurTab == STA_TAB_PAGE2)
 	{
-		CUIRect LeftLeft, Margin, TabSettings, Demo;
 		int i = 0;
 		static CButtonContainer s_aResetIDs[24];
 		ColorRGBA col = color_cast<ColorRGBA>(ColorHSVA(round_to_int(2.0f) % 255 / 100.f, 0.4f, 1.f));
