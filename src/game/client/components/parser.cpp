@@ -19,7 +19,6 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 	str_format(aUrl_DDNet, sizeof(aUrl_DDNet), "%s%s", STATS_URL_DDNET, aEscapedName);
 	pStatsDest->m_pGetStatsDDNet = HttpGet(aUrl_DDNet);
 
-	// 10 seconds connection timeout, lower than 8KB/s for 10 seconds to fail.
 	pStatsDest->m_pGetStatsDDStats->Timeout(CTimeout{10000, 0, 8000, 10});
 	Engine()->AddJob(pStatsDest->m_pGetStatsDDStats);
 
@@ -30,75 +29,68 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 
 void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 {
-	// TODO error type validation
+	if(!pStatsDest->m_pGetStatsDDStats ||pStatsDest->m_pGetStatsDDNet) {
+        dbg_msg("stats", "Failed to fetch stats");
+        return;
+    }
 
-	json_value *pPlayerStats = pStatsDest->m_pGetStatsDDStats->ResultJson();
+    json_value *pPlayerStats = pStatsDest->m_pGetStatsDDStats->ResultJson();
 
-	if(!pPlayerStats)
-	{
-		dbg_msg("stats", "Invalid JSON received");
-		return;
-	}
+    if (!pPlayerStats || pPlayerStats->type!= json_object) {
+        dbg_msg("stats", "Invalid JSON received or unexpected type from DDStats");
+        return;
+    }
 
-	json_value &PlayerStats = *pPlayerStats;
-	// since player is in the first column - do it like this:
-	const json_value &Player = PlayerStats["player"];
-	str_copy(pStatsDest->aPlayer, Player);
+    json_value &PlayerStats = *pPlayerStats;
+    const json_value &Player = PlayerStats["profile"];
+    str_copy(pStatsDest->aPlayer, Player);
 
-	// get the total points of the PointsCategory in DDStats
-	const json_value &PointsCategories = PlayerStats["points"];
-	const json_value &PointsCategory = PointsCategories["points"];
-	const json_value &Points = PointsCategory["total"];
-	const json_value &PointsTotal = Points["points"];
+    const auto PointsCategories = PlayerStats["points"]["points"]["Total"]["points"];
+    if (PointsCategories.type!= json_integer) {
+        dbg_msg("stats", "Expected integer for PointsCategories, got unexpected type");
+        return;
+    }
+    const int PointsTotal = PointsCategories.u.integer;
 
-	pStatsDest->Points = PointsTotal.u.integer;
-	// MPM===============================================
-	const json_value &MostPlayedMaps = PlayerStats["mostPlayedMaps"];
+    const json_value &MostPlayedMaps = PlayerStats["most_played_maps"];
+    if (MostPlayedMaps.type!= json_array) {
+        dbg_msg("stats", "Expected array for MostPlayedMaps, got unexpected type");
+        return;
+    }
 
-	for(int i = 0; i < 11; ++i)
-	{
-		const json_value &map = MostPlayedMaps[i];
-		str_copy(pStatsDest->aMap[i], map["map"].u.string.ptr);
-		pStatsDest->aTime[i] = map["Playtime"].u.integer / 60 / 60;
-	}
-	//
+    for(int i = 0; i < 11; ++i)
+    {
+        const json_value &map = MostPlayedMaps[i];
+        if (map.type!= json_object || map["map"].type!= json_string || map["Playtime"].type!= json_integer) {
+            dbg_msg("stats", "Missing or incorrect type in MostPlayedMaps entry %d", i);
+            return;
+        }
+        str_copy(pStatsDest->aMap[i], map["map"].u.string.ptr);
+        pStatsDest->aTime[i] = map["Playtime"].u.integer / 60 / 60;
+    }
 
-	// rankpoints
-	const json_value &PointsRankCategories = PlayerStats["points"];
-	const json_value &PointsRankCategory = PointsRankCategories["rankpoints"];
-	const json_value &RankPoints = PointsRankCategory["total"];
-	const json_value &RankPointsTotal = RankPoints["points"];
-
-	pStatsDest->RankPoints = RankPointsTotal.u.integer;
-	// total playtime
-	const json_value &PlayerTime = PlayerStats["playtimeGametypes"];
-
-	for(int i = 0; i < 15; i++)
-	{
-		const json_value &pTime = PlayerTime[i];
-		pStatsDest->totalPlaytime[i] = pTime["Playtime"].u.integer;
-	}
-
-	// F***ING
-	const json_value &PlayTimeLocateCategory = PlayerStats["playtimeLocation"];
+	const json_value &PlayTimeLocateCategory = PlayerStats["most_played_locations"];
 
 	if(PlayTimeLocateCategory.type == json_array)
 	{
 		const json_value &PlayTimeLoc = PlayTimeLocateCategory[0];
 
-		if(PlayTimeLoc["location"].type == json_string && PlayTimeLoc["location"].u.string.ptr != nullptr)
+		if(PlayTimeLoc["key"].type == json_string && PlayTimeLoc["seconds_played"].u.string.ptr != nullptr)
 		{
-			str_copy(pStatsDest->PlayTimeLocation, PlayTimeLoc["location"].u.string.ptr);
+			str_copy(pStatsDest->PlayTimeLocation, PlayTimeLoc["key"].u.string.ptr);
 		}
 	}
 
 	json_value *dPlayerStats = pStatsDest->m_pGetStatsDDNet->ResultJson();
-
-	if(!dPlayerStats)
-	{
-		dbg_msg("DDnet.org", "Invalid JSON received");
-		return;
-	}
+    if (!dPlayerStats) {
+        dbg_msg("DDnet.org", "Invalid JSON received from DDNet");
+        return;
+    }
+	
+	if (dPlayerStats->type!= json_object) {
+        dbg_msg("DDnet.org", "Unexpected JSON type from DDNet");
+        return;
+    }
 
 	json_value &dPlayerStat = *dPlayerStats;
 	const json_value &ddrPlayer = dPlayerStat["player"];
