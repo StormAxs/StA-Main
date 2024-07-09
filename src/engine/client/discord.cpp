@@ -78,7 +78,8 @@ public:
 		DiscordActivity Activity;
 
 		mem_zero(&Activity, sizeof(DiscordActivity));
-		if(strcmp(pMapName, "Stronghold") == 0)
+		/*
+		 if(strcmp(pMapName, "Stronghold") == 0)
 		{
 			str_copy(Activity.assets.large_image, "stronghold1",sizeof(Activity.assets.large_image));
 		}
@@ -146,10 +147,16 @@ public:
 		{
 			str_copy(Activity.assets.large_image, "strongholdF",sizeof(Activity.assets.large_image));
 		}
+		if(strcmp(pMapName, "Grandma") == 0)
+		{
+			str_copy(Activity.assets.large_image, "grandma",sizeof(Activity.assets.large_image));
+		}
+		fuck off */
 		str_copy(Activity.assets.large_text, "StA-Client", sizeof(Activity.assets.large_text));
 		str_copy(Activity.assets.small_image, pImage, sizeof(Activity.assets.large_image));
 		str_copy(Activity.assets.small_text, pText, sizeof(Activity.assets.large_text));
 		Activity.timestamps.start = m_StartTime;
+		str_copy(Activity.assets.large_image, "150e4e96-9c83-4309-b692-b212c08e1934",sizeof(Activity.assets.large_image));
 		str_copy(Activity.state, pPlayerName);
 		str_copy(Activity.state, pMapName, sizeof(Activity.state));
 		m_pActivityManager->update_activity(m_pActivityManager, &Activity, 0, 0);

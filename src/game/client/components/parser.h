@@ -12,7 +12,7 @@ enum
 	MOST_PLAYED_LENGTH = 128
 };
 
-static constexpr const char *STATS_URL_DDSTATS = "https://ddstats.qwik.space/player/json?player=";
+static constexpr const char *STATS_URL_DDSTATS = "https://ddstats.tw/player/json?player=";
 static constexpr const char *STATS_URL_DDNET = "https://ddnet.org/players/?json2=";
 
 class CStatsPlayer
@@ -27,8 +27,8 @@ public:
 	int timestamp;
 	char aMap[11][MOST_PLAYED_LENGTH];
 	float aTime[11];
-	int totalPlaytime[15];
-	int pPlaytime;
+	double totalPlaytime[20];
+	double pPlaytimeHRS;
 	int RankPoints;
 
 	char aJson[7][128];

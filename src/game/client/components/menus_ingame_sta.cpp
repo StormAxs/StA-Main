@@ -352,18 +352,28 @@ void CMenus::RenderStats(CUIRect MainView)
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 
-		if(IsParsed | IsParsedDDN)
-		{
+
+
+		if(IsParsed | IsParsedDDN){
+
 			str_format(Welcome, sizeof(Welcome), " Welcome Back %s", Client()->PlayerName());
 			UI()->DoLabel(&WB, Welcome, 40.0f, TEXTALIGN_ML);
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 			int playerPoints = s_StatsPlayer.Points;
+			if (playerPoints > 0)
 			{
 				char aBuf[32];
 				str_format(aBuf, sizeof(aBuf), " Current points: %d", playerPoints);
 				UI()->DoLabel(&CP, aBuf, 35.0f, TEXTALIGN_ML);
 			}
+			else
+			{
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " No points", playerPoints);
+				UI()->DoLabel(&CP, aBuf, 35.0f, TEXTALIGN_ML);
+			}
+
 			int RankPoints = s_StatsPlayer.RankPoints;
 			if(RankPoints == 0)
 			{
@@ -428,16 +438,13 @@ void CMenus::RenderStats(CUIRect MainView)
 			UI()->DoLabel(&Tpoints, cBuf, 24.0f, TEXTALIGN_ML);
 
 
-			int sum = 0;
-			char THP[32];
-
 			//use range based for loop - it's easier to read
-			for(int i : s_StatsPlayer.totalPlaytime)
 			{
-				sum += i;
-				str_format(THP, sizeof(THP), " Total Hours Played: %d hrs", sum);
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), " Total Hours Played: %d hrs", s_StatsPlayer.pPlaytimeHRS);
+				UI()->DoLabel(&Tpoints3, aBuf, 30.0f, TEXTALIGN_ML);
+
 			}
-			UI()->DoLabel(&Tpoints3, THP, 30.0f, TEXTALIGN_ML);
 
 			//DDNET============================
 			{
@@ -495,6 +502,20 @@ void CMenus::RenderStats(CUIRect MainView)
 				snprintf(aBuf, sizeof(aBuf), " No parters detected");
 				}
 			}
+		}
+		else if (!IsParsedDDN || !IsParsed)
+		{
+			char aBuf[64];
+			snprintf(aBuf, sizeof(aBuf), " Parsing player info, please wait");
+			UI()->DoLabel(&PointsS, aBuf, 50.0f, TEXTALIGN_ML);
+			PointsS.HSplitTop(18.0f, nullptr, &PointsS);
+		}
+		else if (!s_StatsPlayer.StatsParsed)
+		{
+			char aBuf[64];
+			snprintf(aBuf, sizeof(aBuf), " Server connection error, please try again later");
+			UI()->DoLabel(&PointsS, aBuf, 40.0f, TEXTALIGN_ML);
+			PointsS.HSplitTop(18.0f, nullptr, &PointsS);
 		}
 	}
 	else if(s_StatsPage == 1)

@@ -29,9 +29,14 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 
 void CStats::ParseJSON(CStatsPlayer *pStatsDest)
 {
-	if(!pStatsDest->m_pGetStatsDDStats ||pStatsDest->m_pGetStatsDDNet) {
-        dbg_msg("stats", "Failed to fetch stats");
+	if(!pStatsDest->m_pGetStatsDDStats) {
+        dbg_msg("stats", "Failed to fetch stats(DDStats)");
         return;
+    }
+
+    if(!pStatsDest->m_pGetStatsDDNet) {
+	    dbg_msg("stats", "Failed to fetch stats(DDrace)");
+	    return;
     }
 
     json_value *pPlayerStats = pStatsDest->m_pGetStatsDDStats->ResultJson();
@@ -42,111 +47,116 @@ void CStats::ParseJSON(CStatsPlayer *pStatsDest)
     }
 
     json_value &PlayerStats = *pPlayerStats;
-    const json_value &Player = PlayerStats["profile"];
-    str_copy(pStatsDest->aPlayer, Player);
+    //DDStats
 
-    const auto PointsCategories = PlayerStats["points"]["points"]["Total"]["points"];
-    if (PointsCategories.type!= json_integer) {
-        dbg_msg("stats", "Expected integer for PointsCategories, got unexpected type");
-        return;
+    const json_value &Profile = PlayerStats["profile"];
+    const json_value &pts = Profile["points"];
+    pStatsDest->Points = pts.u.integer;
+
+    json_value &Partner = *pPlayerStats;
+
+    const json_value &FavPartners = Partner["favourite_teammates"];
+    for(int i = 0; i < 5 && i < static_cast<int>(FavPartners.u.array.length); ++i) // Ensure not to exceed array bounds
+    {
+	    const json_value &BestPartner = FavPartners[i];
+	    if(BestPartner["name"].type == json_string && BestPartner["ranks_together"].type == json_integer)
+	    {
+		    str_copy(pStatsDest->FavouritePartners[i], BestPartner["name"].u.string.ptr);
+		    pStatsDest->BestPartnerFinishes[i] = BestPartner["ranks_together"].u.integer;
+	    }
+	    else
+		    pStatsDest->BestPartnerFinishes[i] = 0;
     }
-    const int PointsTotal = PointsCategories.u.integer;
 
     const json_value &MostPlayedMaps = PlayerStats["most_played_maps"];
     if (MostPlayedMaps.type!= json_array) {
-        dbg_msg("stats", "Expected array for MostPlayedMaps, got unexpected type");
-        return;
+	    dbg_msg("stats", "Expected array for MostPlayedMaps, got unexpected type");
+	    return;
     }
 
     for(int i = 0; i < 11; ++i)
     {
-        const json_value &map = MostPlayedMaps[i];
-        if (map.type!= json_object || map["map"].type!= json_string || map["Playtime"].type!= json_integer) {
-            dbg_msg("stats", "Missing or incorrect type in MostPlayedMaps entry %d", i);
-            return;
-        }
-        str_copy(pStatsDest->aMap[i], map["map"].u.string.ptr);
-        pStatsDest->aTime[i] = map["Playtime"].u.integer / 60 / 60;
+	    const json_value &map = MostPlayedMaps[i];
+	    if (map.type!= json_object || map["map_name"].type!= json_string || map["seconds_played"].type!= json_integer) {
+		    dbg_msg("stats", "Missing or incorrect type in MostPlayedMaps entry %d", i);
+		    return;
+	    }
+	    str_copy(pStatsDest->aMap[i], map["map_name"].u.string.ptr);
+	    pStatsDest->aTime[i] = map["seconds_played"].u.integer / 60 / 60;
+    }
+    
+    json_value &mostPlayedGametypes = *pPlayerStats;
+
+    // Parse each "seconds_played" value
+    const json_value &MPG = mostPlayedGametypes["most_played_gametypes"];
+    for (int i = 0; i < 15; ++i)
+    {
+	    const json_value &gametype = MPG[i];
+	    pStatsDest->totalPlaytime[i] = gametype["seconds_played"].u.dbl;
     }
 
-	const json_value &PlayTimeLocateCategory = PlayerStats["most_played_locations"];
 
-	if(PlayTimeLocateCategory.type == json_array)
-	{
-		const json_value &PlayTimeLoc = PlayTimeLocateCategory[0];
-
-		if(PlayTimeLoc["key"].type == json_string && PlayTimeLoc["seconds_played"].u.string.ptr != nullptr)
-		{
-			str_copy(pStatsDest->PlayTimeLocation, PlayTimeLoc["key"].u.string.ptr);
-		}
-	}
-
-	json_value *dPlayerStats = pStatsDest->m_pGetStatsDDNet->ResultJson();
-    if (!dPlayerStats) {
-        dbg_msg("DDnet.org", "Invalid JSON received from DDNet");
-        return;
+    double totalPlaytimeSum = 0.0;
+    for (int i = 0; i < 20; ++i)
+    {
+	    const json_value &gametype = MPG[i];
+	    pStatsDest->totalPlaytime[i] = gametype["seconds_played"].u.dbl;
+	    totalPlaytimeSum += pStatsDest->totalPlaytime[i];
     }
-	
-	if (dPlayerStats->type!= json_object) {
-        dbg_msg("DDnet.org", "Unexpected JSON type from DDNet");
-        return;
+    pStatsDest->pPlaytimeHRS = totalPlaytimeSum / 60 / 60;
+
+
+    //DDNet
+    json_value *dPlayerStats = pStatsDest->m_pGetStatsDDNet->ResultJson();
+    if(dPlayerStats == NULL)
+	    return;
+
+
+    json_value &dPlayerStat = *dPlayerStats;
+    const json_value &ddrPlayer = dPlayerStat["player"];
+    str_copy(pStatsDest->dPlayer, ddrPlayer);
+
+
+    // get rank lead
+    const json_value &PointCategoryDDR = dPlayerStat["points"];
+    const json_value &CurrentPRank = PointCategoryDDR["rank"];
+    pStatsDest->PointCategoryDDR = CurrentPRank.u.integer; // Rank ddnet
+    // world rank
+    const json_value &RankInWorld = dPlayerStat["rank"];
+    const json_value &CurrentTopWRLD = RankInWorld["rank"];
+    pStatsDest->RankInWorld = CurrentTopWRLD.u.integer;
+
+    const json_value &PointsInWorld = RankInWorld["points"];
+    pStatsDest->RankPoints = PointsInWorld.u.integer;
+
+    //PTS for last month
+    const json_value &PLM = dPlayerStat["points_last_month"];
+    const json_value &PointsMonth = PLM["points"];
+    pStatsDest->PLM = PointsMonth.u.integer; // pts last month
+    // Last Finishes
+    json_value &LastFinishes = *dPlayerStats;
+    // get the total points of the PointsCategory in DDStats
+    const json_value &LastFinish = LastFinishes["last_finishes"];
+    for(int i = 0; i < 7; ++i)
+    {
+	    const json_value &LFM = LastFinish[i];
+	    str_copy(pStatsDest->LastFinish[i], LFM["map"].u.string.ptr);
     }
 
-	json_value &dPlayerStat = *dPlayerStats;
-	const json_value &ddrPlayer = dPlayerStat["player"];
-	str_copy(pStatsDest->dPlayer, ddrPlayer);
+    for(int i = 0; i < 7; ++i)
+    {
+	    const json_value &LFM = LastFinish[i];
+	    pStatsDest->LastFinishTime[i] = LFM["time"].u.dbl / 60;
 
-	// get rank lead
-	const json_value &PointCategoryDDR = dPlayerStat["points"];
-	const json_value &CurrentPRank = PointCategoryDDR["rank"];
-	pStatsDest->PointCategoryDDR = CurrentPRank.u.integer; // Rank ddnet
-	// world rank
-	const json_value &RankInWorld = dPlayerStat["rank"];
-	const json_value &CurrentTopWRLD = RankInWorld["rank"];
-	pStatsDest->RankInWorld = CurrentTopWRLD.u.integer; // Rank pts
-	//PTS for last month
-	const json_value &PLM = dPlayerStat["points_last_month"];
-	const json_value &PointsMonth = PLM["points"];
-	pStatsDest->PLM = PointsMonth.u.integer; // pts last month
-	// Last Finishes
-	json_value &LastFinishes = *dPlayerStats;
-	// get the total points of the PointsCategory in DDStats
-	const json_value &LastFinish = LastFinishes["last_finishes"];
+	    // Assuming you have a Unix timestamp
+	    time_t unixTimestamp = static_cast<time_t>(LFM["time"].u.dbl);
 
-	for(int i = 0; i < 7; ++i)
-	{
-		const json_value &LFM = LastFinish[i];
-		str_copy(pStatsDest->LastFinish[i], LFM["map"].u.string.ptr);
-	}
+	    // Convert Unix timestamp to struct tm in UTC
+	    struct tm *timeinfo = std::gmtime(&unixTimestamp);
 
-	for(int i = 0; i < 7; ++i)
-	{
-		const json_value &LFM = LastFinish[i];
-		pStatsDest->LastFinishTime[i] = LFM["time"].u.dbl / 60;
+	    // Format the time as a string
+	    std::strftime(pStatsDest->aJson[i], sizeof(pStatsDest->aJson[i]), "%H:%M:%S", timeinfo);
+    }
 
-		// Assuming you have a Unix timestamp
-		time_t unixTimestamp = static_cast<time_t>(LFM["time"].u.dbl);
 
-		// Convert Unix timestamp to struct tm in UTC
-		struct tm *timeinfo = std::gmtime(&unixTimestamp);
-
-		// Format the time as a string
-		std::strftime(pStatsDest->aJson[i], sizeof(pStatsDest->aJson[i]), "%H:%M:%S", timeinfo);
-		//thanks, GPT lol
-	}
-
-	json_value &Partner = *dPlayerStats;
-
-	const json_value &FavPartners = Partner["favorite_partners"];
-	for(int i = 0; i < 5 && i < static_cast<int>(FavPartners.u.array.length); ++i) // Ensure not to exceed array bounds
-	{
-		const json_value &BestPartner = FavPartners[i];
-		if(BestPartner["name"].type == json_string && BestPartner["finishes"].type == json_integer)
-		{
-			str_copy(pStatsDest->FavouritePartners[i], BestPartner["name"].u.string.ptr);
-			pStatsDest->BestPartnerFinishes[i] = BestPartner["finishes"].u.integer;
-		}
-		else
-			pStatsDest->BestPartnerFinishes[i] = 0;
-	}
 }
