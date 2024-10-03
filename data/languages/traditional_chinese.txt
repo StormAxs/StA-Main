@@ -25,6 +25,13 @@
 # 2023-07-20 By
 # 2023-08-11 By
 # 2023-11-25 By
+# 2024-01-15 By
+# 2024-03-05 By
+# 2024-04-21 By
+# 2024-06-10 By
+# 2024-07-21 By
+# 2024-08-29 Pioooooo
+# 2024-09-29 Pioooooo
 ##### /authors #####
 
 ##### translated strings #####
@@ -47,9 +54,6 @@
 %s wins!
 == %s勝利！
 
--Page %d-
-== -第%d頁-
-
 Abort
 == 取消
 
@@ -66,7 +70,7 @@ All
 == 全部
 
 Are you sure that you want to quit?
-== 你確定要退出嗎？
+== 確定要退出嗎？
 
 Automatically record demos
 == 自動錄製回放
@@ -101,8 +105,8 @@ Client
 Connecting to
 == 正在連線到
 
-Connection Problems...
-== 連線中斷...
+Connection Problems…
+== 連線中斷…
 
 Console
 == 控制檯
@@ -329,9 +333,6 @@ HUD
 Player country:
 == 玩家國家/地區：
 
-Player options
-== 玩家選項
-
 Players
 == 玩家
 
@@ -393,7 +394,7 @@ Shotgun
 == 霰彈槍
 
 Show chat
-== 顯示聊天
+== 顯示聊天框
 
 Show friends only
 == 只顯示好友
@@ -405,7 +406,7 @@ Show name plates
 == 顯示暱稱
 
 Show only chat messages from friends
-== 只顯示好友訊息
+== 只顯示好友聊天訊息
 
 Sound
 == 聲音
@@ -461,9 +462,6 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == 此伺服器執行著經過調整的非標準遊戲模式。
 
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== 編輯器中的地圖尚未儲存，建議你在退出遊戲之前返回編輯器進行儲存。
-
 Time limit
 == 規定時限
 
@@ -483,7 +481,7 @@ Use sounds
 == 開啟聲音
 
 Use team colors for name plates
-== 用隊伍顏色標註暱稱
+== 用隊伍顏色顯示暱稱
 
 V-Sync
 == 垂直同步
@@ -560,9 +558,6 @@ Map sound volume
 Max Screenshots
 == 最大截圖數
 
-Dummy settings
-== 分身設定
-
 Laser
 == 鐳射
 
@@ -577,12 +572,6 @@ Your skin
 
 Reset to defaults
 == 恢復預設設定
-
-Quit anyway?
-== 無論如何都要退出嗎？
-
-Round
-== 回合
 
 Lht.
 == 亮度
@@ -601,9 +590,6 @@ LAN
 
 Name plates size
 == 暱稱大小
-
-Use DDRace Scoreboard
-== 使用 DDRace 計分板
 
 Show score
 == 顯示比分
@@ -686,8 +672,8 @@ DDNet %s is available:
 Update now
 == 現在更新
 
-Updating...
-== 更新中...
+Updating…
+== 更新中…
 
 DDNet Client updated!
 == DDNet 客戶端更新成功！
@@ -738,9 +724,6 @@ DDNet
 
 Deaths
 == 死亡數
-
-Please use a different filename
-== 
 
 Restart
 == 重新開始
@@ -836,9 +819,6 @@ Show DDNet map finishes in server browser
 transmits your player name to info.ddnet.org
 == 將會發送你的玩家名稱到 info.ddnet.org
 
-Reload
-== 重新整理
-
 Enable replays
 == 啟用短時回放
 
@@ -884,8 +864,8 @@ Zoom in
 1 new mention
 == 1 條新提及
 
-Update failed! Check log...
-== 更新失敗！請檢查日誌...
+Update failed! Check log…
+== 更新失敗！請檢查日誌…
 
 Pause
 == 暫停
@@ -1035,9 +1015,6 @@ Auto
 Replay
 == 回放
 
-Saving ddnet-settings.cfg failed
-== 配置檔案 ddnet-settings.cfg 儲存失敗
-
 Debug mode enabled. Press Ctrl+Shift+D to disable debug mode.
 == 偵錯模式已啟用。按 Ctrl+Shift+D 禁用偵錯模式。
 
@@ -1171,10 +1148,7 @@ https://ddnet.org/discord
 == https://ddnet.org/discord
 
 Are you sure that you want to disconnect and switch to a different server?
-== 你確定要中斷此伺服器并嘗試加入其他伺服器嗎？
-
-Kill Messages
-== 擊殺訊息
+== 確定要中斷此伺服器并嘗試加入其他伺服器嗎？
 
 Show local player's key presses
 == 顯示周圍玩家的按鍵輸入
@@ -1218,9 +1192,6 @@ auto
 Tutorial
 == 教學
 
-Toggle to edit your dummy settings
-== 編輯分身設定
-
 Choose default eyes when joining a server
 == 加入伺服器時的預設表情
 
@@ -1252,7 +1223,7 @@ Team %d
 == 隊伍 %d
 
 Position:
-== 坐標	
+== 坐標
 
 Speed:
 == 速度
@@ -1260,8 +1231,8 @@ Speed:
 Angle:
 == 角度
 
-Trying to determine UDP connectivity...
-== 正在嘗試檢測 UDP 連接...
+Trying to determine UDP connectivity…
+== 正在嘗試檢測 UDP 連接…
 
 UDP seems to be filtered.
 == UDP 疑似被過濾
@@ -1403,29 +1374,23 @@ Show health, shields and ammo
 DDRace HUD
 == DDRace HUD
 
-Show client IDs in scoreboard
-== 顯示客戶端 IDs (計分板中)
-
 Show DDRace HUD
 == 顯示 DDRace HUD
 
 Show jumps indicator
 == 顯示跳躍次數
 
-Show hook strength indicator
-== 顯示對其他玩家的鈎索强度
-
 Hook collision line
-== 瞄準輔助綫
+== 鉤索輔助線
 
 Hook collision line width
-== 輔助綫寬度
+== 輔助線寬度
 
 Hook collision line opacity
-== 輔助綫不透明度
+== 輔助線不透明度
 
 Colors of the hook collision line, in case of a possible collision with:
-== 輔助綫顔色 (當瞄準以下實體物時)：
+== 輔助線顔色 (當瞄準以下實體物時)：
 
 Your movements are not taken into account when calculating the line colors
 == 移動所造成的瞄準偏移將不計入考量
@@ -1527,7 +1492,7 @@ Go forward one marker
 == 跳至下一個標記
 
 Are you sure that you want to delete the demo '%s'?
-== 你確定要刪除回放檔案 "%s" ？
+== 確定要刪除回放檔案 "%s" ？
 
 Unable to delete the demo '%s'
 == 無法刪除回放檔案 "%s"
@@ -1536,11 +1501,11 @@ Reset controls
 == 恢復預設設定
 
 Are you sure that you want to reset the controls to their defaults?
-== 你確定要將當前的控制恢復至預設設定
+== 確定要將當前的控制恢復至預設設定？
 
 [Graphics error]
 Failed during initialization. Try to change gfx_backend to OpenGL or Vulkan in settings_ddnet.cfg in the config directory and try again.
-== 初始化失敗。請嘗試打開配置目錄中的設定檔案 (settings_ddnet.cfg) 并將“gfx_backend OpenGL”修改為“gfx_backend Vulkan” (若沒有前者則可直接輸入後者) 再重試。
+== 初始化失敗。請嘗試打開配置目錄中的設定檔案 (settings_ddnet.cfg) 并將 “gfx_backend” 設定為 “gfx_backend OpenGL” 或 “gfx_backend Vulkan” 再重試。
 
 [Graphics error]
 Out of VRAM. Try removing custom assets (skins, entities, etc.), especially those with high resolution.
@@ -1564,7 +1529,7 @@ Failed to swap framebuffers. Try to update your GPU drivers.
 
 [Graphics error]
 Unknown error. Try to change gfx_backend to OpenGL or Vulkan in settings_ddnet.cfg in the config directory and try again.
-== 未知錯誤。請嘗試打開配置目錄中的設定檔案 (settings_ddnet.cfg) 并將“gfx_backend OpenGL”修改為“gfx_backend Vulkan” (若沒有前者則可直接輸入後者) 再重試。
+== 未知錯誤。請嘗試打開配置目錄中的設定檔案 (settings_ddnet.cfg) 并將 “gfx_backend” 設定為 “gfx_backend OpenGL” 或 “gfx_backend Vulkan” 再重試。
 
 [Graphics error]
 Could not initialize the given graphics backend, reverting to the default backend now.
@@ -1592,7 +1557,7 @@ No controller found. Plug in a controller.
 == 未檢測到任何控制器。請嘗試重新連接控制器。
 
 Unregister protocol and file extensions
-== 未注冊的協議與擴充檔案
+== 解除連結與檔案類型關聯
 
 Open the directory to add custom assets
 == 打開用以新增自定義材質的資料夾路徑
@@ -1693,7 +1658,7 @@ Folder Link
 == 資料夾連結
 
 Are you sure that you want to delete the folder '%s'?
-== 你確定要刪除資料夾 "%s" ？
+== 確定要刪除資料夾 "%s" ？
 
 Delete folder
 == 刪除資料夾
@@ -1723,7 +1688,7 @@ Videos directory
 == 影片目錄
 
 Video was saved to '%s'
-== 影片保存至 "%s"
+== 影片儲存至 "%s"
 
 Go back the specified duration
 == 倒轉指定時長
@@ -1771,10 +1736,239 @@ Enable ghost
 == 啟用影子
 
 Only save improvements
-== 只保存更佳記錄
+== 只儲存更佳記錄
 
 Regular background color
 == 原圖層背景顏色
 
 Entities background color
 == 實體層背景顏色
+
+Saving settings to '%s' failed
+== 無法儲存設定至 "%s"
+
+Searching
+== 正在搜尋
+
+Enter Username
+== 輸入用戶名稱
+
+Enter Password
+== 輸入密碼
+
+NOT CONNECTED
+== 連線未成功
+
+Match %d of %d
+== 結果 %d / 總共 %d 則
+
+No results
+== 無結果
+
+Lines %d - %d (%s)
+== 行 %d - %d (%s)
+
+Locked
+== 鎖定
+
+Following
+== 當前
+
+Press a key…
+== 按任意鍵…
+
+Are you sure that you want to restart?
+== 確定要重新開始？
+
+There's an unsaved map in the editor, you might want to save it.
+== 編輯器中有尚未儲存的地圖，你或需要儲存
+
+Continue anyway?
+== 仍要退出？
+
+Communities
+== 社區
+
+Please use a different filename
+== 請使用不同的檔案名
+
+Info Messages
+== 訊息
+
+Show local time always
+== 始終顯示本地時間
+
+Chat font size
+== 聊天字體大小
+
+Chat width
+== 聊天框寬度
+
+Authed name color in scoreboard
+== 管理權限人員名字計分板顯示顔色
+
+Same clan color in scoreboard
+== 相同戰隊計分板顯示顔色
+
+Show finish messages
+== 顯示完成訊息
+
+Failed saving the replay!
+== 儲存回放失敗！
+
+Error saving settings
+== 儲存設定錯誤
+
+Loading commands…
+== 正在載入指令…
+
+Main menu
+== 主選單
+
+Server filter
+== 伺服器過濾器
+
+Friends
+== 好友
+
+Loading…
+== 正在載入…
+
+Loading demo file from storage
+== 正在從硬盤中載入回放檔案
+
+No login required
+== 無需登入
+
+Player info change cooldown
+== 玩家資訊更改冷卻時間
+
+Always show chat
+== 始終顯示聊天框
+
+Show friend mark (♥) in name plates
+== 在暱稱上顯示好友標記 (♥)
+
+Show hook strength icon indicator
+== 顯示鉤索強度圖示
+
+Show hook strength number indicator
+== 顯示鉤索強度數值
+
+Show own player's hook collision line
+== 顯示自己的鉤索輔助線
+
+Always show own player's hook collision line
+== 始終顯示自己的鉤索輔助線
+
+Always show other players' hook collision lines
+== 始終顯示其他玩家的鉤索輔助線
+
+%d/%d KiB (%.1f KiB/s)
+== %d/%d KiB (%.1f KiB/s)
+
+Tee
+== Tee
+
+Show only chat messages from team members
+== 只顯示隊伍聊天訊息
+
+[Spectating]
+Following %s
+== 正在旁觀 %s
+
+Example of usage
+== 用途示例
+
+Round %d/%d
+== 輪次 %d/%d
+
+[Spectators]
+%d others…
+== %d 其他…
+
+[Team and size]
+%d\n(%d/%d)
+== %d\n(%d/%d)
+
+Team %d (%d/%d)
+== 隊伍 %d (%d/%d)
+
+https://wiki.ddnet.org/wiki/Mapping
+== https://wiki.ddnet.org/index.php?title=Mapping/zh&variant=zh-hant
+
+Could not resolve connect address '%s'. See local console for details.
+== 無法解析連線地址 '%s'。檢查本機控制台以取得詳情。
+
+Connect address error
+== 連線地址錯誤
+
+Could not connect dummy
+== 無法連線分身
+
+Dummy is not allowed on this server
+== 此服務器禁止使用分身
+
+Please wait…
+== 請稍等…
+
+Show client IDs (scoreboard, chat, spectator)
+== 顯示客戶端 ID（計分板、聊天、旁觀者）
+
+Are you sure that you want to delete '%s'?
+== 你確定要刪除'%s'嗎？
+
+Delete skin
+== 刪除外觀
+
+Basic
+== 基本
+
+Custom
+== 自定義
+
+Unable to delete skin
+== 無法刪除外觀
+
+Save skin
+== 保存外觀
+
+Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
+== 你確定要保存外觀嗎？如果已存在同名外觀，將會被替換。
+
+Unable to save the skin
+== 無法保存外觀
+
+Unable to save the skin with a reserved name
+== 無法保存使用保留名稱的外觀
+
+No local servers found (ports %d-%d)
+== 未找到本地伺服器（端口 %d-%d）
+
+[Hertz]
+Hz
+== Hz
+
+[skins]
+Body
+== 身體
+
+[skins]
+Marking
+== 標記
+
+[skins]
+Decoration
+== 裝飾
+
+[skins]
+Hands
+== 手
+
+[skins]
+Feet
+== 腳
+
+[skins]
+Eyes
+== 眼睛

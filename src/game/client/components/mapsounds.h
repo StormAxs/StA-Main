@@ -18,6 +18,7 @@ class CMapSounds : public CComponent
 	struct CSourceQueueEntry
 	{
 		int m_Sound;
+		bool m_HighDetail;
 		ISound::CVoiceHandle m_Voice;
 		CSoundSource *m_pSource;
 
@@ -31,6 +32,9 @@ class CMapSounds : public CComponent
 public:
 	CMapSounds();
 	virtual int Sizeof() const override { return sizeof(*this); }
+
+	void Play(int Channel, int SoundId);
+	void PlayAt(int Channel, int SoundId, vec2 Position);
 
 	virtual void OnMapLoad() override;
 	virtual void OnRender() override;

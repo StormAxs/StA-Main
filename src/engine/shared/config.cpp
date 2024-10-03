@@ -11,361 +11,267 @@
 
 CConfig g_Config;
 
+// ----------------------- Config Variables
+
 static void EscapeParam(char *pDst, const char *pSrc, int Size)
 {
 	str_escape(&pDst, pSrc, pDst + Size);
 }
 
-struct SConfigVariable
+void SConfigVariable::ExecuteLine(const char *pLine) const
 {
-	enum EVariableType
-	{
-		VAR_INT,
-		VAR_COLOR,
-		VAR_STRING,
-	};
-	IConsole *m_pConsole;
-	const char *m_pScriptName;
-	EVariableType m_Type;
-	int m_Flags;
-	const char *m_pHelp;
-	// Note that this only applies to the console command and the SetValue function,
-	// but the underlying config variable can still be modified programatically.
-	bool m_ReadOnly = false;
+	m_pConsole->ExecuteLine(pLine, (m_Flags & CFGFLAG_GAME) != 0 ? IConsole::CLIENT_ID_GAME : -1);
+}
 
-	SConfigVariable(IConsole *pConsole, const char *pScriptName, EVariableType Type, int Flags, const char *pHelp) :
-		m_pConsole(pConsole),
-		m_pScriptName(pScriptName),
-		m_Type(Type),
-		m_Flags(Flags),
-		m_pHelp(pHelp)
-	{
-	}
-
-	virtual ~SConfigVariable() = default;
-
-	virtual void Register() = 0;
-	virtual bool IsDefault() const = 0;
-	virtual void Serialize(char *pOut, size_t Size) const = 0;
-	virtual void ResetToDefault() = 0;
-	virtual void ResetToOld() = 0;
-
-protected:
-	void ExecuteLine(const char *pLine) const
-	{
-		m_pConsole->ExecuteLine(pLine, (m_Flags & CFGFLAG_GAME) != 0 ? IConsole::CLIENT_ID_GAME : -1);
-	}
-
-	bool CheckReadOnly() const
-	{
-		if(!m_ReadOnly)
-			return false;
-		char aBuf[IConsole::CMDLINE_LENGTH + 64];
-		str_format(aBuf, sizeof(aBuf), "The config variable '%s' cannot be changed right now.", m_pScriptName);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-		return true;
-	}
-};
-
-struct SIntConfigVariable : public SConfigVariable
+bool SConfigVariable::CheckReadOnly() const
 {
-	int *m_pVariable;
-	int m_Default;
-	int m_Min;
-	int m_Max;
-	int m_OldValue;
+	if(!m_ReadOnly)
+		return false;
+	char aBuf[IConsole::CMDLINE_LENGTH + 64];
+	str_format(aBuf, sizeof(aBuf), "The config variable '%s' cannot be changed right now.", m_pScriptName);
+	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
+	return true;
+}
 
-	SIntConfigVariable(IConsole *pConsole, const char *pScriptName, EVariableType Type, int Flags, const char *pHelp, int *pVariable, int Default, int Min, int Max) :
-		SConfigVariable(pConsole, pScriptName, Type, Flags, pHelp),
-		m_pVariable(pVariable),
-		m_Default(Default),
-		m_Min(Min),
-		m_Max(Max),
-		m_OldValue(Default)
+// -----
+
+void SIntConfigVariable::CommandCallback(IConsole::IResult *pResult, void *pUserData)
+{
+	SIntConfigVariable *pData = static_cast<SIntConfigVariable *>(pUserData);
+
+	if(pResult->NumArguments())
 	{
-		*m_pVariable = m_Default;
-	}
+		if(pData->CheckReadOnly())
+			return;
 
-	~SIntConfigVariable() override = default;
+		int Value = pResult->GetInteger(0);
 
-	static void CommandCallback(IConsole::IResult *pResult, void *pUserData)
-	{
-		SIntConfigVariable *pData = static_cast<SIntConfigVariable *>(pUserData);
-
-		if(pResult->NumArguments())
+		// do clamping
+		if(pData->m_Min != pData->m_Max)
 		{
-			if(pData->CheckReadOnly())
-				return;
+			if(Value < pData->m_Min)
+				Value = pData->m_Min;
+			if(pData->m_Max != 0 && Value > pData->m_Max)
+				Value = pData->m_Max;
+		}
 
-			int Value = pResult->GetInteger(0);
+		*pData->m_pVariable = Value;
+		if(pResult->m_ClientId != IConsole::CLIENT_ID_GAME)
+			pData->m_OldValue = Value;
+	}
+	else
+	{
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "Value: %d", *pData->m_pVariable);
+		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
+	}
+}
 
-			// do clamping
-			if(pData->m_Min != pData->m_Max)
-			{
-				if(Value < pData->m_Min)
-					Value = pData->m_Min;
-				if(pData->m_Max != 0 && Value > pData->m_Max)
-					Value = pData->m_Max;
-			}
+void SIntConfigVariable::Register()
+{
+	m_pConsole->Register(m_pScriptName, "?i", m_Flags, CommandCallback, this, m_pHelp);
+}
+
+bool SIntConfigVariable::IsDefault() const
+{
+	return *m_pVariable == m_Default;
+}
+
+void SIntConfigVariable::Serialize(char *pOut, size_t Size, int Value) const
+{
+	str_format(pOut, Size, "%s %i", m_pScriptName, Value);
+}
+
+void SIntConfigVariable::Serialize(char *pOut, size_t Size) const
+{
+	Serialize(pOut, Size, *m_pVariable);
+}
+
+void SIntConfigVariable::SetValue(int Value)
+{
+	if(CheckReadOnly())
+		return;
+	char aBuf[IConsole::CMDLINE_LENGTH];
+	Serialize(aBuf, sizeof(aBuf), Value);
+	ExecuteLine(aBuf);
+}
+
+void SIntConfigVariable::ResetToDefault()
+{
+	SetValue(m_Default);
+}
+
+void SIntConfigVariable::ResetToOld()
+{
+	*m_pVariable = m_OldValue;
+}
+
+// -----
+
+void SColorConfigVariable::CommandCallback(IConsole::IResult *pResult, void *pUserData)
+{
+	SColorConfigVariable *pData = static_cast<SColorConfigVariable *>(pUserData);
+	char aBuf[IConsole::CMDLINE_LENGTH + 64];
+	if(pResult->NumArguments())
+	{
+		if(pData->CheckReadOnly())
+			return;
+
+		const auto Color = pResult->GetColor(0, pData->m_DarkestLighting);
+		if(Color)
+		{
+			const unsigned Value = Color->Pack(pData->m_DarkestLighting, pData->m_Alpha);
 
 			*pData->m_pVariable = Value;
-			if(pResult->m_ClientID != IConsole::CLIENT_ID_GAME)
+			if(pResult->m_ClientId != IConsole::CLIENT_ID_GAME)
 				pData->m_OldValue = Value;
 		}
 		else
 		{
-			char aBuf[32];
-			str_format(aBuf, sizeof(aBuf), "Value: %d", *pData->m_pVariable);
+			str_format(aBuf, sizeof(aBuf), "%s is not a valid color.", pResult->GetString(0));
 			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
 		}
 	}
-
-	void Register() override
+	else
 	{
-		m_pConsole->Register(m_pScriptName, "?i", m_Flags, CommandCallback, this, m_pHelp);
-	}
+		str_format(aBuf, sizeof(aBuf), "Value: %u", *pData->m_pVariable);
+		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
 
-	bool IsDefault() const override
-	{
-		return *m_pVariable == m_Default;
-	}
+		const ColorHSLA Hsla = ColorHSLA(*pData->m_pVariable, true).UnclampLighting(pData->m_DarkestLighting);
+		str_format(aBuf, sizeof(aBuf), "H: %d°, S: %d%%, L: %d%%", round_to_int(Hsla.h * 360), round_to_int(Hsla.s * 100), round_to_int(Hsla.l * 100));
+		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
 
-	void Serialize(char *pOut, size_t Size, int Value) const
-	{
-		str_format(pOut, Size, "%s %i", m_pScriptName, Value);
-	}
+		const ColorRGBA Rgba = color_cast<ColorRGBA>(Hsla);
+		str_format(aBuf, sizeof(aBuf), "R: %d, G: %d, B: %d, #%06X", round_to_int(Rgba.r * 255), round_to_int(Rgba.g * 255), round_to_int(Rgba.b * 255), Rgba.Pack(false));
+		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
 
-	void Serialize(char *pOut, size_t Size) const override
-	{
-		Serialize(pOut, Size, *m_pVariable);
+		if(pData->m_Alpha)
+		{
+			str_format(aBuf, sizeof(aBuf), "A: %d%%", round_to_int(Hsla.a * 100));
+			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
+		}
 	}
+}
 
-	void SetValue(int Value)
-	{
-		if(CheckReadOnly())
-			return;
-		char aBuf[IConsole::CMDLINE_LENGTH];
-		Serialize(aBuf, sizeof(aBuf), Value);
-		ExecuteLine(aBuf);
-	}
-
-	void ResetToDefault() override
-	{
-		SetValue(m_Default);
-	}
-
-	void ResetToOld() override
-	{
-		*m_pVariable = m_OldValue;
-	}
-};
-
-struct SColorConfigVariable : public SConfigVariable
+void SColorConfigVariable::Register()
 {
-	unsigned *m_pVariable;
-	unsigned m_Default;
-	bool m_Light;
-	bool m_Alpha;
-	unsigned m_OldValue;
+	m_pConsole->Register(m_pScriptName, "?i", m_Flags, CommandCallback, this, m_pHelp);
+}
 
-	SColorConfigVariable(IConsole *pConsole, const char *pScriptName, EVariableType Type, int Flags, const char *pHelp, unsigned *pVariable, unsigned Default) :
-		SConfigVariable(pConsole, pScriptName, Type, Flags, pHelp),
-		m_pVariable(pVariable),
-		m_Default(Default),
-		m_Light(Flags & CFGFLAG_COLLIGHT),
-		m_Alpha(Flags & CFGFLAG_COLALPHA),
-		m_OldValue(Default)
-	{
-		*m_pVariable = m_Default;
-	}
-
-	~SColorConfigVariable() override = default;
-
-	static void CommandCallback(IConsole::IResult *pResult, void *pUserData)
-	{
-		SColorConfigVariable *pData = static_cast<SColorConfigVariable *>(pUserData);
-
-		if(pResult->NumArguments())
-		{
-			if(pData->CheckReadOnly())
-				return;
-
-			const ColorHSLA Color = pResult->GetColor(0, pData->m_Light);
-			const unsigned Value = Color.Pack(pData->m_Light ? 0.5f : 0.0f, pData->m_Alpha);
-
-			*pData->m_pVariable = Value;
-			if(pResult->m_ClientID != IConsole::CLIENT_ID_GAME)
-				pData->m_OldValue = Value;
-		}
-		else
-		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "Value: %u", *pData->m_pVariable);
-			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-
-			ColorHSLA Hsla = ColorHSLA(*pData->m_pVariable, true);
-			if(pData->m_Light)
-				Hsla = Hsla.UnclampLighting();
-			str_format(aBuf, sizeof(aBuf), "H: %d°, S: %d%%, L: %d%%", round_truncate(Hsla.h * 360), round_truncate(Hsla.s * 100), round_truncate(Hsla.l * 100));
-			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-
-			const ColorRGBA Rgba = color_cast<ColorRGBA>(Hsla);
-			str_format(aBuf, sizeof(aBuf), "R: %d, G: %d, B: %d, #%06X", round_truncate(Rgba.r * 255), round_truncate(Rgba.g * 255), round_truncate(Rgba.b * 255), Rgba.Pack(false));
-			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-
-			if(pData->m_Alpha)
-			{
-				str_format(aBuf, sizeof(aBuf), "A: %d%%", round_truncate(Hsla.a * 100));
-				pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-			}
-		}
-	}
-
-	void Register() override
-	{
-		m_pConsole->Register(m_pScriptName, "?i", m_Flags, CommandCallback, this, m_pHelp);
-	}
-
-	bool IsDefault() const override
-	{
-		return *m_pVariable == m_Default;
-	}
-
-	void Serialize(char *pOut, size_t Size, unsigned Value) const
-	{
-		str_format(pOut, Size, "%s %u", m_pScriptName, Value);
-	}
-
-	void Serialize(char *pOut, size_t Size) const override
-	{
-		Serialize(pOut, Size, *m_pVariable);
-	}
-
-	void SetValue(unsigned Value)
-	{
-		if(CheckReadOnly())
-			return;
-		char aBuf[IConsole::CMDLINE_LENGTH];
-		Serialize(aBuf, sizeof(aBuf), Value);
-		ExecuteLine(aBuf);
-	}
-
-	void ResetToDefault() override
-	{
-		SetValue(m_Default);
-	}
-
-	void ResetToOld() override
-	{
-		*m_pVariable = m_OldValue;
-	}
-};
-
-struct SStringConfigVariable : public SConfigVariable
+bool SColorConfigVariable::IsDefault() const
 {
-	char *m_pStr;
-	const char *m_pDefault;
-	size_t m_MaxSize;
-	char *m_pOldValue;
+	return *m_pVariable == m_Default;
+}
 
-	SStringConfigVariable(IConsole *pConsole, const char *pScriptName, EVariableType Type, int Flags, const char *pHelp, char *pStr, const char *pDefault, size_t MaxSize, char *pOldValue) :
-		SConfigVariable(pConsole, pScriptName, Type, Flags, pHelp),
-		m_pStr(pStr),
-		m_pDefault(pDefault),
-		m_MaxSize(MaxSize),
-		m_pOldValue(pOldValue)
+void SColorConfigVariable::Serialize(char *pOut, size_t Size, unsigned Value) const
+{
+	str_format(pOut, Size, "%s %u", m_pScriptName, Value);
+}
+
+void SColorConfigVariable::Serialize(char *pOut, size_t Size) const
+{
+	Serialize(pOut, Size, *m_pVariable);
+}
+
+void SColorConfigVariable::SetValue(unsigned Value)
+{
+	if(CheckReadOnly())
+		return;
+	char aBuf[IConsole::CMDLINE_LENGTH];
+	Serialize(aBuf, sizeof(aBuf), Value);
+	ExecuteLine(aBuf);
+}
+
+void SColorConfigVariable::ResetToDefault()
+{
+	SetValue(m_Default);
+}
+
+void SColorConfigVariable::ResetToOld()
+{
+	*m_pVariable = m_OldValue;
+}
+
+// -----
+
+SStringConfigVariable::SStringConfigVariable(IConsole *pConsole, const char *pScriptName, EVariableType Type, int Flags, const char *pHelp, char *pStr, const char *pDefault, size_t MaxSize, char *pOldValue) :
+	SConfigVariable(pConsole, pScriptName, Type, Flags, pHelp),
+	m_pStr(pStr),
+	m_pDefault(pDefault),
+	m_MaxSize(MaxSize),
+	m_pOldValue(pOldValue)
+{
+	str_copy(m_pStr, m_pDefault, m_MaxSize);
+	str_copy(m_pOldValue, m_pDefault, m_MaxSize);
+}
+
+void SStringConfigVariable::CommandCallback(IConsole::IResult *pResult, void *pUserData)
+{
+	SStringConfigVariable *pData = static_cast<SStringConfigVariable *>(pUserData);
+
+	if(pResult->NumArguments())
 	{
-		str_copy(m_pStr, m_pDefault, m_MaxSize);
-		str_copy(m_pOldValue, m_pDefault, m_MaxSize);
-	}
-
-	~SStringConfigVariable() override = default;
-
-	static void CommandCallback(IConsole::IResult *pResult, void *pUserData)
-	{
-		SStringConfigVariable *pData = static_cast<SStringConfigVariable *>(pUserData);
-
-		if(pResult->NumArguments())
-		{
-			if(pData->CheckReadOnly())
-				return;
-
-			const char *pString = pResult->GetString(0);
-			if(!str_utf8_check(pString))
-			{
-				char aTemp[4];
-				size_t Length = 0;
-				while(*pString)
-				{
-					size_t Size = str_utf8_encode(aTemp, static_cast<unsigned char>(*pString++));
-					if(Length + Size < pData->m_MaxSize)
-					{
-						mem_copy(pData->m_pStr + Length, aTemp, Size);
-						Length += Size;
-					}
-					else
-						break;
-				}
-				pData->m_pStr[Length] = '\0';
-			}
-			else
-				str_copy(pData->m_pStr, pString, pData->m_MaxSize);
-
-			if(pResult->m_ClientID != IConsole::CLIENT_ID_GAME)
-				str_copy(pData->m_pOldValue, pData->m_pStr, pData->m_MaxSize);
-		}
-		else
-		{
-			char aBuf[1024];
-			str_format(aBuf, sizeof(aBuf), "Value: %s", pData->m_pStr);
-			pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-		}
-	}
-
-	void Register() override
-	{
-		m_pConsole->Register(m_pScriptName, "?r", m_Flags, CommandCallback, this, m_pHelp);
-	}
-
-	bool IsDefault() const override
-	{
-		return str_comp(m_pStr, m_pDefault) == 0;
-	}
-
-	void Serialize(char *pOut, size_t Size, const char *pValue) const
-	{
-		str_copy(pOut, m_pScriptName, Size);
-		str_append(pOut, " \"", Size);
-		const int OutLen = str_length(pOut);
-		EscapeParam(pOut + OutLen, pValue, Size - OutLen - 1); // -1 to ensure space for final quote
-		str_append(pOut, "\"", Size);
-	}
-
-	void Serialize(char *pOut, size_t Size) const override
-	{
-		Serialize(pOut, Size, m_pStr);
-	}
-
-	void SetValue(const char *pValue)
-	{
-		if(CheckReadOnly())
+		if(pData->CheckReadOnly())
 			return;
-		char aBuf[2048];
-		Serialize(aBuf, sizeof(aBuf), pValue);
-		ExecuteLine(aBuf);
-	}
 
-	void ResetToDefault() override
+		const char *pString = pResult->GetString(0);
+		str_copy(pData->m_pStr, pString, pData->m_MaxSize);
+
+		if(pResult->m_ClientId != IConsole::CLIENT_ID_GAME)
+			str_copy(pData->m_pOldValue, pData->m_pStr, pData->m_MaxSize);
+	}
+	else
 	{
-		SetValue(m_pDefault);
+		char aBuf[1024];
+		str_format(aBuf, sizeof(aBuf), "Value: %s", pData->m_pStr);
+		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
 	}
+}
 
-	void ResetToOld() override
-	{
-		str_copy(m_pStr, m_pOldValue, m_MaxSize);
-	}
-};
+void SStringConfigVariable::Register()
+{
+	m_pConsole->Register(m_pScriptName, "?r", m_Flags, CommandCallback, this, m_pHelp);
+}
 
+bool SStringConfigVariable::IsDefault() const
+{
+	return str_comp(m_pStr, m_pDefault) == 0;
+}
+
+void SStringConfigVariable::Serialize(char *pOut, size_t Size, const char *pValue) const
+{
+	str_copy(pOut, m_pScriptName, Size);
+	str_append(pOut, " \"", Size);
+	const int OutLen = str_length(pOut);
+	EscapeParam(pOut + OutLen, pValue, Size - OutLen - 1); // -1 to ensure space for final quote
+	str_append(pOut, "\"", Size);
+}
+
+void SStringConfigVariable::Serialize(char *pOut, size_t Size) const
+{
+	Serialize(pOut, Size, m_pStr);
+}
+
+void SStringConfigVariable::SetValue(const char *pValue)
+{
+	if(CheckReadOnly())
+		return;
+	char aBuf[2048];
+	Serialize(aBuf, sizeof(aBuf), pValue);
+	ExecuteLine(aBuf);
+}
+
+void SStringConfigVariable::ResetToDefault()
+{
+	SetValue(m_pDefault);
+}
+
+void SStringConfigVariable::ResetToOld()
+{
+	str_copy(m_pStr, m_pOldValue, m_MaxSize);
+}
+
+// ----------------------- Config Manager
 CConfigManager::CConfigManager()
 {
 	m_pConsole = nullptr;
@@ -388,7 +294,7 @@ void CConfigManager::Init()
 
 #define MACRO_CONFIG_INT(Name, ScriptName, Def, Min, Max, Flags, Desc) \
 	{ \
-		const char *pHelp = Min == Max ? Desc " (default: " #Def ")" : Max == 0 ? Desc " (default: " #Def ", min: " #Min ")" : Desc " (default: " #Def ", min: " #Min ", max: " #Max ")"; \
+		const char *pHelp = Min == Max ? Desc " (default: " #Def ")" : (Max == 0 ? Desc " (default: " #Def ", min: " #Min ")" : Desc " (default: " #Def ", min: " #Min ", max: " #Max ")"); \
 		AddVariable(m_ConfigHeap.Allocate<SIntConfigVariable>(m_pConsole, #ScriptName, SConfigVariable::VAR_INT, Flags, pHelp, &g_Config.m_##Name, Def, Min, Max)); \
 	}
 
@@ -496,19 +402,27 @@ bool CConfigManager::Save()
 		WriteLine(pCommand);
 	}
 
+	if(m_Failed)
+	{
+		log_error("config", "ERROR: writing to %s failed", aConfigFileTmp);
+	}
+
 	if(io_sync(m_ConfigFile) != 0)
 	{
 		m_Failed = true;
+		log_error("config", "ERROR: synchronizing %s failed", aConfigFileTmp);
 	}
 
 	if(io_close(m_ConfigFile) != 0)
+	{
 		m_Failed = true;
+		log_error("config", "ERROR: closing %s failed", aConfigFileTmp);
+	}
 
 	m_ConfigFile = 0;
 
 	if(m_Failed)
 	{
-		log_error("config", "ERROR: writing to %s failed", aConfigFileTmp);
 		return false;
 	}
 
@@ -518,6 +432,7 @@ bool CConfigManager::Save()
 		return false;
 	}
 
+	log_info("config", "saved to " CONFIG_FILE);
 	return true;
 }
 
@@ -539,6 +454,20 @@ void CConfigManager::WriteLine(const char *pLine)
 void CConfigManager::StoreUnknownCommand(const char *pCommand)
 {
 	m_vpUnknownCommands.push_back(m_ConfigHeap.StoreString(pCommand));
+}
+
+void CConfigManager::PossibleConfigVariables(const char *pStr, int FlagMask, POSSIBLECFGFUNC pfnCallback, void *pUserData)
+{
+	for(const SConfigVariable *pVariable : m_vpAllVariables)
+	{
+		if(pVariable->m_Flags & FlagMask)
+		{
+			if(str_find_nocase(pVariable->m_pScriptName, pStr))
+			{
+				pfnCallback(pVariable, pUserData);
+			}
+		}
+	}
 }
 
 void CConfigManager::Con_Reset(IConsole::IResult *pResult, void *pUserData)
@@ -563,19 +492,21 @@ void CConfigManager::Con_Toggle(IConsole::IResult *pResult, void *pUserData)
 		if(pVariable->m_Type == SConfigVariable::VAR_INT)
 		{
 			SIntConfigVariable *pIntVariable = static_cast<SIntConfigVariable *>(pVariable);
-			pIntVariable->SetValue(*pIntVariable->m_pVariable == pResult->GetInteger(1) ? pResult->GetInteger(2) : pResult->GetInteger(1));
+			const bool EqualToFirst = *pIntVariable->m_pVariable == pResult->GetInteger(1);
+			pIntVariable->SetValue(pResult->GetInteger(EqualToFirst ? 2 : 1));
 		}
 		else if(pVariable->m_Type == SConfigVariable::VAR_COLOR)
 		{
 			SColorConfigVariable *pColorVariable = static_cast<SColorConfigVariable *>(pVariable);
-			const float Darkest = pColorVariable->m_Light ? 0.5f : 0.0f;
-			const ColorHSLA Value = *pColorVariable->m_pVariable == pResult->GetColor(1, pColorVariable->m_Light).Pack(Darkest, pColorVariable->m_Alpha) ? pResult->GetColor(2, pColorVariable->m_Light) : pResult->GetColor(1, pColorVariable->m_Light);
-			pColorVariable->SetValue(Value.Pack(Darkest, pColorVariable->m_Alpha));
+			const bool EqualToFirst = *pColorVariable->m_pVariable == pResult->GetColor(1, pColorVariable->m_DarkestLighting).value_or(ColorHSLA(0, 0, 0)).Pack(pColorVariable->m_DarkestLighting, pColorVariable->m_Alpha);
+			const std::optional<ColorHSLA> Value = pResult->GetColor(EqualToFirst ? 2 : 1, pColorVariable->m_DarkestLighting);
+			pColorVariable->SetValue(Value.value_or(ColorHSLA(0, 0, 0)).Pack(pColorVariable->m_DarkestLighting, pColorVariable->m_Alpha));
 		}
 		else if(pVariable->m_Type == SConfigVariable::VAR_STRING)
 		{
 			SStringConfigVariable *pStringVariable = static_cast<SStringConfigVariable *>(pVariable);
-			pStringVariable->SetValue(str_comp(pStringVariable->m_pStr, pResult->GetString(1)) == 0 ? pResult->GetString(2) : pResult->GetString(1));
+			const bool EqualToFirst = str_comp(pStringVariable->m_pStr, pResult->GetString(1)) == 0;
+			pStringVariable->SetValue(pResult->GetString(EqualToFirst ? 2 : 1));
 		}
 		return;
 	}

@@ -1,8 +1,9 @@
 #include <base/system.h>
 #include <engine/discord.h>
+
 // Hack for universal binary builds on macOS: Ignore arm64 until Discord
 // releases a native arm64 SDK for macOS.
-#include "game/client/component.h"
+
 #if defined(CONF_DISCORD) && !(defined(CONF_ARCH_ARM64) && defined(CONF_PLATFORM_MACOS))
 #include <discord_game_sdk.h>
 
@@ -56,7 +57,6 @@ public:
 		}
 
 		m_pActivityManager = m_pCore->get_activity_manager(m_pCore);
-		m_StartTime = time_timestamp();
 		return false;
 	}
 	void Update() override
@@ -78,87 +78,10 @@ public:
 		DiscordActivity Activity;
 
 		mem_zero(&Activity, sizeof(DiscordActivity));
-		/*
-		 if(strcmp(pMapName, "Stronghold") == 0)
-		{
-			str_copy(Activity.assets.large_image, "stronghold1",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Multeasymap") == 0)
-		{
-			str_copy(Activity.assets.large_image, "multeasy",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Multeasymap") == 0)
-		{
-			str_copy(Activity.assets.large_image, "multeasy",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Copy Love Box 2s") == 0)
-		{
-			str_copy(Activity.assets.large_image, "CLB2s",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Copy Love Box") == 0)
-		{
-			str_copy(Activity.assets.large_image, "CLB",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Tutorial") == 0)
-		{
-			str_copy(Activity.assets.large_image, "tutorial",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Simple Down") == 0)
-		{
-			str_copy(Activity.assets.large_image, "simpledown",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Baby Aim 1.0") == 0)
-		{
-			str_copy(Activity.assets.large_image, "babyaim1",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Baby Aim 2.0") == 0)
-		{
-			str_copy(Activity.assets.large_image, "babyaim2",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Baby Aim 3.0") == 0)
-		{
-			str_copy(Activity.assets.large_image, "babyaim3",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Back in Time 3") == 0)
-		{
-			str_copy(Activity.assets.large_image, "bit3",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Back in Time 3") == 0)
-		{
-			str_copy(Activity.assets.large_image, "bit3",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Grandma") == 0)
-		{
-			str_copy(Activity.assets.large_image, "grandma",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Luxis") == 0)
-		{
-			str_copy(Activity.assets.large_image, "luxis",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Stronghold 2") == 0)
-		{
-			str_copy(Activity.assets.large_image, "stronghold2",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Stronghold 3") == 0)
-		{
-			str_copy(Activity.assets.large_image, "stronghold3",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Stronghold 4[Final]") == 0)
-		{
-			str_copy(Activity.assets.large_image, "strongholdF",sizeof(Activity.assets.large_image));
-		}
-		if(strcmp(pMapName, "Grandma") == 0)
-		{
-			str_copy(Activity.assets.large_image, "grandma",sizeof(Activity.assets.large_image));
-		}
-		fuck off */
-		str_copy(Activity.assets.large_text, "StA-Client", sizeof(Activity.assets.large_text));
-		str_copy(Activity.assets.small_image, pImage, sizeof(Activity.assets.large_image));
-		str_copy(Activity.assets.small_text, pText, sizeof(Activity.assets.large_text));
-		Activity.timestamps.start = m_StartTime;
-		str_copy(Activity.assets.large_image, "150e4e96-9c83-4309-b692-b212c08e1934",sizeof(Activity.assets.large_image));
-		str_copy(Activity.state, pPlayerName);
-		str_copy(Activity.state, pMapName, sizeof(Activity.state));
+		str_copy(Activity.assets.large_image, "ddnet_logo", sizeof(Activity.assets.large_image));
+		str_copy(Activity.assets.large_text, "DDNet logo", sizeof(Activity.assets.large_text));
+		Activity.timestamps.start = time_timestamp();
+		str_copy(Activity.details, pMapName, sizeof(Activity.details));
 		m_pActivityManager->update_activity(m_pActivityManager, &Activity, 0, 0);
 
 

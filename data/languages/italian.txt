@@ -32,9 +32,6 @@
 %s wins!
 == %s ha vinto!
 
--Page %d-
-== -Pagina %d-
-
 Abort
 == Annulla
 
@@ -86,8 +83,8 @@ Client
 Connecting to
 == Connessione a
 
-Connection Problems...
-== Problemi di connessione...
+Connection Problems…
+== Problemi di connessione…
 
 Console
 == Console
@@ -287,9 +284,6 @@ Player
 Player country:
 == Filtra per paese:
 
-Player options
-== Opzioni giocatore
-
 Players
 == Giocatori
 
@@ -407,9 +401,6 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == Il server presenta impostazioni non standard in un tipo di gioco normale.
 
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== C'è una mappa non salvata nell'editor, probabilmente vuoi salvarla prima di uscire.
-
 Time limit
 == Limite di tempo
 
@@ -508,12 +499,6 @@ Your skin
 Reset to defaults
 == Reimposta predefinito
 
-Quit anyway?
-== Vuoi chiudere comunque?
-
-Round
-== Turno
-
 Lht.
 == Luminosità
 
@@ -565,8 +550,8 @@ Length
 Downloading %s:
 == Scaricando %s:
 
-Update failed! Check log...
-== Aggiornamento non riuscito! Controlla registro...
+Update failed! Check log…
+== Aggiornamento non riuscito! Controlla registro…
 
 Filter connecting players
 == Filtra i giocatori in conness.
@@ -585,9 +570,6 @@ Are you sure that you want to disconnect your dummy?
 
 Successfully saved the replay!
 == Hai salvato il replay con successo!
-
-Saving ddnet-settings.cfg failed
-== Salvataggio di ddnet-settings.cfg non riuscito
 
 Replay feature is disabled!
 == Il replay è disabilitato!
@@ -700,9 +682,6 @@ Countries
 Types
 == Tipi
 
-Please use a different filename
-== 
-
 Remove chat
 == Rimuovi chat
 
@@ -726,9 +705,6 @@ Kill
 
 Pause
 == Pausa
-
-Reload
-== Ricarica
 
 Deactivate
 == Disattiva
@@ -771,9 +747,6 @@ Automatically create statboard csv
 
 Max CSVs
 == Massimo valore separato da virgole (CSV)
-
-Dummy settings
-== Impostazioni Dummy
 
 Download skins
 == Scarica skin
@@ -895,9 +868,6 @@ Assets
 DDNet Client needs to be restarted to complete update!
 == Il Client DDNet deve essere riavviato per completare l'aggiornamento!
 
-Use DDRace Scoreboard
-== Usa il tabellone segnapunti DDRace
-
 Show score
 == Mostra punteggio/tempo
 
@@ -997,8 +967,8 @@ DDNet %s is available:
 Update now
 == Aggiorna ora
 
-Updating...
-== Aggiornamento in corso...
+Updating…
+== Aggiornamento in corso…
 
 DDNet Client updated!
 == Client DDNet aggiornato!
@@ -1129,10 +1099,10 @@ Sending initial client info
 == Inviando le informazioni del client
 
 Quitting. Please wait…
-== Uscendo. Perfavore aspetta...
+== Uscendo. Perfavore aspetta…
 
 Restarting. Please wait…
-== Riavviando. Perfavore aspetta...
+== Riavviando. Perfavore aspetta…
 
 Position:
 == Posizione:
@@ -1152,8 +1122,8 @@ Team %d
 Uploading map data to GPU
 == Caricando dati mappa alla GPU
 
-Trying to determine UDP connectivity...
-== Provando a determinare l'UDP connectivity...
+Trying to determine UDP connectivity…
+== Provando a determinare l'UDP connectivity…
 
 UDP seems to be filtered.
 == UDP sembra essere filtrato.
@@ -1204,7 +1174,7 @@ No server selected
 == Nessun server selezionato
 
 Online clanmates (%d)
-== Compagni di clan online
+== Compagni di clan online (%d)
 
 Click to select server. Double click to join your friend.
 == Fare click per selezionare il server. Fai doppio click per unirti al tuo amico.
@@ -1297,9 +1267,6 @@ Hook Collisions
 Show health, shields and ammo
 == Mostra vita, scudi e munizioni
 
-Show client IDs in scoreboard
-== Mostra gli ID clienti nella scoreboard
-
 Show DDRace HUD
 == Mostra l'HUD DDRace
 
@@ -1326,9 +1293,6 @@ Opacity of freeze bars inside freeze
 
 Preview
 == Anteprima
-
-Show hook strength indicator
-== Mostra l'indicatore della forza del gancio
 
 Show local player's key presses
 == Mostra le pressioni dei tasti del giocatore locale
@@ -1438,10 +1402,28 @@ Could not initialize the given graphics backend, reverting to the default backen
 Could not initialize the given graphics backend, this is probably because you didn't install the driver of the integrated graphics card.
 == 
 
+Could not resolve connect address '%s'. See local console for details.
+== 
+
+Connect address error
+== 
+
 Could not save downloaded map. Try manually deleting this file: %s
 == 
 
+Could not connect dummy
+== 
+
 Error playing demo
+== 
+
+Failed saving the replay!
+== 
+
+Saving settings to '%s' failed
+== 
+
+Error saving settings
 == 
 
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
@@ -1450,7 +1432,47 @@ The width of texture %s is not divisible by %d, or the height is not divisible b
 The format of texture %s is not RGBA which will cause visual bugs.
 == 
 
+Loading demo file from storage
+== 
+
 Why are you slowmo replaying to read this?
+== 
+
+Loading skin files
+== 
+
+Searching
+== 
+
+Enter Username
+== 
+
+Enter Password
+== 
+
+NOT CONNECTED
+== 
+
+Match %d of %d
+== 
+
+No results
+== 
+
+Lines %d - %d (%s)
+== 
+
+Locked
+== 
+
+Following
+== 
+
+Loading commands…
+== 
+
+[Spectating]
+Following %s
 == 
 
 Some map images could not be loaded. Check the local console for details.
@@ -1462,13 +1484,43 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
+Press a key…
+== 
+
+Main menu
+== 
+
 Render complete
+== 
+
+Are you sure that you want to restart?
+== 
+
+Save skin
+== 
+
+Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
+== 
+
+There's an unsaved map in the editor, you might want to save it.
+== 
+
+Continue anyway?
 == 
 
 Videos directory
 == 
 
 Video was saved to '%s'
+== 
+
+Unable to save the skin
+== 
+
+Unable to save the skin with a reserved name
+== 
+
+%d/%d KiB (%.1f KiB/s)
 == 
 
 Loading menu images
@@ -1495,6 +1547,18 @@ SA
 CHN
 == 
 
+No local servers found (ports %d-%d)
+== 
+
+Example of usage
+== 
+
+No login required
+== 
+
+Communities
+== 
+
 Copy info
 == 
 
@@ -1506,6 +1570,12 @@ Online players (%d)
 
 [friends (server browser)]
 Offline (%d)
+== 
+
+Server filter
+== 
+
+Friends
 == 
 
 Play the current demo
@@ -1579,6 +1649,9 @@ Cut length
 Render cut to video
 == 
 
+Please use a different filename
+== 
+
 Loading demo files
 == 
 
@@ -1622,6 +1695,15 @@ Unable to delete the demo '%s'
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
+Dummy is not allowed on this server
+== 
+
+Please wait…
+== 
+
+Loading…
+== 
+
 Loading ghost files
 == 
 
@@ -1635,6 +1717,10 @@ Deactivate all
 == 
 
 Menu opened. Press Esc key again to close menu.
+== 
+
+[Hertz]
+Hz
 == 
 
 Save power by lowering refresh rate (higher input latency)
@@ -1655,10 +1741,10 @@ Open the directory that contains the configuration and user files
 Open the directory to add custom themes
 == 
 
-Toggle to edit your dummy settings
+Dummy
 == 
 
-Loading skin files
+Player info change cooldown
 == 
 
 Converse
@@ -1689,9 +1775,6 @@ Aim bind
 Mouse
 == 
 
-Dummy
-== 
-
 Allows maps to render with more detail
 == 
 
@@ -1707,19 +1790,67 @@ custom
 auto
 == 
 
+Tee
+== 
+
 Appearance
 == 
 
 Name Plate
 == 
 
-Kill Messages
+Info Messages
+== 
+
+Show local time always
 == 
 
 DDRace HUD
 == 
 
+Show client IDs (scoreboard, chat, spectator)
+== 
+
+Always show chat
+== 
+
+Show only chat messages from team members
+== 
+
+Chat font size
+== 
+
+Chat width
+== 
+
+Show friend mark (♥) in name plates
+== 
+
+Show hook strength icon indicator
+== 
+
+Show hook strength number indicator
+== 
+
+Authed name color in scoreboard
+== 
+
+Same clan color in scoreboard
+== 
+
+Show own player's hook collision line
+== 
+
+Always show own player's hook collision line
+== 
+
+Always show other players' hook collision lines
+== 
+
 A Tee
+== 
+
+Show finish messages
 == 
 
 Normal Color
@@ -1770,6 +1901,21 @@ Regular background color
 Entities background color
 == 
 
+Basic
+== 
+
+Custom
+== 
+
+Are you sure that you want to delete '%s'?
+== 
+
+Delete skin
+== 
+
+Unable to delete skin
+== 
+
 Extras
 == 
 
@@ -1782,8 +1928,49 @@ https://ddnet.org/discord
 Tutorial
 == 
 
+Round %d/%d
+== 
+
+[Spectators]
+%d others…
+== 
+
 Super
 == 
 
+[Team and size]
+%d\n(%d/%d)
+== 
+
+Team %d (%d/%d)
+== 
+
+[skins]
+Body
+== 
+
+[skins]
+Marking
+== 
+
+[skins]
+Decoration
+== 
+
+[skins]
+Hands
+== 
+
+[skins]
+Feet
+== 
+
+[skins]
+Eyes
+== 
+
 FPM
+== 
+
+https://wiki.ddnet.org/wiki/Mapping
 == 

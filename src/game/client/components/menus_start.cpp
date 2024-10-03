@@ -144,9 +144,11 @@ std::string GetRandomQuote() {
 	}
 }
 
+using namespace FontIcons;
+
 void CMenus::RenderStartMenu(CUIRect MainView)
 {
-	// Render logo
+	// render logo
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(1, 1, 1, 1);
@@ -181,11 +183,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	static CButtonContainer s_DiscordButton;
 	if(DoButton_Menu(&s_DiscordButton, Localize("Discord"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 	{
-		const char *pLink = Localize("https://ddnet.org/discord");
-		if(!open_link(pLink))
-		{
-			dbg_msg("menus", "couldn't open link '%s'", pLink);
-		}
+		Client()->ViewLink(Localize("https://ddnet.org/discord"));
 	}
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, 0); // little space
@@ -193,11 +191,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	static CButtonContainer s_LearnButton;
 	if(DoButton_Menu(&s_LearnButton, Localize("Learn"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 	{
-		const char *pLink = Localize("https://wiki.ddnet.org/");
-		if(!open_link(pLink))
-		{
-			dbg_msg("menus", "couldn't open link '%s'", pLink);
-		}
+		Client()->ViewLink(Localize("https://wiki.ddnet.org/"));
 	}
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, 0); // little space
@@ -207,6 +201,10 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	if(DoButton_Menu(&s_TutorialButton, Localize("Tutorial"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) ||
 		(s_JoinTutorialTime != 0.0f && Client()->LocalTime() >= s_JoinTutorialTime))
 	{
+		// Activate internet tab before joining tutorial to make sure the server info
+		// for the tutorial servers is available.
+		SetMenuPage(PAGE_INTERNET);
+		RefreshBrowserTab(true);
 		const char *pAddr = ServerBrowser()->GetTutorialServer();
 		if(pAddr)
 		{
@@ -230,11 +228,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	static CButtonContainer s_WebsiteButton;
 	if(DoButton_Menu(&s_WebsiteButton, Localize("Website"), 0, &Button, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 	{
-		const char *pLink = "https://ddnet.org/";
-		if(!open_link(pLink))
-		{
-			dbg_msg("menus", "couldn't open link '%s'", pLink);
-		}
+		Client()->ViewLink("https://ddnet.org/");
 	}
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, 0); // little space
@@ -253,7 +247,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(40.0f, &Menu, &Button);
 	static CButtonContainer s_QuitButton;
 	bool UsedEscape = false;
-	if(DoButton_Menu(&s_QuitButton, Localize("Quit"), 0, &Button, 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (UsedEscape = UI()->ConsumeHotkey(CUI::HOTKEY_ESCAPE)) || CheckHotKey(KEY_Q))
+	if(DoButton_Menu(&s_QuitButton, Localize("Quit"), 0, &Button, 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (UsedEscape = Ui()->ConsumeHotkey(CUi::HOTKEY_ESCAPE)) || CheckHotKey(KEY_Q))
 	{
 		if(UsedEscape || m_pClient->Editor()->HasUnsavedData() || (Client()->GetCurrentRaceTime() / 60 >= g_Config.m_ClConfirmQuitTime && g_Config.m_ClConfirmQuitTime >= 0))
 		{
@@ -272,6 +266,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	if(DoButton_Menu(&s_SettingsButton, Localize(""), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
 		NewPage = PAGE_SETTINGS;
 
+#if !defined(CONF_PLATFORM_ANDROID)
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_LocalServerButton;
@@ -291,13 +286,10 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 			char aBuf[IO_MAX_PATH_LENGTH];
 			Storage()->GetBinaryPath(PLAT_SERVER_EXEC, aBuf, sizeof(aBuf));
 			// No / in binary path means to search in $PATH, so it is expected that the file can't be opened. Just try executing anyway.
-			if(str_find(aBuf, "/") == 0)
+			if(str_find(aBuf, "/") == 0 || fs_is_file(aBuf))
 			{
-				m_ServerProcess.m_Process = shell_execute(aBuf);
-			}
-			else if(fs_is_file(aBuf))
-			{
-				m_ServerProcess.m_Process = shell_execute(aBuf);
+				m_ServerProcess.m_Process = shell_execute(aBuf, EShellExecuteWindowState::BACKGROUND);
+				m_ForceRefreshLanPage = true;
 			}
 			else
 			{
@@ -305,9 +297,8 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 			}
 		}
 	}
+#endif
 
-	static bool EditorHotkeyWasPressed = true;
-	static float EditorHotKeyChecktime = 0.0f;
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
 	Menu.HSplitBottom(55.0f, &Menu, &Button);
 	static CButtonContainer s_MapEditorButton;
@@ -315,12 +306,12 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 	{
 		g_Config.m_ClEditor = 1;
 		Input()->MouseModeRelative();
-		EditorHotkeyWasPressed = true;
+		m_EditorHotkeyWasPressed = true;
 	}
 	if(!Input()->KeyIsPressed(KEY_E))
 	{
-		EditorHotkeyWasPressed = false;
-		EditorHotKeyChecktime = Client()->LocalTime();
+		m_EditorHotkeyWasPressed = false;
+		m_EditorHotKeyChecktime = Client()->LocalTime();
 	}
 
 	Menu.HSplitBottom(5.0f, &Menu, 0); // little space
@@ -336,7 +327,7 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 	static CButtonContainer s_PlayButton;
 	if(DoButton_Menu(&s_PlayButton, Localize("", "Start menu"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "play_game" : 0, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || UI()->ConsumeHotkey(CUI::HOTKEY_ENTER) || CheckHotKey(KEY_P))
 	{
-		NewPage = g_Config.m_UiPage >= PAGE_INTERNET && g_Config.m_UiPage <= PAGE_FAVORITES ? g_Config.m_UiPage : PAGE_INTERNET;
+		NewPage = g_Config.m_UiPage >= PAGE_INTERNET && g_Config.m_UiPage <= PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : PAGE_INTERNET;
 	}
 
 	// render version
@@ -344,7 +335,18 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 	MainView.HSplitBottom(30.0f, 0, 0);
 	MainView.HSplitBottom(55.0f, 0, &VersionUpdate);
 
-	VersionUpdate.VSplitRight(50.0f, &CurVersion, 0);
+	static CButtonContainer s_ConsoleButton;
+	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+	if(DoButton_Menu(&s_ConsoleButton, FONT_ICON_TERMINAL, 0, &ConsoleButton, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.1f)))
+	{
+		GameClient()->m_GameConsole.Toggle(CGameConsole::CONSOLETYPE_LOCAL);
+	}
+	TextRender()->SetRenderFlags(0);
+	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
+	CUIRect VersionUpdate;
+	MainView.HSplitBottom(20.0f, nullptr, &VersionUpdate);
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);
 
 	CUIRect RandomText;
@@ -414,12 +416,12 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 	}
 	else if(State == IUpdater::FAIL)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Update failed! Check log..."));
+		str_copy(aBuf, Localize("Update failed! Check log…"));
 		TextRender()->TextColor(1.0f, 0.4f, 0.4f, 1.0f);
 	}
 	else if(State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("DDNet Client updated!"));
+		str_copy(aBuf, Localize("DDNet Client updated!"));
 		TextRender()->TextColor(1.0f, 0.4f, 0.4f, 1.0f);
 	}
 	UI()->DoLabel(&VersionUpdate, aBuf, 14.0f, TEXTALIGN_ML);
@@ -459,36 +461,35 @@ if(DoButton_Menu(&s_LocalServerButton, Localize(""), 0, &Button, g_Config.m_ClSh
 		ProgressBar.w = clamp((float)Updater()->GetCurrentPercent(), 10.0f, 100.0f);
 		ProgressBar.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f), IGraphics::CORNER_ALL, 5.0f);
 	}
-	/*
 #elif defined(CONF_INFORM_UPDATE)
 	if(str_comp(Client()->LatestVersion(), "0") != 0)
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), Localize("DDNet %s is out!"), Client()->LatestVersion());
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-		UI()->DoLabel(&VersionUpdate, aBuf, 14.0f, TEXTALIGN_MC);
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		TextRender()->TextColor(TextRender()->DefaultTextColor());
+		Ui()->DoLabel(&VersionUpdate, aBuf, 14.0f, TEXTALIGN_MC);
 	}
 */
 #endif
 
-	UI()->DoLabel(&CurVersion, GAME_RELEASE_VERSION, 14.0f, TEXTALIGN_MR);
-
 	if(NewPage != -1)
 	{
-		m_MenuPage = NewPage;
 		m_ShowStart = false;
+		SetMenuPage(NewPage);
 	}
 
 }
 
 void CMenus::KillServer()
 {
+#if !defined(CONF_PLATFORM_ANDROID)
 	if(m_ServerProcess.m_Process)
 	{
 		if(kill_process(m_ServerProcess.m_Process))
 		{
 			m_ServerProcess.m_Process = INVALID_PROCESS;
+			m_ForceRefreshLanPage = true;
 		}
 	}
+#endif
 }

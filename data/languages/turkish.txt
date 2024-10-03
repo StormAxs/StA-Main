@@ -11,6 +11,13 @@
 #   h-kaan          2023-08-23 15:57:36
 #   h-kaan          2023-08-30 01:52:04
 #   h-kaan          2023-09-21 21:04:35
+#   eghwand          2024-03-03 13:24:20
+#   Gokturk          2024-04-23 01:56:10
+#   Gokturk          2024-04-24 03:01:50
+#   Gokturk          2024-06-09 12:00:50
+#   Gokturk          2024-07-17 02:24:00
+#   Gokturk          2024-08-29 23:31:00
+#   Gokturk          2024-09-29 19:23:00
 ##### /authors #####
 
 ##### translated strings #####
@@ -32,9 +39,6 @@
 
 %s wins!
 == %s kazandı!
-
--Page %d-
-== -Sayfa %d-
 
 Abort
 == İptal
@@ -58,7 +62,7 @@ Automatically record demos
 == Demoları otomatik olarak kaydet
 
 Automatically take game over screenshot
-== Otomatik olarak oyun bitişinde ekran görüntüsü al
+== Oyun bittiğinde otomatik olarak ekran görüntüsü al
 
 Blue team
 == Mavi takım
@@ -87,8 +91,8 @@ Client
 Connecting to
 == Bağlanılıyor
 
-Connection Problems...
-== Bağlantı Hataları...
+Connection Problems…
+== Bağlantı Hataları…
 
 Console
 == Konsol
@@ -133,7 +137,7 @@ Dynamic Camera
 == Dinamik Kamera
 
 Emoticon
-== Yüz ifadesi
+== İfade
 
 Error
 == Hata
@@ -172,7 +176,7 @@ Game info
 == Oyun bilgisi
 
 Game over
-== Oyun sonu
+== Oyun bitti
 
 Game type
 == Oyun türü
@@ -241,7 +245,7 @@ Mute when not active
 == Aktif değilken sessizleştir
 
 Name
-== Takma ad
+== İsim
 
 Next weapon
 == Sonraki silah
@@ -253,7 +257,7 @@ No
 == Hayır
 
 No password
-== Şifresiz
+== Şifre yok
 
 No servers found
 == Sunucu bulunamadı
@@ -280,13 +284,10 @@ Pistol
 == Tabanca
 
 Play background music
-== Arkaplan müziğini çal
+== Arka plan müziğini oynat
 
 Player
 == Oyuncu
-
-Player options
-== Oyuncu ayarları
 
 Players
 == Oyuncular
@@ -310,7 +311,7 @@ Red team wins!
 == Kırmızı takım kazandı!
 
 Remote console
-== Uzak Konsol
+== Uzak konsol
 
 Remove
 == Çıkar
@@ -331,7 +332,7 @@ Score limit
 == Skor limiti
 
 Scoreboard
-== Skor tahtası
+== Skor tablosu
 
 Screenshot
 == Ekran görüntüsü
@@ -340,7 +341,7 @@ Server address:
 == Sunucu adresi:
 
 Server info
-== Hakkında
+== Sunucu bilgisi
 
 Server not full
 == Sunucu dolu değil
@@ -404,9 +405,6 @@ The audio device couldn't be initialised.
 
 The server is running a non-standard tuning on a pure game type.
 == Bu sunucu standart olmayan bir ayarı saf bir oyun türünde kullanıyor.
-
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== Editörde kaydedilmemiş bir harita var, kapatmadan önce kaydetmek isteyebilirsiniz.
 
 Time limit
 == Süre limiti
@@ -472,13 +470,13 @@ Miscellaneous
 == Çeşitli
 
 Internet
-== Internet
+== İnternet
 
 Max demos
 == Maksimum Demo Sayısı
 
 News
-== Haber
+== Haberler
 
 Join game
 == Oyuna katıl
@@ -506,12 +504,6 @@ Your skin
 
 Reset to defaults
 == Varsayılanlara getir
-
-Quit anyway?
-== Çıkmak istediğinize emin misiniz?
-
-Round
-== Raunt
 
 Lht.
 == Parlaklık
@@ -559,7 +551,7 @@ Reconnect in %d sec
 == %d saniye içinde yeniden bağlanılacak
 
 Render demo
-== Render demo
+== Demo'yu işle
 
 Replace video
 == Video üzerine yaz
@@ -574,22 +566,22 @@ Disconnect Dummy
 == Dummy Ayrıl
 
 Are you sure that you want to disconnect your dummy?
-== Dummy bağlantısını koparmak istediğinizden emin misiniz?
+== Dummy'nin bağlantısını koparmak istediğinizden emin misiniz?
 
 Welcome to DDNet
-== DDNet e hoşgeldiniz
+== DDNet'e hoş geldiniz
 
 DDraceNetwork is a cooperative online game where the goal is for you and your group of tees to reach the finish line of the map. As a newcomer you should start on Novice servers, which host the easiest maps. Consider the ping to choose a server close to you.
-== DDRaceNetwork bitiş çizgisine en kısa sürede ulaşmayı amaçlayan oyunculardan oluşan, çevrimiçi bir takım oyunudur. Çaylak olarak ilk önce kolay haritalardan yani Novice sunuculardan oynamaya başlamanı öneririz. Herhangi bir sunucu seçmeden önce sana yakın olan sunucuyu seçmek için ping'i dikkate al.
+== DDRaceNetwork bitiş çizgisine en kısa sürede ulaşmayı amaçlayan oyunculardan oluşan, çevrim içi bir takım oyunudur. Çaylak olarak ilk önce kolay haritalardan yani Novice sunuculardan oynamaya başlamanı öneririz. Size uygun sunucuyu seçerken pinginizi dikkate alın.
 
 Use k key to kill (restart), q to pause and watch other players. See settings for other key binds.
-== İntihar etmek (yeniden başlamak) için k tuşu, oyunu durdurup diğer oyuncuları izlemek için q tuşunu kullanabilirsin. Diğer kontrollere ayarlardan bakabilirsin.
+== Ölmek (yeniden başlamak) için "k" tuşu, oyunu durdurup diğer oyuncuları izlemek için "q" tuşunu kullanabilirsin. Diğer kontrollere ayarlardan bakabilirsin.
 
 It's recommended that you check the settings to adjust them to your liking before joining a server.
 == Sunuculara bağlanmadan önce ayarları kontrol edip kendine göre düzenlemeni öneriyoruz.
 
 Please enter your nickname below.
-== Lütfen takma adı girin.
+== Lütfen takma adınızı girin.
 
 Video name:
 == Video ismi:
@@ -607,7 +599,7 @@ Exclude
 == Hariç
 
 Player country:
-== Oyuncu ülkesi
+== Oyuncu ülkesi:
 
 Filter connecting players
 == Bağlanan oyuncuları sayma
@@ -630,7 +622,7 @@ DDNet %s is out!
 Downloading %s:
 == İndiriliyor %s:
 
-Update failed! Check log...
+Update failed! Check log…
 == Güncelleme sırasında hata oluştu!
 
 DDNet Client updated!
@@ -641,9 +633,6 @@ Update now
 
 Restart
 == Yeniden başlat
-
-Please use a different filename
-== 
 
 Remove chat
 == Sohbeti kaldır
@@ -675,9 +664,6 @@ Connecting dummy
 Connect Dummy
 == Dummy Katıl
 
-Reload
-== Yenile
-
 Deactivate
 == Devre dışı bırak
 
@@ -703,16 +689,13 @@ Refresh Rate
 == Yenileme Hızı
 
 Automatically take statboard screenshot
-== Otomatik olarak stat tahtası ekran görüntüsü al
+== Otomatik olarak skor tablosunun ekran görüntüsü al
 
 Automatically create statboard csv
-== Otomatik olarak stat tahtası csv oluştur
+== Otomatik olarak skor tablosunu csv olarak oluştur
 
 Max CSVs
-== Max CSVs
-
-Dummy settings
-== Dummy ayarları
+== Maksimum CSVs
 
 Vanilla skins only
 == Sadece vanilla skinleri
@@ -730,7 +713,7 @@ Pause
 == Durdur
 
 Kill
-== İntihar et
+== Öl
 
 Zoom in
 == Yakınlaştır
@@ -739,7 +722,7 @@ Zoom out
 == Uzaklaştır
 
 Default zoom
-== Varsayılan zoom
+== Varsayılan yakınlaştırma
 
 Show others
 == Diğerlerini göster
@@ -757,16 +740,16 @@ Toggle ghost
 == Hayaleti göster
 
 Dummy copy
-== Dummy copy
+== Dummy kopyala
 
 Hammerfly dummy
-== Hammerfly dummy
+== Çekiç uçuşu dummy
 
 Converse
 == Konuşma
 
 Statboard
-== Stat tahtası
+== Skor Tablosu
 
 Lock team
 == Takımı kilitle
@@ -817,16 +800,13 @@ DDNet
 == DDNet
 
 DDNet Client needs to be restarted to complete update!
-== Güncellemenin tamamlanabilmesi için istemcinin yeniden başlatılması gerek!
-
-Use DDRace Scoreboard
-== DDRace Skor Tahtası kulan
+== Güncellemenin tamamlanabilmesi için oyunun yeniden başlatılması lazım!
 
 Show score
 == Skoru göster
 
 Show names in chat in team colors
-== Sohbetde isimleri takım rengiyle göster
+== Sohbette isimleri takım rengine göre ayır
 
 Show kill messages
 == Ölüm mesajlarını göster
@@ -862,7 +842,7 @@ Save the best demo of each race
 == Her yarış için en iyi demoyu kaydet
 
 Default length
-== Uzunluk
+== Varsayılan uzunluk
 
 Enable replays
 == Tekrar oynatmaları etkinleştir
@@ -886,7 +866,7 @@ Show text entities
 == Yazı yapılarını göster
 
 Show others (own team only)
-== Diğerlerini göster (sadece kendi takımın)
+== Diğerlerini göster (sadece kendi takımını)
 
 Show quads
 == Dörtgen yapıları göster
@@ -915,8 +895,8 @@ Show tiles layers from BG map
 DDNet %s is available:
 == DDNet %s yayınlandı:
 
-Updating...
-== Güncelleniyor...
+Updating…
+== Güncelleniyor…
 
 No updates available
 == Güncelleme mevcut değil
@@ -934,7 +914,7 @@ Follow
 == Takip et
 
 Frags
-== Frags
+== Parçalanma
 
 Deaths
 == Ölümler
@@ -958,7 +938,7 @@ Best
 == En iyi
 
 Grabs
-== Grabs
+== Yakalama
 
 1 new mention
 == 1 yeni bildirim
@@ -1014,17 +994,14 @@ Unknown error. Try to change gfx_backend to OpenGL or Vulkan in settings_ddnet.c
 
 [Graphics error]
 Could not initialize the given graphics backend, reverting to the default backend now.
-== Verilen grafik renderer başlatılamadı, varsayılan ayarlara dönülüyor.
+== Verilen grafik işleyicisi başlatılamadı, varsayılan ayarlara dönülüyor.
 
 [Graphics error]
 Could not initialize the given graphics backend, this is probably because you didn't install the driver of the integrated graphics card.
-== Verilen grafik renderer başlatılamadı, muhtemelen dahili ekran kartının sürücülerini yüklemediğinizden kaynaklanıyor.
+== Verilen grafik işleyicisi başlatılamadı, muhtemelen dahili ekran kartının sürücülerini yüklemediğinizden kaynaklanıyor.
 
 Could not save downloaded map. Try manually deleting this file: %s
 == İndirilen map kaydedilemedi. Bu dosyayı manuel olarak silmeyi deneyin: %s
-
-Saving ddnet-settings.cfg failed
-== ddnet-settings.cfg dosyası kaydedilemedi
 
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
 == %s dokusunun genişliği %d'ye veya yüksekliği %d'ye bölünmüyor, bu görsel hatalara neden olabilir.
@@ -1036,7 +1013,7 @@ Preparing demo playback
 == Demo oynatmaya hazırlanıyor
 
 Connected
-== Bağlandı
+== Bağlanıldı
 
 Loading map file from storage
 == Harita dosyası yükleniyor
@@ -1060,10 +1037,10 @@ Warning
 == Uyarı
 
 Quitting. Please wait…
-== Çıkılıyor. Lütfen bekleyin...
+== Çıkılıyor. Lütfen bekleyin…
 
 Restarting. Please wait…
-== Yeniden başlatılıyor. Lütfen bekleyin...
+== Yeniden başlatılıyor. Lütfen bekleyin…
 
 Debug mode enabled. Press Ctrl+Shift+D to disable debug mode.
 == Hata ayıklama modu etkinleştirildi. Devre dışı bırakmak için Ctrl+Shift+D tuşlarına basın.
@@ -1078,7 +1055,7 @@ Angle:
 == Açı:
 
 Multi-View
-== Çoklu İzle
+== Çoklu İzleme
 
 Team %d
 == Takım %d
@@ -1086,8 +1063,8 @@ Team %d
 Uploading map data to GPU
 == Harita verisi GPU'ya yükleniyor
 
-Trying to determine UDP connectivity...
-== UDP bağlantısı belirlenmeye çalışılıyor...
+Trying to determine UDP connectivity…
+== UDP bağlantısı belirlenmeye çalışılıyor…
 
 UDP seems to be filtered.
 == UDP filtrelenmiş görünüyor.
@@ -1195,14 +1172,14 @@ No server selected
 == Sunucu seçilmedi
 
 Online players (%d)
-== Çevrimiçi oyuncular (%d)
+== Çevrim içi oyuncular (%d)
 
 Online clanmates (%d)
-== Çevrimiçi klan arkadaşları (%d)
+== Çevrim içi klan arkadaşları (%d)
 
 [friends (server browser)]
 Offline (%d)
-== Çevrimdışı (%d)
+== Çevrim dışı (%d)
 
 Click to select server. Double click to join your friend.
 == Sunucu seçmek için tıklayın. Arkadaşınıza katılmak için çift tıklayın.
@@ -1342,9 +1319,6 @@ Open the directory to add custom themes
 Loading skin files
 == Skin dosyaları yükleniyor
 
-Toggle to edit your dummy settings
-== Dummy ayarlarını düzenle
-
 Download skins
 == Skinleri indir
 
@@ -1444,7 +1418,7 @@ Allows maps to render with more detail
 == Haritaların daha detaylı işlenmesine izin ver
 
 Renderer
-== Renderer
+== İşleyici
 
 default
 == varsayılan
@@ -1465,7 +1439,7 @@ Chat sound volume
 == Sohbet ses seviyesi
 
 Background music volume
-== Arkaplan müziği ses seviyesi
+== Arka plan müziği ses seviyesi
 
 Appearance
 == Görünüm
@@ -1479,20 +1453,14 @@ Name Plate
 Hook Collisions
 == Kanca kesişmeleri
 
-Kill Messages
-== Ölüm mesajları
-
 Show health, shields and ammo
 == Can, kalkan ve cephaneyi göster 
 
 DDRace HUD
-== DDRace HUD
-
-Show client IDs in scoreboard
-== Skor tahtasında istemci ID'lerini göster
+== DDRace arayüzü
 
 Show DDRace HUD
-== DDRace HUD göster
+== DDRace arayüzünü göster
 
 Show jumps indicator
 == Kaç zıplama kaldığını göster
@@ -1519,10 +1487,7 @@ Use old chat style
 == Eski sohbet stilini kullan
 
 Preview
-== Önizleme
-
-Show hook strength indicator
-== Kanca gücü göstergesini göster
+== Ön izleme
 
 Show local player's key presses
 == Yerel oyuncunun tuş basışlarını göster
@@ -1561,25 +1526,25 @@ Weapons
 == Silahlar
 
 Rifle Laser Outline Color
-== Tüfek Lazeri Dış Rengi
+== Tüfeğin Lazer Dış Rengi
 
 Rifle Laser Inner Color
-== Tüfek Lazeri İç Rengi
+== Tüfeğin Lazer İç Rengi
 
 Shotgun Laser Outline Color
-== Pompalı Tüfek Lazeri Dış Rengi
+== Pompalı Tüfeğin Lazer Dış Rengi
 
 Shotgun Laser Inner Color
-== Pompalı Tüfek Lazeri İç Rengi
+== Pompalı Tüfeğin Lazer İç Rengi
 
 Entities
 == Yapılar
 
 Door Laser Outline Color
-== Kapı Lazeri Dış Rengi
+== Kapının Lazer Dış Rengi
 
 Door Laser Inner Color
-== Kapı Lazeri İç Rengi
+== Kapının Lazer İç Rengi
 
 Freeze Laser Outline Color
 == Freeze Lazeri Dış Rengi
@@ -1588,7 +1553,7 @@ Freeze Laser Inner Color
 == Freeze Lazeri İç Rengi
 
 Set all to Rifle
-== Hepsini tüfeğe ayarla
+== Hepsini tüfeğe göre ayarla
 
 When you cross the start line, show a ghost tee replicating the movements of your best time
 == Başlangıç çizgisini geçtiğinizde en iyi zamanınızın hareketlerini kopyalayan bir hayalet tee göster
@@ -1600,16 +1565,16 @@ Adjust the opacity of entities belonging to other teams, such as tees and namepl
 == Teeler ve isim etiketleri gibi diğer takımlara ait varlıkların opaklığını ayarlayın
 
 Quads are used for background decoration
-== Dörtgen yapılar arkaplan dekorasyonu için kullanılır
+== Dörtgen yapılar arka plan dekorasyonu için kullanılır
 
 Tries to predict other entities to give a feel of low latency
 == Düşük gecikme hissi vermek için diğer yapıları tahmin etmeye çalışır
 
 Background
-== Arkaplan
+== Arka plan
 
 Use current map as background
-== Mevcut haritayı arkaplan olarak kullan
+== Mevcut haritayı arka plan olarak kullan
 
 Run on join
 == Katılınca çalıştır
@@ -1651,7 +1616,7 @@ Can't find a Tutorial server
 == Öğretici sunucu bulunamıyor
 
 Website
-== Website
+== Web sitesi
 
 Settings
 == Ayarlar
@@ -1663,7 +1628,7 @@ Run server
 == Sunucu aç
 
 Server executable not found, can't run server
-== Yürütülebilir sunucu bulunamadı, sunucu başlatılamıyor
+== Çalıştırılabilir sunucu bulunamadı, sunucu başlatılamıyor
 
 Editor
 == Editör
@@ -1705,56 +1670,285 @@ Render cut to video
 == Kesiti videoya dönüştür
 
 Error playing demo
-== 
+== Demo oynatırken hata oluştu
+
+Failed saving the replay!
+== Tekrar kaydedilemedi!
+
+Saving settings to '%s' failed
+== Ayarlar '%s' dosyasına kaydedilemedi
+
+Error saving settings
+== Ayarları kaydederken hata oluştu
+
+Searching
+== Aranıyor
+
+Enter Username
+== Kullanıcı adı girin
+
+Enter Password
+== Şifre girin
+
+NOT CONNECTED
+== BAĞLI DEĞİL
+
+Match %d of %d
+== %d'den %d'yi eşleştir
+
+No results
+== Sonuç yok
+
+Lines %d - %d (%s)
+== Satır %d - %d (%s)
+
+Locked
+== Sabit
+
+Following
+== Takipte
+
+Loading commands…
+== Komutlar yükleniyor…
 
 Some map images could not be loaded. Check the local console for details.
-== 
+== Bazı görseller yüklenemedi. Detaylar için konsolu kontrol edin.
 
 Some map sounds could not be loaded. Check the local console for details.
-== 
+== Bazı sesler yüklenemedi. Detaylar için konsolu kontrol edin.
 
 Loading menu themes
-== 
+== Temalar yükleniyor
+
+Press a key…
+== Bir tuşa basın…
+
+Main menu
+== Ana menü
 
 Render complete
-== 
+== Video işleme tamamlandı
+
+Are you sure that you want to restart?
+== Yeniden başlatmak istediğinizden eminmisiniz?
+
+There's an unsaved map in the editor, you might want to save it.
+== Editörde kaydedilmemiş bir harita var, kaydetmek isteyebilirsiniz
+
+Continue anyway?
+== Yine de devam et
 
 Videos directory
-== 
+== Video dizini
 
 Video was saved to '%s'
-== 
+== Video '%s' yoluna kaydedildi
+
+Communities
+== Topluluklar
+
+Server filter
+== Sunucu filtresi
+
+Friends
+== Arkadaşlar
+
+Please use a different filename
+== Farklı bir dosya adı kullanın
 
 No demo selected
-== 
+== Demo seçilmedi
 
 Created
-== 
+== Oluşturuldu
+
+Loading…
+== Yükleniyor…
+
+Ghosts directory
+== Hayalet dizini
+
+Activate all
+== Tümünü etkinleştir
+
+Deactivate all
+== Tümünü devre dışı bırak
+
+Info Messages
+== Bilgi Mesajları
+
+Show local time always
+== Yerel saati her zaman göster
+
+Chat font size
+== Yazı tipi büyüklüğü
+
+Chat width
+== Sohbet genişliği
+
+Authed name color in scoreboard
+== Skor tablosunda yetkili isim rengi
+
+Same clan color in scoreboard
+== Skor tablosunda aynı klan rengi
+
+Show finish messages
+== Bitirme mesajlarını göster
+
+Enable ghost
+== Hayaleti etkinleştir
+
+Only save improvements
+== Sadece iyileştirmeleri kaydet
+
+Regular background color
+== Normal arka plan rengi
+
+Entities background color
+== Yapı arka plan rengi
+
+Loading demo file from storage
+== Cihazdaki demo dosyası yükleniyor
+
+No login required
+== Giriş yapılmasına gerek yok
 
 Netversion
-== 
+==  Netversion
+
+Player info change cooldown
+== Oyuncu bilgisini değiştirmek için bekleme süresi
+
+Always show chat
+== Sohbeti her zaman göster
+
+Show friend mark (♥) in name plates
+== İsim etiketlerinde arkadaşlık simgesini (♥) göster
+
+Show hook strength icon indicator
+== Kancanın güç göstergesini göster
+
+Show hook strength number indicator
+== Kancanın güç numarası göstergesini göster
+
+Show own player's hook collision line
+== Karakterinin kanca çarpışma çizgini göster
+
+Always show own player's hook collision line
+== Karakterinin her zaman kanca çarpışma çizgini göster
+
+Always show other players' hook collision lines
+== Diğerlerinin kanca çarpışma çizgini göster
 
 [Demo details]
 map not included
-== 
+== harita dahil edilmemiş
 
-Ghosts directory
-== 
+%d/%d KiB (%.1f KiB/s)
+== %d/%d KiB (%.1f KiB/s)
 
-Activate all
-== 
+Tee
+== Tee
 
-Deactivate all
-== 
+Show only chat messages from team members
+== Sadece takım üyelerinin mesajlarını göster
 
-Enable ghost
-== 
+[Spectating]
+Following %s
+== İzleniyor %s
 
-Only save improvements
-== 
+Example of usage
+== Kullanım örneği
 
-Regular background color
-== 
+Round %d/%d
+== Yuvarlak %d/%d
 
-Entities background color
-== 
+[Spectators]
+%d others…
+== %d diğerleri…
+
+[Team and size]
+%d\n(%d/%d)
+== %d\n(%d/%d)
+
+Team %d (%d/%d)
+== Takım %d (%d/%d)
+
+https://wiki.ddnet.org/wiki/Mapping
+== https://wiki.ddnet.org/wiki/Mapping/tr
+
+Could not resolve connect address '%s'. See local console for details.
+== '%s' Bağlantı adresi çözümlenemedi. Detaylar için yerel konsola bakın
+
+Connect address error
+== Bağlantı adresi hatası
+
+Could not connect dummy
+== Dummy bağlanamadı
+
+Dummy is not allowed on this server
+== Bu sunucuda dummy izin verilmiyor
+
+Please wait…
+== Lütfen bekleyin…
+
+Show client IDs (scoreboard, chat, spectator)
+== İstemci ID'sini göster (skor tablosu, sohbet, izleyici)
+
+Are you sure that you want to delete '%s'?
+== '%s' bunu silmek istediğine emin misin?
+
+Delete skin
+== Skini sil
+
+Basic
+== Basit
+
+Custom
+== Özel
+
+Unable to delete skin
+== Skin silinemiyor
+
+Save skin
+== Skini kaydet
+
+Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
+== Skini kaydetmek istiyor musun? Bu isimde başka bir skin varsa, bu skin varolan skin yerine kaydedilecek.
+
+Unable to save the skin
+== Skin kaydedilemiyor
+
+Unable to save the skin with a reserved name
+== Skin kaydedilemiyor, bu isimde zaten bir skin var.
+
+No local servers found (ports %d-%d)
+== Yerel sunucu bulunamadı (bağlantı noktası %d-%d)
+
+[Hertz]
+Hz
+== Hz
+
+[skins]
+Body
+== Gövde
+
+[skins]
+Marking
+== İşaretleme
+
+[skins]
+Decoration
+== Dekorasyon
+
+[skins]
+Hands
+== El
+
+[skins]
+Feet
+== Ayak
+
+[skins]
+Eyes
+== Göz

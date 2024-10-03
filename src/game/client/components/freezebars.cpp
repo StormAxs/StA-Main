@@ -2,16 +2,16 @@
 
 #include "freezebars.h"
 
-void CFreezeBars::RenderFreezeBar(const int ClientID)
+void CFreezeBars::RenderFreezeBar(const int ClientId)
 {
 	const float FreezeBarWidth = 64.0f;
 	const float FreezeBarHalfWidth = 32.0f;
 	const float FreezeBarHight = 16.0f;
 
 	// pCharacter contains the predicted character for local players or the last snap for players who are spectated
-	CCharacterCore *pCharacter = &m_pClient->m_aClients[ClientID].m_Predicted;
+	CCharacterCore *pCharacter = &m_pClient->m_aClients[ClientId].m_Predicted;
 
-	if(pCharacter->m_FreezeEnd <= 0 || pCharacter->m_FreezeStart == 0 || pCharacter->m_FreezeEnd <= pCharacter->m_FreezeStart || !m_pClient->m_Snap.m_aCharacters[ClientID].m_HasExtendedDisplayInfo || (pCharacter->m_IsInFreeze && g_Config.m_ClFreezeBarsAlphaInsideFreeze == 0))
+	if(pCharacter->m_FreezeEnd <= 0 || pCharacter->m_FreezeStart == 0 || pCharacter->m_FreezeEnd <= pCharacter->m_FreezeStart || !m_pClient->m_Snap.m_aCharacters[ClientId].m_HasExtendedDisplayInfo || (pCharacter->m_IsInFreeze && g_Config.m_ClFreezeBarsAlphaInsideFreeze == 0))
 	{
 		return;
 	}
@@ -23,11 +23,11 @@ void CFreezeBars::RenderFreezeBar(const int ClientID)
 		return;
 	}
 
-	vec2 Position = m_pClient->m_aClients[ClientID].m_RenderPos;
+	vec2 Position = m_pClient->m_aClients[ClientId].m_RenderPos;
 	Position.x -= FreezeBarHalfWidth;
 	Position.y += 32;
 
-	float Alpha = m_pClient->IsOtherTeam(ClientID) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
+	float Alpha = m_pClient->IsOtherTeam(ClientId) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
 	if(pCharacter->m_IsInFreeze)
 	{
 		Alpha *= g_Config.m_ClFreezeBarsAlphaInsideFreeze / 100.0f;
@@ -36,7 +36,7 @@ void CFreezeBars::RenderFreezeBar(const int ClientID)
 	RenderFreezeBarPos(Position.x, Position.y, FreezeBarWidth, FreezeBarHight, FreezeProgress, Alpha);
 }
 
-void CFreezeBars::RenderFreezeBarPos(float x, const float y, const float width, const float height, float Progress, const float Alpha)
+void CFreezeBars::RenderFreezeBarPos(float x, const float y, const float Width, const float Height, float Progress, const float Alpha)
 {
 	Progress = clamp(Progress, 0.0f, 1.0f);
 
@@ -45,9 +45,9 @@ void CFreezeBars::RenderFreezeBarPos(float x, const float y, const float width, 
 	const float RestPct = 0.5f;
 	const float ProgPct = 0.5f;
 
-	const float EndWidth = height; // to keep the correct scale - the height of the sprite is as long as the width
-	const float BarHeight = height;
-	const float WholeBarWidth = width;
+	const float EndWidth = Height; // to keep the correct scale - the height of the sprite is as long as the width
+	const float BarHeight = Height;
+	const float WholeBarWidth = Width;
 	const float MiddleBarWidth = WholeBarWidth - (EndWidth * 2.0f);
 	const float EndProgressWidth = EndWidth * ProgPct;
 	const float EndRestWidth = EndWidth * RestPct;
@@ -187,15 +187,18 @@ void CFreezeBars::RenderFreezeBarPos(float x, const float y, const float width, 
 	Graphics()->WrapNormal();
 }
 
-inline bool CFreezeBars::IsPlayerInfoAvailable(int ClientID) const
+inline bool CFreezeBars::IsPlayerInfoAvailable(int ClientId) const
 {
-	const void *pPrevInfo = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_PLAYERINFO, ClientID);
-	const void *pInfo = Client()->SnapFindItem(IClient::SNAP_CURRENT, NETOBJTYPE_PLAYERINFO, ClientID);
+	const void *pPrevInfo = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_PLAYERINFO, ClientId);
+	const void *pInfo = Client()->SnapFindItem(IClient::SNAP_CURRENT, NETOBJTYPE_PLAYERINFO, ClientId);
 	return pPrevInfo && pInfo;
 }
 
 void CFreezeBars::OnRender()
 {
+	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+		return;
+
 	if(!g_Config.m_ClShowFreezeBars)
 	{
 		return;
@@ -213,27 +216,27 @@ void CFreezeBars::OnRender()
 	ScreenY0 -= BorderBuffer;
 	ScreenY1 += BorderBuffer;
 
-	int LocalClientID = m_pClient->m_Snap.m_LocalClientID;
+	int LocalClientId = m_pClient->m_Snap.m_LocalClientId;
 
 	// render everyone else's freeze bar, then our own
-	for(int ClientID = 0; ClientID < MAX_CLIENTS; ClientID++)
+	for(int ClientId = 0; ClientId < MAX_CLIENTS; ClientId++)
 	{
-		if(ClientID == LocalClientID || !m_pClient->m_Snap.m_aCharacters[ClientID].m_Active || !IsPlayerInfoAvailable(ClientID))
+		if(ClientId == LocalClientId || !m_pClient->m_Snap.m_aCharacters[ClientId].m_Active || !IsPlayerInfoAvailable(ClientId))
 		{
 			continue;
 		}
 
 		//don't render if the tee is offscreen
-		vec2 *pRenderPos = &m_pClient->m_aClients[ClientID].m_RenderPos;
+		vec2 *pRenderPos = &m_pClient->m_aClients[ClientId].m_RenderPos;
 		if(pRenderPos->x < ScreenX0 || pRenderPos->x > ScreenX1 || pRenderPos->y < ScreenY0 || pRenderPos->y > ScreenY1)
 		{
 			continue;
 		}
 
-		RenderFreezeBar(ClientID);
+		RenderFreezeBar(ClientId);
 	}
-	if(LocalClientID != -1 && m_pClient->m_Snap.m_aCharacters[LocalClientID].m_Active && IsPlayerInfoAvailable(LocalClientID))
+	if(LocalClientId != -1 && m_pClient->m_Snap.m_aCharacters[LocalClientId].m_Active && IsPlayerInfoAvailable(LocalClientId))
 	{
-		RenderFreezeBar(LocalClientID);
+		RenderFreezeBar(LocalClientId);
 	}
 }

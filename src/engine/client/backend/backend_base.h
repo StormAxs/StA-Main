@@ -84,9 +84,7 @@ protected:
 	SGfxErrorContainer m_Error;
 	SGfxWarningContainer m_Warning;
 
-	static void *Resize(const unsigned char *pData, int Width, int Height, int NewWidth, int NewHeight, int BPP);
-
-	static bool Texture2DTo3D(void *pImageBuffer, int ImageWidth, int ImageHeight, size_t PixelSize, int SplitCountWidth, int SplitCountHeight, void *pTarget3DImageData, int &Target3DImageWidth, int &Target3DImageHeight);
+	static bool Texture2DTo3D(uint8_t *pImageBuffer, int ImageWidth, int ImageHeight, size_t PixelSize, int SplitCountWidth, int SplitCountHeight, uint8_t *pTarget3DImageData, int &Target3DImageWidth, int &Target3DImageHeight);
 
 	virtual bool GetPresentedImageData(uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData) = 0;
 
@@ -123,7 +121,7 @@ public:
 		char *m_pVersionString;
 		char *m_pRendererString;
 
-		TTWGraphicsGPUList *m_pGPUList;
+		TTwGraphicsGpuList *m_pGpuList;
 	};
 
 	struct SCommand_Init : public CCommandBuffer::SCommand
@@ -141,7 +139,7 @@ public:
 		std::atomic<uint64_t> *m_pStreamMemoryUsage;
 		std::atomic<uint64_t> *m_pStagingMemoryUsage;
 
-		TTWGraphicsGPUList *m_pGPUList;
+		TTwGraphicsGpuList *m_pGpuList;
 
 		TGLBackendReadPresentedImageData *m_pReadPresentedImageDataFunc;
 

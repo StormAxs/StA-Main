@@ -216,7 +216,7 @@ void CGhost::CheckStartLocal(bool Predicted)
 
 		vec2 PrevPos = m_pClient->m_PredictedPrevChar.m_Pos;
 		vec2 Pos = m_pClient->m_PredictedChar.m_Pos;
-		if(((!m_Rendering && RenderTick == -1) || m_AllowRestart) && CRaceHelper::IsStart(m_pClient, PrevPos, Pos))
+		if(((!m_Rendering && RenderTick == -1) || m_AllowRestart) && GameClient()->RaceHelper()->IsStart(PrevPos, Pos))
 		{
 			if(m_Rendering && !m_RenderingStartedByServer) // race restarted: stop rendering
 				StopRender();
@@ -240,7 +240,7 @@ void CGhost::CheckStartLocal(bool Predicted)
 			int TickDiff = CurTick - PrevTick;
 			for(int i = 0; i < TickDiff; i++)
 			{
-				if(CRaceHelper::IsStart(m_pClient, mix(PrevPos, Pos, (float)i / TickDiff), mix(PrevPos, Pos, (float)(i + 1) / TickDiff)))
+				if(GameClient()->RaceHelper()->IsStart(mix(PrevPos, Pos, (float)i / TickDiff), mix(PrevPos, Pos, (float)(i + 1) / TickDiff)))
 				{
 					RecordTick = PrevTick + i + 1;
 					if(!m_AllowRestart)
@@ -287,7 +287,7 @@ void CGhost::OnNewSnapshot()
 			CheckStart();
 
 		if(m_Recording)
-			AddInfos(m_pClient->m_Snap.m_pLocalCharacter, (m_pClient->m_Snap.m_LocalClientID != -1 && m_pClient->m_Snap.m_aCharacters[m_pClient->m_Snap.m_LocalClientID].m_HasExtendedData) ? &m_pClient->m_Snap.m_aCharacters[m_pClient->m_Snap.m_LocalClientID].m_ExtendedData : nullptr);
+			AddInfos(m_pClient->m_Snap.m_pLocalCharacter, (m_pClient->m_Snap.m_LocalClientId != -1 && m_pClient->m_Snap.m_aCharacters[m_pClient->m_Snap.m_LocalClientId].m_HasExtendedData) ? &m_pClient->m_Snap.m_aCharacters[m_pClient->m_Snap.m_LocalClientId].m_ExtendedData : nullptr);
 	}
 
 	// Record m_LastRaceTick for g_Config.m_ClConfirmDisconnect/QuitTime anyway
@@ -311,6 +311,9 @@ void CGhost::OnNewPredictedSnapshot()
 
 void CGhost::OnRender()
 {
+	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+		return;
+
 	// Play the ghost
 	if(!m_Rendering || !g_Config.m_ClRaceShowGhost)
 		return;
@@ -363,10 +366,7 @@ void CGhost::OnRender()
 					IsTeamplay = (m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS) != 0;
 
 				GhostNinjaRenderInfo = Ghost.m_RenderInfo;
-				GhostNinjaRenderInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-				GhostNinjaRenderInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-				GhostNinjaRenderInfo.m_BloodColor = pSkin->m_BloodColor;
-				GhostNinjaRenderInfo.m_SkinMetrics = pSkin->m_Metrics;
+				GhostNinjaRenderInfo.Apply(pSkin);
 				GhostNinjaRenderInfo.m_CustomColoredSkin = IsTeamplay;
 				if(!IsTeamplay)
 				{
@@ -385,20 +385,16 @@ void CGhost::OnRender()
 
 void CGhost::InitRenderInfos(CGhostItem *pGhost)
 {
-	char aSkinName[64];
-	IntsToStr(&pGhost->m_Skin.m_Skin0, 6, aSkinName);
+	char aSkinName[24];
+	IntsToStr(&pGhost->m_Skin.m_Skin0, 6, aSkinName, std::size(aSkinName));
 	CTeeRenderInfo *pRenderInfo = &pGhost->m_RenderInfo;
 
-	const CSkin *pSkin = m_pClient->m_Skins.Find(aSkinName);
-	pRenderInfo->m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-	pRenderInfo->m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-	pRenderInfo->m_BloodColor = pSkin->m_BloodColor;
-	pRenderInfo->m_SkinMetrics = pSkin->m_Metrics;
+	pRenderInfo->Apply(m_pClient->m_Skins.Find(aSkinName));
 	pRenderInfo->m_CustomColoredSkin = pGhost->m_Skin.m_UseCustomColor;
 	if(pGhost->m_Skin.m_UseCustomColor)
 	{
-		pRenderInfo->m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(pGhost->m_Skin.m_ColorBody).UnclampLighting());
-		pRenderInfo->m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(pGhost->m_Skin.m_ColorFeet).UnclampLighting());
+		pRenderInfo->m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(pGhost->m_Skin.m_ColorBody).UnclampLighting(ColorHSLA::DARKEST_LGT));
+		pRenderInfo->m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(pGhost->m_Skin.m_ColorFeet).UnclampLighting(ColorHSLA::DARKEST_LGT));
 	}
 	else
 	{
@@ -415,7 +411,7 @@ void CGhost::StartRecord(int Tick)
 	m_CurGhost.Reset();
 	m_CurGhost.m_StartTick = Tick;
 
-	const CGameClient::CClientData *pData = &m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID];
+	const CGameClient::CClientData *pData = &m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientId];
 	str_copy(m_CurGhost.m_aPlayer, Client()->PlayerName());
 	GetGhostSkin(&m_CurGhost.m_Skin, pData->m_aSkinName, pData->m_UseCustomColor, pData->m_ColorBody, pData->m_ColorFeet);
 	InitRenderInfos(&m_CurGhost);
@@ -620,7 +616,7 @@ void CGhost::OnMessage(int MsgType, void *pRawMsg)
 	if(MsgType == NETMSGTYPE_SV_KILLMSG)
 	{
 		CNetMsg_Sv_KillMsg *pMsg = (CNetMsg_Sv_KillMsg *)pRawMsg;
-		if(pMsg->m_Victim == m_pClient->m_Snap.m_LocalClientID)
+		if(pMsg->m_Victim == m_pClient->m_Snap.m_LocalClientId)
 		{
 			if(m_Recording)
 				StopRecord();
@@ -633,7 +629,7 @@ void CGhost::OnMessage(int MsgType, void *pRawMsg)
 		CNetMsg_Sv_KillMsgTeam *pMsg = (CNetMsg_Sv_KillMsgTeam *)pRawMsg;
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if(m_pClient->m_Teams.Team(i) == pMsg->m_Team && i == m_pClient->m_Snap.m_LocalClientID)
+			if(m_pClient->m_Teams.Team(i) == pMsg->m_Team && i == m_pClient->m_Snap.m_LocalClientId)
 			{
 				if(m_Recording)
 					StopRecord();
@@ -645,11 +641,11 @@ void CGhost::OnMessage(int MsgType, void *pRawMsg)
 	else if(MsgType == NETMSGTYPE_SV_CHAT)
 	{
 		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
-		if(pMsg->m_ClientID == -1 && m_Recording)
+		if(pMsg->m_ClientId == -1 && m_Recording)
 		{
 			char aName[MAX_NAME_LENGTH];
 			int Time = CRaceHelper::TimeFromFinishMessage(pMsg->m_pMessage, aName, sizeof(aName));
-			if(Time > 0 && m_pClient->m_Snap.m_LocalClientID >= 0 && str_comp(aName, m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_aName) == 0)
+			if(Time > 0 && m_pClient->m_Snap.m_LocalClientId >= 0 && str_comp(aName, m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientId].m_aName) == 0)
 			{
 				StopRecord(Time);
 				StopRender();
@@ -684,21 +680,17 @@ int CGhost::GetLastRaceTick() const
 	return m_LastRaceTick;
 }
 
-void CGhost::RefindSkins()
+void CGhost::OnRefreshSkins()
 {
 	const auto &&RefindSkin = [&](auto &Ghost) {
 		if(Ghost.Empty())
 			return;
-		char aSkinName[64];
-		IntsToStr(&Ghost.m_Skin.m_Skin0, 6, aSkinName);
+		char aSkinName[24];
+		IntsToStr(&Ghost.m_Skin.m_Skin0, 6, aSkinName, std::size(aSkinName));
 		CTeeRenderInfo *pRenderInfo = &Ghost.m_RenderInfo;
 		if(aSkinName[0] != '\0')
 		{
-			const CSkin *pSkin = m_pClient->m_Skins.Find(aSkinName);
-			pRenderInfo->m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-			pRenderInfo->m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-			pRenderInfo->m_BloodColor = pSkin->m_BloodColor;
-			pRenderInfo->m_SkinMetrics = pSkin->m_Metrics;
+			pRenderInfo->Apply(m_pClient->m_Skins.Find(aSkinName));
 		}
 		else
 		{

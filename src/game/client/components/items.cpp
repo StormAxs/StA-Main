@@ -23,7 +23,7 @@
 
 #include "items.h"
 
-void CItems::RenderProjectile(const CProjectileData *pCurrent, int ItemID)
+void CItems::RenderProjectile(const CProjectileData *pCurrent, int ItemId)
 {
 	int CurWeapon = clamp(pCurrent->m_Type, 0, NUM_WEAPONS - 1);
 
@@ -50,7 +50,7 @@ void CItems::RenderProjectile(const CProjectileData *pCurrent, int ItemID)
 	bool LocalPlayerInGame = false;
 
 	if(m_pClient->m_Snap.m_pLocalInfo)
-		LocalPlayerInGame = m_pClient->m_aClients[m_pClient->m_Snap.m_pLocalInfo->m_ClientID].m_Team != TEAM_SPECTATORS;
+		LocalPlayerInGame = m_pClient->m_aClients[m_pClient->m_Snap.m_pLocalInfo->m_ClientId].m_Team != TEAM_SPECTATORS;
 
 	static float s_LastGameTickTime = Client()->GameTickTime(g_Config.m_ClDummy);
 	if(m_pClient->m_Snap.m_pGameInfoObj && !(m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
@@ -117,7 +117,7 @@ void CItems::RenderProjectile(const CProjectileData *pCurrent, int ItemID)
 				s_Time += LocalTime() - s_LastLocalTime;
 		}
 
-		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
+		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemId);
 		s_LastLocalTime = LocalTime();
 	}
 	else
@@ -383,7 +383,7 @@ void CItems::OnRender()
 				continue;
 
 			CProjectileData Data = pProj->GetData();
-			RenderProjectile(&Data, pProj->GetID());
+			RenderProjectile(&Data, pProj->GetId());
 		}
 		for(CEntity *pEnt = GameClient()->m_PredictedWorld.FindFirst(CGameWorld::ENTTYPE_LASER); pEnt; pEnt = pEnt->NextEntity())
 		{
@@ -400,7 +400,7 @@ void CItems::OnRender()
 
 			if(pPickup->InDDNetTile())
 			{
-				if(auto *pPrev = (CPickup *)GameClient()->m_PrevPredictedWorld.GetEntity(pPickup->GetID(), CGameWorld::ENTTYPE_PICKUP))
+				if(auto *pPrev = (CPickup *)GameClient()->m_PrevPredictedWorld.GetEntity(pPickup->GetId(), CGameWorld::ENTTYPE_PICKUP))
 				{
 					CNetObj_Pickup Data, Prev;
 					pPickup->FillInfo(&Data);
@@ -414,7 +414,7 @@ void CItems::OnRender()
 	for(const CSnapEntities &Ent : m_pClient->SnapEntities())
 	{
 		const IClient::CSnapItem Item = Ent.m_Item;
-		const void *pData = Ent.m_pData;
+		const void *pData = Item.m_pData;
 		const CNetObj_EntityEx *pEntEx = Ent.m_pDataEx;
 
 		if(Item.m_Type == NETOBJTYPE_PROJECTILE || Item.m_Type == NETOBJTYPE_DDRACEPROJECTILE || Item.m_Type == NETOBJTYPE_DDNETPROJECTILE)
@@ -426,13 +426,13 @@ void CItems::OnRender()
 			if(UsePredicted)
 
 			{
-				if(auto *pProj = (CProjectile *)GameClient()->m_GameWorld.FindMatch(Item.m_ID, Item.m_Type, pData))
+				if(auto *pProj = (CProjectile *)GameClient()->m_GameWorld.FindMatch(Item.m_Id, Item.m_Type, pData))
 				{
 					bool IsOtherTeam = m_pClient->IsOtherTeam(pProj->GetOwner());
 					if(pProj->m_LastRenderTick <= 0 && (pProj->m_Type != WEAPON_SHOTGUN || (!pProj->m_Freeze && !pProj->m_Explosive)) // skip ddrace shotgun bullets
 						&& (pProj->m_Type == WEAPON_SHOTGUN || absolute(length(pProj->m_Direction) - 1.f) < 0.02f) // workaround to skip grenades on ball mod
 						&& (pProj->GetOwner() < 0 || !GameClient()->m_aClients[pProj->GetOwner()].m_IsPredictedLocal || IsOtherTeam) // skip locally predicted projectiles
-						&& !Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID))
+						&& !Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_Id))
 					{
 						ReconstructSmokeTrail(&Data, pProj->m_DestroyTick);
 					}
@@ -441,7 +441,7 @@ void CItems::OnRender()
 						continue;
 				}
 			}
-			RenderProjectile(&Data, Item.m_ID);
+			RenderProjectile(&Data, Item.m_Id);
 		}
 		else if(Item.m_Type == NETOBJTYPE_PICKUP || Item.m_Type == NETOBJTYPE_DDNETPICKUP)
 		{
@@ -452,11 +452,11 @@ void CItems::OnRender()
 				continue;
 			if(UsePredicted)
 			{
-				auto *pPickup = (CPickup *)GameClient()->m_GameWorld.FindMatch(Item.m_ID, Item.m_Type, pData);
+				auto *pPickup = (CPickup *)GameClient()->m_GameWorld.FindMatch(Item.m_Id, Item.m_Type, pData);
 				if(pPickup && pPickup->InDDNetTile())
 					continue;
 			}
-			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID);
+			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_Id);
 			if(pPrev)
 				RenderPickup((const CNetObj_Pickup *)pPrev, (const CNetObj_Pickup *)pData);
 		}
@@ -464,7 +464,7 @@ void CItems::OnRender()
 		{
 			if(UsePredicted)
 			{
-				auto *pLaser = dynamic_cast<CLaser *>(GameClient()->m_GameWorld.FindMatch(Item.m_ID, Item.m_Type, pData));
+				auto *pLaser = dynamic_cast<CLaser *>(GameClient()->m_GameWorld.FindMatch(Item.m_Id, Item.m_Type, pData));
 				if(pLaser && pLaser->GetOwner() >= 0 && GameClient()->m_aClients[pLaser->GetOwner()].m_IsPredictedLocal)
 					continue;
 			}
@@ -523,16 +523,15 @@ void CItems::OnRender()
 	// render flag
 	for(int i = 0; i < Num; i++)
 	{
-		IClient::CSnapItem Item;
-		const void *pData = Client()->SnapGetItem(IClient::SNAP_CURRENT, i, &Item);
+		const IClient::CSnapItem Item = Client()->SnapGetItem(IClient::SNAP_CURRENT, i);
 
 		if(Item.m_Type == NETOBJTYPE_FLAG)
 		{
-			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID);
+			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_Id);
 			if(pPrev)
 			{
-				const void *pPrevGameData = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_GAMEDATA, m_pClient->m_Snap.m_GameDataSnapID);
-				RenderFlag(static_cast<const CNetObj_Flag *>(pPrev), static_cast<const CNetObj_Flag *>(pData),
+				const void *pPrevGameData = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_GAMEDATA, m_pClient->m_Snap.m_GameDataSnapId);
+				RenderFlag(static_cast<const CNetObj_Flag *>(pPrev), static_cast<const CNetObj_Flag *>(Item.m_pData),
 					static_cast<const CNetObj_GameData *>(pPrevGameData), m_pClient->m_Snap.m_pGameDataObj);
 			}
 		}
@@ -599,7 +598,7 @@ void CItems::ReconstructSmokeTrail(const CProjectileData *pCurrent, int DestroyT
 	bool LocalPlayerInGame = false;
 
 	if(m_pClient->m_Snap.m_pLocalInfo)
-		LocalPlayerInGame = m_pClient->m_aClients[m_pClient->m_Snap.m_pLocalInfo->m_ClientID].m_Team != TEAM_SPECTATORS;
+		LocalPlayerInGame = m_pClient->m_aClients[m_pClient->m_Snap.m_pLocalInfo->m_ClientId].m_Team != TEAM_SPECTATORS;
 	if(!m_pClient->AntiPingGunfire() || !LocalPlayerInGame)
 		return;
 	if(Client()->PredGameTick(g_Config.m_ClDummy) == pCurrent->m_StartTick)

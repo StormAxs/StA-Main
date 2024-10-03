@@ -37,9 +37,6 @@
 %s wins!
 == %s 승리!
 
--Page %d-
-== -페이지 %d-
-
 Abort
 == 취소
 
@@ -91,8 +88,8 @@ Client
 Connecting to
 == 연결 중
 
-Connection Problems...
-== 연결 문제 발생...
+Connection Problems…
+== 연결 문제 발생…
 
 Console
 == 콘솔
@@ -283,9 +280,6 @@ Pistol
 Player
 == 플레이어
 
-Player options
-== 플레이어 옵션
-
 Players
 == 플레이어
 
@@ -397,9 +391,6 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == 이 서버는 조정된 비표준 게임 모드를 실행하고 있습니다.
 
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== 편집기에서 맵이 저장되지 않았습니다. 종료 전 되돌아가 저장하실 수 있습니다.
-
 Time limit
 == 시간 제한
 
@@ -483,12 +474,6 @@ Max demos
 Internet
 == 인터넷
 
-Round
-== 라운드
-
-Quit anyway?
-== 상관 않고 종료하시겠습니까?
-
 News
 == 뉴스
 
@@ -543,14 +528,8 @@ Name plates size
 Successfully saved the replay!
 == 리플레이 저장에 성공했습니다!
 
-Saving ddnet-settings.cfg failed
-== ddnet-settings.cfg 저장 실패
-
 Replay feature is disabled!
 == 리플레이 기능을 비활성화했습니다!
-
-The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
-== 텍스처 %s 의 너비 또는 높이를 %d 으로 나눌 수 없습니다. 이는 시각적 오류를 발생시킬 수 있습니다.
 
 Warning
 == 주의
@@ -678,9 +657,6 @@ Types
 Leak IP
 == IP 노출하기
 
-Please use a different filename
-== 
-
 Remove chat
 == 채팅 제거
 
@@ -719,9 +695,6 @@ Pause
 
 Time
 == 시간
-
-Reload
-== 새로고침
 
 Deactivate
 == 비활성화
@@ -767,9 +740,6 @@ Automatically create statboard csv
 
 Max CSVs
 == 최대 CSV 파일 수
-
-Dummy settings
-== 더미 설정
 
 Download skins
 == 스킨 다운로드
@@ -909,9 +879,6 @@ Assets
 DDNet Client needs to be restarted to complete update!
 == 업데이트 완료를 위해 DDNet 클라이언트 재시작이 필요합니다!
 
-Use DDRace Scoreboard
-== DDRace 점수판 사용
-
 Show score
 == 점수 표시
 
@@ -923,9 +890,6 @@ Show votes window after voting
 
 Show kill messages
 == 킬 메시지 표시
-
-Kill Messages
-== 킬 메시지
 
 Use old chat style
 == 구식 채팅 방식 사용
@@ -1032,8 +996,8 @@ DDNet %s is available:
 Update now
 == 지금 업데이트하기
 
-Updating...
-== 업데이트 중...
+Updating…
+== 업데이트 중…
 
 DDNet Client updated!
 == DDNet 클라이언트가 업데이트되었습니다!
@@ -1096,8 +1060,8 @@ DDNet %s is out!
 Downloading %s:
 == %s 다운로드 중:
 
-Update failed! Check log...
-== 업데이트 실패! 로그를 확인해 주십시오...
+Update failed! Check log…
+== 업데이트 실패! 로그를 확인해 주십시오…
 
 Restart
 == 재시작
@@ -1207,9 +1171,6 @@ Tutorial
 Can't find a Tutorial server
 == 튜토리얼 서버를 찾을 수 없음
 
-Toggle to edit your dummy settings
-== 더미 설정으로 전환합니다.
-
 Choose default eyes when joining a server
 == 서버 입장 시의 기본 눈을 선택합니다.
 
@@ -1246,8 +1207,8 @@ Speed:
 Angle:
 == 각도
 
-Trying to determine UDP connectivity...
-== UDP 연결 확인 시도 중...
+Trying to determine UDP connectivity…
+== UDP 연결 확인 시도 중…
 
 UDP seems to be filtered.
 == UDP가 필터링된 것으로 보입니다.
@@ -1389,17 +1350,11 @@ Show health, shields and ammo
 DDRace HUD
 == DDRace HUD
 
-Show client IDs in scoreboard
-== 점수판에 클라이언트 ID 표시
-
 Show DDRace HUD
 == DDRace HUD 표시
 
 Show jumps indicator
 == 점프 상태 표시
-
-Show hook strength indicator
-== 갈고리 세기 표시
 
 Hook collision line
 == 갈고리 보조선
@@ -1596,7 +1551,31 @@ Copy info
 Create a random skin
 == 무작위 스킨 생성
 
+Could not resolve connect address '%s'. See local console for details.
+== 
+
+Connect address error
+== 
+
+Could not connect dummy
+== 
+
 Error playing demo
+== 
+
+Failed saving the replay!
+== 
+
+Saving settings to '%s' failed
+== 
+
+Error saving settings
+== 
+
+The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
+== 
+
+Loading demo file from storage
 == 
 
 Quitting. Please wait…
@@ -1605,7 +1584,41 @@ Quitting. Please wait…
 Restarting. Please wait…
 == 
 
+Searching
+== 
+
+Enter Username
+== 
+
+Enter Password
+== 
+
+NOT CONNECTED
+== 
+
+Match %d of %d
+== 
+
+No results
+== 
+
+Lines %d - %d (%s)
+== 
+
+Locked
+== 
+
+Following
+== 
+
+Loading commands…
+== 
+
 Multi-View
+== 
+
+[Spectating]
+Following %s
 == 
 
 Some map images could not be loaded. Check the local console for details.
@@ -1617,10 +1630,31 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
+Press a key…
+== 
+
+Main menu
+== 
+
 Rename folder
 == 
 
 Render complete
+== 
+
+Are you sure that you want to restart?
+== 
+
+Save skin
+== 
+
+Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
+== 
+
+There's an unsaved map in the editor, you might want to save it.
+== 
+
+Continue anyway?
 == 
 
 A demo with this name already exists
@@ -1639,6 +1673,27 @@ Videos directory
 == 
 
 Video was saved to '%s'
+== 
+
+Unable to save the skin
+== 
+
+Unable to save the skin with a reserved name
+== 
+
+%d/%d KiB (%.1f KiB/s)
+== 
+
+No local servers found (ports %d-%d)
+== 
+
+Example of usage
+== 
+
+No login required
+== 
+
+Communities
 == 
 
 No server selected
@@ -1667,6 +1722,12 @@ None
 == 
 
 Add Clan
+== 
+
+Server filter
+== 
+
+Friends
 == 
 
 Go back the specified duration
@@ -1707,6 +1768,9 @@ Cut length
 Render cut to video
 == 
 
+Please use a different filename
+== 
+
 All combined
 == 
 
@@ -1735,6 +1799,15 @@ Delete folder
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
+Dummy is not allowed on this server
+== 
+
+Please wait…
+== 
+
+Loading…
+== 
+
 Ghosts directory
 == 
 
@@ -1744,10 +1817,68 @@ Activate all
 Deactivate all
 == 
 
+[Hertz]
+Hz
+== 
+
+Player info change cooldown
+== 
+
 Axis
 == 
 
 Graphics card
+== 
+
+Tee
+== 
+
+Info Messages
+== 
+
+Show local time always
+== 
+
+Show client IDs (scoreboard, chat, spectator)
+== 
+
+Always show chat
+== 
+
+Show only chat messages from team members
+== 
+
+Chat font size
+== 
+
+Chat width
+== 
+
+Show friend mark (♥) in name plates
+== 
+
+Show hook strength icon indicator
+== 
+
+Show hook strength number indicator
+== 
+
+Authed name color in scoreboard
+== 
+
+Same clan color in scoreboard
+== 
+
+Show own player's hook collision line
+== 
+
+Always show own player's hook collision line
+== 
+
+Always show other players' hook collision lines
+== 
+
+Show finish messages
 == 
 
 Enable ghost
@@ -1762,5 +1893,61 @@ Regular background color
 Entities background color
 == 
 
+Basic
+== 
+
+Custom
+== 
+
+Are you sure that you want to delete '%s'?
+== 
+
+Delete skin
+== 
+
+Unable to delete skin
+== 
+
+Round %d/%d
+== 
+
+[Spectators]
+%d others…
+== 
+
+[Team and size]
+%d\n(%d/%d)
+== 
+
+Team %d (%d/%d)
+== 
+
+[skins]
+Body
+== 
+
+[skins]
+Marking
+== 
+
+[skins]
+Decoration
+== 
+
+[skins]
+Hands
+== 
+
+[skins]
+Feet
+== 
+
+[skins]
+Eyes
+== 
+
 Moved ingame
+== 
+
+https://wiki.ddnet.org/wiki/Mapping
 == 

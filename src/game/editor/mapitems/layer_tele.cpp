@@ -10,6 +10,9 @@ CLayerTele::CLayerTele(CEditor *pEditor, int w, int h) :
 
 	m_pTeleTile = new CTeleTile[w * h];
 	mem_zero(m_pTeleTile, (size_t)w * h * sizeof(CTeleTile));
+
+	m_GotoTeleOffset = 0;
+	m_GotoTeleLastPos = ivec2(-1, -1);
 }
 
 CLayerTele::CLayerTele(const CLayerTele &Other) :
@@ -65,14 +68,14 @@ bool CLayerTele::IsEmpty(const std::shared_ptr<CLayerTiles> &pLayer)
 	return true;
 }
 
-void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
+void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, vec2 WorldPos)
 {
 	if(m_Readonly)
 		return;
 
 	std::shared_ptr<CLayerTele> pTeleLayer = std::static_pointer_cast<CLayerTele>(pBrush);
-	int sx = ConvertX(wx);
-	int sy = ConvertY(wy);
+	int sx = ConvertX(WorldPos.x);
+	int sy = ConvertY(WorldPos.y);
 	if(str_comp(pTeleLayer->m_aFileName, m_pEditor->m_aFileName))
 		m_pEditor->m_TeleNumber = pTeleLayer->m_TeleNum;
 
@@ -98,15 +101,20 @@ void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
 
 			if((m_pEditor->m_AllowPlaceUnusedTiles || IsValidTeleTile(pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index)) && pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index != TILE_AIR)
 			{
-				if(!IsTeleTileNumberUsed(pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index))
+				bool IsCheckpoint = IsTeleTileCheckpoint(pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index);
+				if(!IsCheckpoint && !IsTeleTileNumberUsed(pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index, false))
 				{
 					// Tele tile number is unused. Set a known value which is not 0,
 					// as tiles with number 0 would be ignored by previous versions.
 					m_pTeleTile[Index].m_Number = 255;
 				}
-				else if(m_pEditor->m_TeleNumber != pTeleLayer->m_TeleNum)
+				else if(!IsCheckpoint && m_pEditor->m_TeleNumber != pTeleLayer->m_TeleNum)
 				{
 					m_pTeleTile[Index].m_Number = m_pEditor->m_TeleNumber;
+				}
+				else if(IsCheckpoint && m_pEditor->m_TeleCheckpointNumber != pTeleLayer->m_TeleCheckpointNum)
+				{
+					m_pTeleTile[Index].m_Number = m_pEditor->m_TeleCheckpointNumber;
 				}
 				else if(pTeleLayer->m_pTeleTile[y * pTeleLayer->m_Width + x].m_Number)
 				{
@@ -114,7 +122,7 @@ void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
 				}
 				else
 				{
-					if(!m_pEditor->m_TeleNumber)
+					if((!IsCheckpoint && !m_pEditor->m_TeleNumber) || (IsCheckpoint && !m_pEditor->m_TeleCheckpointNumber))
 					{
 						m_pTeleTile[Index].m_Number = 0;
 						m_pTeleTile[Index].m_Type = 0;
@@ -130,7 +138,7 @@ void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
 					}
 					else
 					{
-						m_pTeleTile[Index].m_Number = m_pEditor->m_TeleNumber;
+						m_pTeleTile[Index].m_Number = IsCheckpoint ? m_pEditor->m_TeleCheckpointNumber : m_pEditor->m_TeleNumber;
 					}
 				}
 
@@ -142,6 +150,9 @@ void CLayerTele::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
 				m_pTeleTile[Index].m_Number = 0;
 				m_pTeleTile[Index].m_Type = 0;
 				m_pTiles[Index].m_Index = 0;
+
+				if(pTeleLayer->m_pTiles[y * pTeleLayer->m_Width + x].m_Index != TILE_AIR)
+					ShowPreventUnusedTilesWarning();
 			}
 
 			STeleTileStateChange::SData Current{
@@ -254,6 +265,9 @@ void CLayerTele::FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRe
 				m_pTiles[TgtIndex].m_Index = 0;
 				m_pTeleTile[TgtIndex].m_Type = 0;
 				m_pTeleTile[TgtIndex].m_Number = 0;
+
+				if(!Empty)
+					ShowPreventUnusedTilesWarning();
 			}
 			else
 			{
@@ -261,15 +275,18 @@ void CLayerTele::FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRe
 				if(pLt->m_Tele && m_pTiles[TgtIndex].m_Index > 0)
 				{
 					m_pTeleTile[TgtIndex].m_Type = m_pTiles[TgtIndex].m_Index;
+					bool IsCheckpoint = IsTeleTileCheckpoint(m_pTiles[TgtIndex].m_Index);
 
-					if(!IsTeleTileNumberUsed(m_pTeleTile[TgtIndex].m_Type))
+					if(!IsCheckpoint && !IsTeleTileNumberUsed(m_pTeleTile[TgtIndex].m_Type, false))
 					{
 						// Tele tile number is unused. Set a known value which is not 0,
 						// as tiles with number 0 would be ignored by previous versions.
 						m_pTeleTile[TgtIndex].m_Number = 255;
 					}
-					else if((pLt->m_pTeleTile[SrcIndex].m_Number == 0 && m_pEditor->m_TeleNumber) || m_pEditor->m_TeleNumber != pLt->m_TeleNum)
+					else if(!IsCheckpoint && ((pLt->m_pTeleTile[SrcIndex].m_Number == 0 && m_pEditor->m_TeleNumber) || m_pEditor->m_TeleNumber != pLt->m_TeleNum))
 						m_pTeleTile[TgtIndex].m_Number = m_pEditor->m_TeleNumber;
+					else if(IsCheckpoint && ((pLt->m_pTeleTile[SrcIndex].m_Number == 0 && m_pEditor->m_TeleCheckpointNumber) || m_pEditor->m_TeleCheckpointNumber != pLt->m_TeleCheckpointNum))
+						m_pTeleTile[TgtIndex].m_Number = m_pEditor->m_TeleCheckpointNumber;
 					else
 						m_pTeleTile[TgtIndex].m_Number = pLt->m_pTeleTile[SrcIndex].m_Number;
 				}
@@ -286,13 +303,13 @@ void CLayerTele::FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRe
 	FlagModified(sx, sy, w, h);
 }
 
-bool CLayerTele::ContainsElementWithId(int Id)
+bool CLayerTele::ContainsElementWithId(int Id, bool Checkpoint)
 {
 	for(int y = 0; y < m_Height; ++y)
 	{
 		for(int x = 0; x < m_Width; ++x)
 		{
-			if(IsTeleTileNumberUsed(m_pTeleTile[y * m_Width + x].m_Type) && m_pTeleTile[y * m_Width + x].m_Number == Id)
+			if(IsTeleTileNumberUsed(m_pTeleTile[y * m_Width + x].m_Type, Checkpoint) && m_pTeleTile[y * m_Width + x].m_Number == Id)
 			{
 				return true;
 			}
@@ -300,6 +317,60 @@ bool CLayerTele::ContainsElementWithId(int Id)
 	}
 
 	return false;
+}
+
+void CLayerTele::GetPos(int Number, int Offset, int &TeleX, int &TeleY)
+{
+	int Match = -1;
+	ivec2 MatchPos = ivec2(-1, -1);
+	TeleX = -1;
+	TeleY = -1;
+
+	auto FindTile = [this, &Match, &MatchPos, &Number, &Offset]() {
+		for(int x = 0; x < m_Width; x++)
+		{
+			for(int y = 0; y < m_Height; y++)
+			{
+				int i = y * m_Width + x;
+				int Tele = m_pTeleTile[i].m_Number;
+				if(Number == Tele)
+				{
+					Match++;
+					if(Offset != -1)
+					{
+						if(Match == Offset)
+						{
+							MatchPos = ivec2(x, y);
+							m_GotoTeleOffset = Match;
+							return;
+						}
+						continue;
+					}
+					MatchPos = ivec2(x, y);
+					if(m_GotoTeleLastPos != ivec2(-1, -1))
+					{
+						if(distance(m_GotoTeleLastPos, MatchPos) < 10.0f)
+						{
+							m_GotoTeleOffset++;
+							continue;
+						}
+					}
+					m_GotoTeleLastPos = MatchPos;
+					if(Match == m_GotoTeleOffset)
+						return;
+				}
+			}
+		}
+	};
+	FindTile();
+
+	if(MatchPos == ivec2(-1, -1))
+		return;
+	if(Match < m_GotoTeleOffset)
+		m_GotoTeleOffset = -1;
+	TeleX = MatchPos.x;
+	TeleY = MatchPos.y;
+	m_GotoTeleOffset++;
 }
 
 std::shared_ptr<CLayer> CLayerTele::Duplicate() const

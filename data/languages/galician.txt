@@ -25,9 +25,6 @@
 %s wins!
 == ¡%s gana!
 
--Page %d-
-== -Páxina %d-
-
 Abort
 == Cancelar
 
@@ -79,8 +76,8 @@ Client
 Connecting to
 == Conectando con
 
-Connection Problems...
-== Problemas de conexión...
+Connection Problems…
+== Problemas de conexión…
 
 Console
 == Consola
@@ -283,9 +280,6 @@ Player
 Player country:
 == País do xogador
 
-Player options
-== Opcións de xogador
-
 Players
 == Xogadores
 
@@ -406,9 +400,6 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == O servidor está a executar unha configuración non estándar nun tipo de xogo puro.
 
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== Tes un mapa sen gardar no editor, quizá queiras gardalo antes de saír.
-
 Time limit
 == Tempo límite
 
@@ -507,12 +498,6 @@ Your skin
 
 Reset to defaults
 == Restablecer por defecto
-
-Quit anyway?
-== Saír de todos os xeitos?
-
-Round
-== Rolda
 
 Lht.
 == Lum.
@@ -622,8 +607,8 @@ DDNet %s is out!
 Downloading %s:
 == Descargando %s:
 
-Update failed! Check log...
-== Actualización errada! Comproba o rexistro...
+Update failed! Check log…
+== Actualización errada! Comproba o rexistro…
 
 DDNet Client updated!
 == Cliente DDNet actualizado!
@@ -633,9 +618,6 @@ Update now
 
 Restart
 == Reiniciar
-
-Please use a different filename
-== 
 
 Remove chat
 == Eliminar chat
@@ -667,9 +649,6 @@ Connecting dummy
 Connect Dummy
 == Conectar Dummy
 
-Reload
-== Recargar
-
 Deactivate
 == Desactivar
 
@@ -699,9 +678,6 @@ Automatically create statboard csv
 
 Max CSVs
 == CSV máx
-
-Dummy settings
-== Config. del Dummy
 
 Vanilla skins only
 == Só skins Vanilla
@@ -808,9 +784,6 @@ DDNet
 DDNet Client needs to be restarted to complete update!
 == Utilizar o marcador DDRace
 
-Use DDRace Scoreboard
-== Utilizar o marcador DDRace
-
 Show score
 == Mostrar puntaje
 
@@ -898,8 +871,8 @@ Show tiles layers from BG map
 DDNet %s is available:
 == DDNet %s está dispoñible:
 
-Updating...
-== Actualizando...
+Updating…
+== Actualizando…
 
 No updates available
 == Non hai actualizacións dispoñibles
@@ -951,9 +924,6 @@ Grabs
 
 9+ new mentions
 == 9+ novas mencións
-
-Saving ddnet-settings.cfg failed
-== Erro ao gardar ddnet-settings.cfg
 
 Warning
 == Advertencia
@@ -1142,9 +1112,6 @@ https://ddnet.org/discord
 Are you sure that you want to disconnect and switch to a different server?
 == Seguro que queres desconectarche e cambiar de servidor?
 
-Kill Messages
-== Mensaxes de morte
-
 Show local player's key presses
 == Mostrar as teclas presionadas polo xogador local
 
@@ -1190,9 +1157,6 @@ Tutorial
 Can't find a Tutorial server
 == Non se puido atopar un servidor Titorial
 
-Toggle to edit your dummy settings
-== Actívao para editar a configuración do téu monicreque
-
 Choose default eyes when joining a server
 == Escolle os ollos predeterminados ao unirche a un servidor
 
@@ -1226,8 +1190,8 @@ Speed:
 Angle:
 == Ángulo:
 
-Trying to determine UDP connectivity...
-== Tratando de determinar a conexión UDP...
+Trying to determine UDP connectivity…
+== Tratando de determinar a conexión UDP…
 
 UDP seems to be filtered.
 == UDP parece estar filtrado.
@@ -1388,17 +1352,11 @@ Show health, shields and ammo
 DDRace HUD
 == HUD DDRace
 
-Show client IDs in scoreboard
-== Mostrar IDs de cliente na táboa de puntuación
-
 Show DDRace HUD
 == Mostrar o HUD DDRace
 
 Show jumps indicator
 == Mostrar indicador de saltos
-
-Show hook strength indicator
-== Mostrar indicador de forza do gancho
 
 Hook collision line
 == Liña de colisión do gancho
@@ -1604,7 +1562,28 @@ Relative
 Absolute
 == Absoluto
 
+Could not resolve connect address '%s'. See local console for details.
+== 
+
+Connect address error
+== 
+
+Could not connect dummy
+== 
+
 Error playing demo
+== 
+
+Failed saving the replay!
+== 
+
+Saving settings to '%s' failed
+== 
+
+Error saving settings
+== 
+
+Loading demo file from storage
 == 
 
 Quitting. Please wait…
@@ -1613,7 +1592,41 @@ Quitting. Please wait…
 Restarting. Please wait…
 == 
 
+Searching
+== 
+
+Enter Username
+== 
+
+Enter Password
+== 
+
+NOT CONNECTED
+== 
+
+Match %d of %d
+== 
+
+No results
+== 
+
+Lines %d - %d (%s)
+== 
+
+Locked
+== 
+
+Following
+== 
+
+Loading commands…
+== 
+
 Multi-View
+== 
+
+[Spectating]
+Following %s
 == 
 
 Some map images could not be loaded. Check the local console for details.
@@ -1625,10 +1638,31 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
+Press a key…
+== 
+
+Main menu
+== 
+
 Rename folder
 == 
 
 Render complete
+== 
+
+Are you sure that you want to restart?
+== 
+
+Save skin
+== 
+
+Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
+== 
+
+There's an unsaved map in the editor, you might want to save it.
+== 
+
+Continue anyway?
 == 
 
 A demo with this name already exists
@@ -1649,7 +1683,34 @@ Videos directory
 Video was saved to '%s'
 == 
 
+Unable to save the skin
+== 
+
+Unable to save the skin with a reserved name
+== 
+
+%d/%d KiB (%.1f KiB/s)
+== 
+
+No local servers found (ports %d-%d)
+== 
+
+Example of usage
+== 
+
+No login required
+== 
+
+Communities
+== 
+
 No server selected
+== 
+
+Server filter
+== 
+
+Friends
 == 
 
 Go back the specified duration
@@ -1690,6 +1751,9 @@ Cut length
 Render cut to video
 == 
 
+Please use a different filename
+== 
+
 All combined
 == 
 
@@ -1718,6 +1782,15 @@ Delete folder
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
+Dummy is not allowed on this server
+== 
+
+Please wait…
+== 
+
+Loading…
+== 
+
 Ghosts directory
 == 
 
@@ -1727,10 +1800,68 @@ Activate all
 Deactivate all
 == 
 
+[Hertz]
+Hz
+== 
+
+Player info change cooldown
+== 
+
 Axis
 == 
 
 Graphics card
+== 
+
+Tee
+== 
+
+Info Messages
+== 
+
+Show local time always
+== 
+
+Show client IDs (scoreboard, chat, spectator)
+== 
+
+Always show chat
+== 
+
+Show only chat messages from team members
+== 
+
+Chat font size
+== 
+
+Chat width
+== 
+
+Show friend mark (♥) in name plates
+== 
+
+Show hook strength icon indicator
+== 
+
+Show hook strength number indicator
+== 
+
+Authed name color in scoreboard
+== 
+
+Same clan color in scoreboard
+== 
+
+Show own player's hook collision line
+== 
+
+Always show own player's hook collision line
+== 
+
+Always show other players' hook collision lines
+== 
+
+Show finish messages
 == 
 
 Default length
@@ -1748,5 +1879,61 @@ Regular background color
 Entities background color
 == 
 
+Basic
+== 
+
+Custom
+== 
+
+Are you sure that you want to delete '%s'?
+== 
+
+Delete skin
+== 
+
+Unable to delete skin
+== 
+
+Round %d/%d
+== 
+
+[Spectators]
+%d others…
+== 
+
+[Team and size]
+%d\n(%d/%d)
+== 
+
+Team %d (%d/%d)
+== 
+
+[skins]
+Body
+== 
+
+[skins]
+Marking
+== 
+
+[skins]
+Decoration
+== 
+
+[skins]
+Hands
+== 
+
+[skins]
+Feet
+== 
+
+[skins]
+Eyes
+== 
+
 Moved ingame
+== 
+
+https://wiki.ddnet.org/wiki/Mapping
 == 
