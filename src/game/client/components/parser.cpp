@@ -12,8 +12,17 @@ void CStats::FetchPlayer(CStatsPlayer *pStatsDest, const char *pPlayer)
 	char aUrl_DDStats[256];
 	char aUrl_DDNet[256];
 	char aEscapedName[MAX_NAME_LENGTH * 4];
+	char aEscapedNameNoSpaces[MAX_NAME_LENGTH * 4];
 	EscapeUrl(aEscapedName, sizeof(aEscapedName), pPlayer);
-	str_format(aUrl_DDStats, sizeof(aUrl_DDStats), "%s%s", STATS_URL_DDSTATS, aEscapedName);
+	int j = 0;
+	for (int i = 0; aEscapedName[i] != '\0'; i++) {
+		if (aEscapedName[i] != ' ') {
+			aEscapedNameNoSpaces[j++] = aEscapedName[i]; // copy non-space characters
+		}
+	}
+	aEscapedNameNoSpaces[j] = '\0'; // null-terminate the new string
+
+	str_format(aUrl_DDStats, sizeof(aUrl_DDStats), "%s%s", STATS_URL_DDSTATS, aEscapedNameNoSpaces);
 	pStatsDest->m_pGetStatsDDStats = HttpGet(aUrl_DDStats);
 
 	str_format(aUrl_DDNet, sizeof(aUrl_DDNet), "%s%s", STATS_URL_DDNET, aEscapedName);
