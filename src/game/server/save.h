@@ -12,21 +12,39 @@ class CGameWorld;
 class CCharacter;
 class CSaveTeam;
 
+enum
+{
+	RESCUEMODE_AUTO = 0,
+	RESCUEMODE_MANUAL,
+	NUM_RESCUEMODES
+};
+
+enum class ESaveResult
+{
+	SUCCESS,
+	TEAM_FLOCK,
+	TEAM_NOT_FOUND,
+	CHAR_NOT_FOUND,
+	NOT_STARTED,
+	TEAM_0_MODE,
+	DRAGGER_ACTIVE
+};
+
 class CSaveTee
 {
 public:
 	CSaveTee();
 	~CSaveTee() = default;
-	void Save(CCharacter *pchr);
-	void Load(CCharacter *pchr, int Team, bool IsSwap = false);
+	void Save(CCharacter *pchr, bool AddPenalty = true);
+	bool Load(CCharacter *pchr, int Team, bool IsSwap = false);
 	char *GetString(const CSaveTeam *pTeam);
 	int FromString(const char *pString);
 	void LoadHookedPlayer(const CSaveTeam *pTeam);
 	bool IsHooking() const;
 	vec2 GetPos() const { return m_Pos; }
 	const char *GetName() const { return m_aName; }
-	int GetClientID() const { return m_ClientID; }
-	void SetClientID(int ClientID) { m_ClientID = ClientID; }
+	int GetClientId() const { return m_ClientId; }
+	void SetClientId(int ClientId) { m_ClientId = ClientId; }
 
 	enum
 	{
@@ -38,7 +56,7 @@ public:
 	};
 
 private:
-	int m_ClientID;
+	int m_ClientId;
 
 	char m_aString[2048];
 	char m_aName[16];
@@ -140,17 +158,17 @@ public:
 	// MatchPlayers has to be called afterwards
 	int FromString(const char *pString);
 	// returns true if a team can load, otherwise writes a nice error Message in pMessage
-	bool MatchPlayers(const char (*paNames)[MAX_NAME_LENGTH], const int *pClientID, int NumPlayer, char *pMessage, int MessageLen) const;
-	int Save(CGameContext *pGameServer, int Team, bool Dry = false);
-	void Load(CGameContext *pGameServer, int Team, bool KeepCurrentWeakStrong);
+	bool MatchPlayers(const char (*paNames)[MAX_NAME_LENGTH], const int *pClientId, int NumPlayer, char *pMessage, int MessageLen) const;
+	ESaveResult Save(CGameContext *pGameServer, int Team, bool Dry = false, bool Force = false);
+	bool Load(CGameContext *pGameServer, int Team, bool KeepCurrentWeakStrong, bool IgnorePlayers = false);
 
 	CSaveTee *m_pSavedTees = nullptr;
 
 	// returns true if an error occurred
-	static bool HandleSaveError(int Result, int ClientID, CGameContext *pGameContext);
+	static bool HandleSaveError(ESaveResult Result, int ClientId, CGameContext *pGameContext);
 
 private:
-	CCharacter *MatchCharacter(CGameContext *pGameServer, int ClientID, int SaveID, bool KeepCurrentCharacter) const;
+	CCharacter *MatchCharacter(CGameContext *pGameServer, int ClientId, int SaveId, bool KeepCurrentCharacter) const;
 
 	char m_aString[65536];
 

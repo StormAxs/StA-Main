@@ -39,8 +39,13 @@ public:
 
 	int Init(int StorageType, int NumArgs, const char **ppArguments)
 	{
-#if !defined(CONF_PLATFORM_ANDROID)
-		// get userdir, just use data directory on android
+#if defined(CONF_PLATFORM_ANDROID)
+		// See InitAndroid in android_main.cpp for details about Android storage handling.
+		// The current working directory is set to the app specific external storage location
+		// on Android. The user data is stored within a folder "user" in the external storage.
+		str_copy(m_aUserdir, "user");
+#else
+		// get userdir
 		char aFallbackUserdir[IO_MAX_PATH_LENGTH];
 		if(fs_storage_path("DDNet", m_aUserdir, sizeof(m_aUserdir)))
 		{
@@ -91,6 +96,7 @@ public:
 				CreateFolder("mapres", TYPE_SAVE);
 				CreateFolder("downloadedmaps", TYPE_SAVE);
 				CreateFolder("skins", TYPE_SAVE);
+				CreateFolder("skins7", TYPE_SAVE);
 				CreateFolder("downloadedskins", TYPE_SAVE);
 				CreateFolder("themes", TYPE_SAVE);
 				CreateFolder("communityicons", TYPE_SAVE);
@@ -109,6 +115,7 @@ public:
 			CreateFolder("demos", TYPE_SAVE);
 			CreateFolder("demos/auto", TYPE_SAVE);
 			CreateFolder("demos/auto/race", TYPE_SAVE);
+			CreateFolder("demos/auto/server", TYPE_SAVE);
 			CreateFolder("demos/replays", TYPE_SAVE);
 			CreateFolder("editor", TYPE_SAVE);
 			CreateFolder("ghosts", TYPE_SAVE);
@@ -121,7 +128,7 @@ public:
 	void LoadPaths(const char *pArgv0)
 	{
 		// check current directory
-		IOHANDLE File = io_open("storage.cfg", IOFLAG_READ | IOFLAG_SKIP_BOM);
+		IOHANDLE File = io_open("storage.cfg", IOFLAG_READ);
 		if(!File)
 		{
 			// check usable path in argv[0]
@@ -134,7 +141,7 @@ public:
 				char aBuffer[IO_MAX_PATH_LENGTH];
 				str_copy(aBuffer, pArgv0, Pos + 1);
 				str_append(aBuffer, "/storage.cfg");
-				File = io_open(aBuffer, IOFLAG_READ | IOFLAG_SKIP_BOM);
+				File = io_open(aBuffer, IOFLAG_READ);
 			}
 
 			if(Pos >= IO_MAX_PATH_LENGTH || !File)
@@ -145,10 +152,12 @@ public:
 		}
 
 		CLineReader LineReader;
-		LineReader.Init(File);
-
-		char *pLine;
-		while((pLine = LineReader.Get()))
+		if(!LineReader.OpenFile(File))
+		{
+			dbg_msg("storage", "couldn't open storage.cfg");
+			return;
+		}
+		while(const char *pLine = LineReader.Get())
 		{
 			const char *pLineWithoutPrefix = str_startswith(pLine, "add_path ");
 			if(pLineWithoutPrefix)
@@ -156,8 +165,6 @@ public:
 				AddPath(pLineWithoutPrefix);
 			}
 		}
-
-		io_close(File);
 
 		if(!m_NumPaths)
 			dbg_msg("storage", "no paths found in storage.cfg");
@@ -559,7 +566,7 @@ public:
 
 	char *ReadFileStr(const char *pFilename, int Type) override
 	{
-		IOHANDLE File = OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, Type);
+		IOHANDLE File = OpenFile(pFilename, IOFLAG_READ, Type);
 		if(!File)
 			return nullptr;
 		char *pResult = io_read_all_str(File);

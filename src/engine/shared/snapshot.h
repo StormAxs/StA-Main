@@ -6,6 +6,9 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <game/generated/protocol.h>
+#include <game/generated/protocol7.h>
+
 // CSnapshot
 
 class CSnapshotItem
@@ -15,12 +18,13 @@ class CSnapshotItem
 	int *Data() { return (int *)(this + 1); }
 
 public:
-	int m_TypeAndID;
+	int m_TypeAndId;
 
 	const int *Data() const { return (int *)(this + 1); }
-	int Type() const { return m_TypeAndID >> 16; }
-	int ID() const { return m_TypeAndID & 0xffff; }
-	int Key() const { return m_TypeAndID; }
+	int Type() const { return m_TypeAndId >> 16; }
+	int Id() const { return m_TypeAndId & 0xffff; }
+	int Key() const { return m_TypeAndId; }
+	void Invalidate() { m_TypeAndId = -1; }
 };
 
 class CSnapshot
@@ -52,9 +56,10 @@ public:
 	const CSnapshotItem *GetItem(int Index) const;
 	int GetItemSize(int Index) const;
 	int GetItemIndex(int Key) const;
+	void InvalidateItem(int Index);
 	int GetItemType(int Index) const;
 	int GetExternalItemType(int InternalType) const;
-	const void *FindItem(int Type, int ID) const;
+	const void *FindItem(int Type, int Id) const;
 
 	unsigned Crc() const;
 	void DebugDump() const;
@@ -83,6 +88,7 @@ private:
 		MAX_NETOBJSIZES = 64
 	};
 	short m_aItemSizes[MAX_NETOBJSIZES];
+	short m_aItemSizes7[MAX_NETOBJSIZES];
 	int m_aSnapshotDataRate[CSnapshot::MAX_TYPE + 1];
 	int m_aSnapshotDataUpdates[CSnapshot::MAX_TYPE + 1];
 	CData m_Empty;
@@ -96,9 +102,11 @@ public:
 	int GetDataRate(int Index) const { return m_aSnapshotDataRate[Index]; }
 	int GetDataUpdates(int Index) const { return m_aSnapshotDataUpdates[Index]; }
 	void SetStaticsize(int ItemType, size_t Size);
+	void SetStaticsize7(int ItemType, size_t Size);
 	const CData *EmptyDelta() const;
 	int CreateDelta(const CSnapshot *pFrom, const CSnapshot *pTo, void *pDstData);
-	int UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize);
+	int UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, bool Sixup);
+	int DebugDumpDelta(const void *pSrcData, int DataSize);
 };
 
 // CSnapshotStorage
@@ -150,18 +158,19 @@ class CSnapshotBuilder
 	int m_aExtendedItemTypes[MAX_EXTENDED_ITEM_TYPES];
 	int m_NumExtendedItemTypes;
 
-	void AddExtendedItemType(int Index);
-	int GetExtendedItemTypeIndex(int TypeID);
+	bool AddExtendedItemType(int Index);
+	int GetExtendedItemTypeIndex(int TypeId);
 	int GetTypeFromIndex(int Index) const;
 
-	bool m_Sixup;
+	bool m_Sixup = false;
 
 public:
 	CSnapshotBuilder();
 
 	void Init(bool Sixup = false);
+	void Init7(const CSnapshot *pSnapshot);
 
-	void *NewItem(int Type, int ID, int Size);
+	void *NewItem(int Type, int Id, int Size);
 
 	CSnapshotItem *GetItem(int Index);
 	int *GetItemData(int Key);

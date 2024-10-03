@@ -17,60 +17,15 @@ bool operator<(const ColorRGBA &Left, const ColorRGBA &Right)
 		return Left.a < Right.a;
 }
 
-static ColorRGBA GetPixelColor(const CImageInfo &Image, size_t x, size_t y)
-{
-	uint8_t *pData = static_cast<uint8_t *>(Image.m_pData);
-	const size_t PixelSize = Image.PixelSize();
-	const size_t PixelStartIndex = x * PixelSize + (Image.m_Width * PixelSize * y);
-
-	ColorRGBA Color = {255, 255, 255, 255};
-	if(PixelSize == 1)
-	{
-		Color.a = pData[PixelStartIndex];
-	}
-	else
-	{
-		Color.r = pData[PixelStartIndex + 0];
-		Color.g = pData[PixelStartIndex + 1];
-		Color.b = pData[PixelStartIndex + 2];
-
-		if(PixelSize == 4)
-			Color.a = pData[PixelStartIndex + 3];
-	}
-
-	return Color;
-}
-
-static void SetPixelColor(CImageInfo *pImage, size_t x, size_t y, ColorRGBA Color)
-{
-	uint8_t *pData = static_cast<uint8_t *>(pImage->m_pData);
-	const size_t PixelSize = pImage->PixelSize();
-	const size_t PixelStartIndex = x * PixelSize + (pImage->m_Width * PixelSize * y);
-
-	if(PixelSize == 1)
-	{
-		pData[PixelStartIndex] = Color.a;
-	}
-	else
-	{
-		pData[PixelStartIndex + 0] = Color.r;
-		pData[PixelStartIndex + 1] = Color.g;
-		pData[PixelStartIndex + 2] = Color.b;
-
-		if(PixelSize == 4)
-			pData[PixelStartIndex + 3] = Color.a;
-	}
-}
-
 static std::vector<ColorRGBA> GetUniqueColors(const CImageInfo &Image)
 {
 	std::set<ColorRGBA> ColorSet;
 	std::vector<ColorRGBA> vUniqueColors;
-	for(int x = 0; x < Image.m_Width; x++)
+	for(size_t x = 0; x < Image.m_Width; x++)
 	{
-		for(int y = 0; y < Image.m_Height; y++)
+		for(size_t y = 0; y < Image.m_Height; y++)
 		{
-			ColorRGBA Color = GetPixelColor(Image, x, y);
+			ColorRGBA Color = Image.PixelColor(x, y);
 			if(Color.a > 0 && ColorSet.insert(Color).second)
 				vUniqueColors.push_back(Color);
 		}
@@ -106,12 +61,12 @@ static std::vector<std::array<ColorRGBA, NumTiles>> GroupColors(const std::vecto
 	return vaColorGroups;
 }
 
-static void SetColorTile(CImageInfo *pImage, int x, int y, ColorRGBA Color)
+static void SetColorTile(CImageInfo &Image, int x, int y, ColorRGBA Color)
 {
 	for(int i = 0; i < TileSize; i++)
 	{
 		for(int j = 0; j < TileSize; j++)
-			SetPixelColor(pImage, x * TileSize + i, y * TileSize + j, Color);
+			Image.SetPixelColor(x * TileSize + i, y * TileSize + j, Color);
 	}
 }
 
@@ -121,16 +76,14 @@ static CImageInfo ColorGroupToImage(const std::array<ColorRGBA, NumTiles> &aColo
 	Image.m_Width = NumTilesRow * TileSize;
 	Image.m_Height = NumTilesColumn * TileSize;
 	Image.m_Format = CImageInfo::FORMAT_RGBA;
-
-	uint8_t *pData = static_cast<uint8_t *>(malloc(static_cast<size_t>(Image.m_Width) * Image.m_Height * 4 * sizeof(uint8_t)));
-	Image.m_pData = pData;
+	Image.m_pData = static_cast<uint8_t *>(malloc(Image.DataSize()));
 
 	for(int y = 0; y < NumTilesColumn; y++)
 	{
 		for(int x = 0; x < NumTilesRow; x++)
 		{
 			int ColorIndex = x + NumTilesRow * y;
-			SetColorTile(&Image, x, y, aColorGroup[ColorIndex]);
+			SetColorTile(Image, x, y, aColorGroup[ColorIndex]);
 		}
 	}
 
@@ -156,7 +109,7 @@ static std::shared_ptr<CEditorImage> ImageInfoToEditorImage(CEditor *pEditor, co
 	pEditorImage->m_pData = Image.m_pData;
 
 	int TextureLoadFlag = pEditor->Graphics()->Uses2DTextureArrays() ? IGraphics::TEXLOAD_TO_2D_ARRAY_TEXTURE : IGraphics::TEXLOAD_TO_3D_TEXTURE;
-	pEditorImage->m_Texture = pEditor->Graphics()->LoadTextureRaw(Image.m_Width, Image.m_Height, Image.m_Format, Image.m_pData, TextureLoadFlag, pName);
+	pEditorImage->m_Texture = pEditor->Graphics()->LoadTextureRaw(Image, TextureLoadFlag, pName);
 	pEditorImage->m_External = 0;
 	str_copy(pEditorImage->m_aName, pName);
 
@@ -181,7 +134,7 @@ static void SetTilelayerIndices(const std::shared_ptr<CLayerTiles> &pLayer, cons
 	for(int x = 0; x < pLayer->m_Width; x++)
 	{
 		for(int y = 0; y < pLayer->m_Height; y++)
-			pLayer->m_pTiles[x + y * pLayer->m_Width].m_Index = GetColorIndex(aColorGroup, GetPixelColor(Image, x, y));
+			pLayer->m_pTiles[x + y * pLayer->m_Width].m_Index = GetColorIndex(aColorGroup, Image.PixelColor(x, y));
 	}
 }
 
@@ -212,8 +165,7 @@ void CEditor::AddTileart(bool IgnoreHistory)
 		m_EditorHistory.RecordAction(std::make_shared<CEditorActionTileArt>(this, ImageCount, m_aTileartFilename, IndexMap));
 	}
 
-	free(m_TileartImageInfo.m_pData);
-	m_TileartImageInfo.m_pData = nullptr;
+	m_TileartImageInfo.Free();
 	m_Map.OnModify();
 	m_Dialog = DIALOG_NONE;
 }
@@ -226,8 +178,7 @@ void CEditor::TileartCheckColors()
 	{
 		m_PopupEventType = CEditor::POPEVENT_PIXELART_TOO_MANY_COLORS;
 		m_PopupEventActivated = true;
-		free(m_TileartImageInfo.m_pData);
-		m_TileartImageInfo.m_pData = nullptr;
+		m_TileartImageInfo.Free();
 	}
 	else if(NumColorGroups > 1)
 	{
@@ -242,7 +193,7 @@ bool CEditor::CallbackAddTileart(const char *pFilepath, int StorageType, void *p
 {
 	CEditor *pEditor = (CEditor *)pUser;
 
-	if(!pEditor->Graphics()->LoadPNG(&pEditor->m_TileartImageInfo, pFilepath, StorageType))
+	if(!pEditor->Graphics()->LoadPng(pEditor->m_TileartImageInfo, pFilepath, StorageType))
 	{
 		pEditor->ShowFileDialogError("Failed to load image from file '%s'.", pFilepath);
 		return false;

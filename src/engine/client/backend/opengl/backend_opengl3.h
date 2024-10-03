@@ -37,18 +37,18 @@ protected:
 	CGLSLPrimitiveExProgram *m_pPrimitiveExProgramTexturedRotationless;
 	CGLSLSpriteMultipleProgram *m_pSpriteProgramMultiple;
 
-	TWGLuint m_LastProgramID;
+	TWGLuint m_LastProgramId;
 
-	TWGLuint m_aPrimitiveDrawVertexID[MAX_STREAM_BUFFER_COUNT];
-	TWGLuint m_PrimitiveDrawVertexIDTex3D;
-	TWGLuint m_aPrimitiveDrawBufferID[MAX_STREAM_BUFFER_COUNT];
-	TWGLuint m_PrimitiveDrawBufferIDTex3D;
+	TWGLuint m_aPrimitiveDrawVertexId[MAX_STREAM_BUFFER_COUNT];
+	TWGLuint m_PrimitiveDrawVertexIdTex3D;
+	TWGLuint m_aPrimitiveDrawBufferId[MAX_STREAM_BUFFER_COUNT];
+	TWGLuint m_PrimitiveDrawBufferIdTex3D;
 
 	TWGLuint m_aLastIndexBufferBound[MAX_STREAM_BUFFER_COUNT];
 
 	int m_LastStreamBuffer;
 
-	TWGLuint m_QuadDrawIndexBufferID;
+	TWGLuint m_QuadDrawIndexBufferId;
 	unsigned int m_CurrentIndicesInBuffer;
 
 	void DestroyBufferContainer(int Index, bool DeleteBOs = true);
@@ -58,8 +58,8 @@ protected:
 	struct SBufferContainer
 	{
 		SBufferContainer() :
-			m_VertArrayID(0), m_LastIndexBufferBound(0) {}
-		TWGLuint m_VertArrayID;
+			m_VertArrayId(0), m_LastIndexBufferBound(0) {}
+		TWGLuint m_VertArrayId;
 		TWGLuint m_LastIndexBufferBound;
 		SBufferContainerInfo m_ContainerInfo;
 	};
@@ -71,19 +71,17 @@ protected:
 
 	void InitPrimExProgram(CGLSLPrimitiveExProgram *pProgram, class CGLSLCompiler *pCompiler, class IStorage *pStorage, bool Textured, bool Rotationless);
 
-	static int TexFormatToNewOpenGLFormat(int TexFormat);
 	bool IsNewApi() override { return true; }
 
 	void UseProgram(CGLSLTWProgram *pProgram);
 	void UploadStreamBufferData(unsigned int PrimitiveType, const void *pVertices, size_t VertSize, unsigned int PrimitiveCount, bool AsTex3D = false);
 	void RenderText(const CCommandBuffer::SState &State, int DrawNum, int TextTextureIndex, int TextOutlineTextureIndex, int TextureSize, const ColorRGBA &TextColor, const ColorRGBA &TextOutlineColor);
 
-	void TextureUpdate(int Slot, int X, int Y, int Width, int Height, int GLFormat, void *pTexData);
-	void TextureCreate(int Slot, int Width, int Height, int GLFormat, int GLStoreFormat, int Flags, void *pTexData);
+	void TextureUpdate(int Slot, int X, int Y, int Width, int Height, int GLFormat, uint8_t *pTexData);
+	void TextureCreate(int Slot, int Width, int Height, int GLFormat, int GLStoreFormat, int Flags, uint8_t *pTexData);
 
 	bool Cmd_Init(const SCommand_Init *pCommand) override;
 	void Cmd_Shutdown(const SCommand_Shutdown *pCommand) override;
-	void Cmd_Texture_Update(const CCommandBuffer::SCommand_Texture_Update *pCommand) override;
 	void Cmd_Texture_Destroy(const CCommandBuffer::SCommand_Texture_Destroy *pCommand) override;
 	void Cmd_Texture_Create(const CCommandBuffer::SCommand_Texture_Create *pCommand) override;
 	void Cmd_TextTexture_Update(const CCommandBuffer::SCommand_TextTexture_Update *pCommand) override;

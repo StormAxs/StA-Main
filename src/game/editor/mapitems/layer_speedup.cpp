@@ -65,14 +65,14 @@ bool CLayerSpeedup::IsEmpty(const std::shared_ptr<CLayerTiles> &pLayer)
 	return true;
 }
 
-void CLayerSpeedup::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy)
+void CLayerSpeedup::BrushDraw(std::shared_ptr<CLayer> pBrush, vec2 WorldPos)
 {
 	if(m_Readonly)
 		return;
 
 	std::shared_ptr<CLayerSpeedup> pSpeedupLayer = std::static_pointer_cast<CLayerSpeedup>(pBrush);
-	int sx = ConvertX(wx);
-	int sy = ConvertY(wy);
+	int sx = ConvertX(WorldPos.x);
+	int sy = ConvertY(WorldPos.y);
 	if(str_comp(pSpeedupLayer->m_aFileName, m_pEditor->m_aFileName))
 	{
 		m_pEditor->m_SpeedupAngle = pSpeedupLayer->m_SpeedupAngle;
@@ -144,6 +144,9 @@ void CLayerSpeedup::BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy
 				m_pSpeedupTile[Index].m_Angle = 0;
 				m_pSpeedupTile[Index].m_Type = 0;
 				m_pTiles[Index].m_Index = 0;
+
+				if(pSpeedupLayer->m_pTiles[y * pSpeedupLayer->m_Width + x].m_Index != TILE_AIR)
+					ShowPreventUnusedTilesWarning();
 			}
 
 			SSpeedupTileStateChange::SData Current{
@@ -258,6 +261,9 @@ void CLayerSpeedup::FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CU
 				m_pTiles[TgtIndex].m_Index = 0;
 				m_pSpeedupTile[TgtIndex].m_Force = 0;
 				m_pSpeedupTile[TgtIndex].m_Angle = 0;
+
+				if(!Empty)
+					ShowPreventUnusedTilesWarning();
 			}
 			else
 			{

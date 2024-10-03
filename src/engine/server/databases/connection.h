@@ -3,7 +3,14 @@
 
 #include "connection_pool.h"
 
+#include <engine/shared/protocol.h>
 #include <memory>
+
+enum
+{
+	// MAX_NAME_LENGTH includes the size with \0, which is not necessary in SQL
+	MAX_NAME_LENGTH_SQL = MAX_NAME_LENGTH - 1,
+};
 
 class IConsole;
 
@@ -54,6 +61,7 @@ public:
 	virtual void BindInt(int Idx, int Value) = 0;
 	virtual void BindInt64(int Idx, int64_t Value) = 0;
 	virtual void BindFloat(int Idx, float Value) = 0;
+	virtual void BindNull(int Idx) = 0;
 
 	// Print expanded sql statement
 	virtual void Print() = 0;

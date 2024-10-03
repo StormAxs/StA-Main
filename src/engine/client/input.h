@@ -5,6 +5,7 @@
 
 #include <SDL_events.h>
 #include <SDL_joystick.h>
+#include <engine/console.h>
 
 #include <engine/input.h>
 #include <engine/keys.h>
@@ -13,6 +14,7 @@
 #include <vector>
 
 class IEngineGraphics;
+class IConfigManager;
 
 class CInput : public IEngineInput
 {
@@ -25,7 +27,7 @@ public:
 		int m_Index;
 		char m_aName[64];
 		char m_aGUID[34];
-		SDL_JoystickID m_InstanceID;
+		SDL_JoystickID m_InstanceId;
 		int m_NumAxes;
 		int m_NumButtons;
 		int m_NumBalls;
@@ -42,7 +44,7 @@ public:
 		int GetIndex() const override { return m_Index; }
 		const char *GetName() const override { return m_aName; }
 		const char *GetGUID() const { return m_aGUID; }
-		SDL_JoystickID GetInstanceID() const { return m_InstanceID; }
+		SDL_JoystickID GetInstanceId() const { return m_InstanceId; }
 		int GetNumAxes() const override { return m_NumAxes; }
 		int GetNumButtons() const override { return m_NumButtons; }
 		int GetNumBalls() const override { return m_NumBalls; }
@@ -58,9 +60,10 @@ public:
 private:
 	IEngineGraphics *m_pGraphics;
 	IConsole *m_pConsole;
+	IConfigManager *m_pConfigManager;
 
-	IEngineGraphics *Graphics() { return m_pGraphics; }
-	IConsole *Console() { return m_pConsole; }
+	IEngineGraphics *Graphics() const { return m_pGraphics; }
+	IConsole *Console() const { return m_pConsole; }
 
 	// joystick
 	std::vector<CJoystick> m_vJoysticks;
@@ -73,29 +76,27 @@ private:
 	float GetJoystickDeadzone();
 
 	bool m_InputGrabbed;
-	char *m_pClipboardText;
 
 	bool m_MouseFocus;
-	bool m_MouseDoubleClick;
-#if defined(CONF_PLATFORM_ANDROID) // No relative mouse on Android
-	ivec2 m_LastMousePos = ivec2(0, 0);
-#endif
 
 	// IME support
-	char m_aComposition[MAX_COMPOSITION_ARRAY_SIZE];
+	std::string m_CompositionString;
 	int m_CompositionCursor;
-	int m_CompositionLength;
 	std::vector<std::string> m_vCandidates;
 	int m_CandidateSelectedIndex;
 
-	void AddEvent(char *pText, int Key, int Flags);
-	void Clear() override;
-	bool IsEventValid(const CEvent &Event) const override { return Event.m_InputCount == m_InputCounter; }
+	// events
+	std::vector<CEvent> m_vInputEvents;
+	int64_t m_LastUpdate;
+	float m_UpdateTime;
+	void AddKeyEvent(int Key, int Flags);
+	void AddTextEvent(const char *pText);
 
 	// quick access to input
-	unsigned short m_aInputCount[g_MaxKeys]; // tw-KEY
-	unsigned char m_aInputState[g_MaxKeys]; // SDL_SCANCODE
-	int m_InputCounter;
+	uint32_t m_aInputCount[g_MaxKeys];
+	unsigned char m_aInputState[g_MaxKeys];
+	uint32_t m_InputCounter;
+	std::vector<CTouchFingerState> m_vTouchFingerStates;
 
 	void UpdateMouseState();
 	void UpdateJoystickState();
@@ -104,6 +105,10 @@ private:
 	void HandleJoystickHatMotionEvent(const SDL_JoyHatEvent &Event);
 	void HandleJoystickAddedEvent(const SDL_JoyDeviceEvent &Event);
 	void HandleJoystickRemovedEvent(const SDL_JoyDeviceEvent &Event);
+	void HandleTouchDownEvent(const SDL_TouchFingerEvent &Event);
+	void HandleTouchUpEvent(const SDL_TouchFingerEvent &Event);
+	void HandleTouchMotionEvent(const SDL_TouchFingerEvent &Event);
+	void HandleTextEditingEvent(const char *pText, int Start, int Length);
 
 	char m_aDropFile[IO_MAX_PATH_LENGTH];
 
@@ -118,11 +123,16 @@ public:
 	int Update() override;
 	void Shutdown() override;
 
+	void ConsumeEvents(std::function<void(const CEvent &Event)> Consumer) const override;
+	void Clear() override;
+	float GetUpdateTime() const override;
+
 	bool ModifierIsPressed() const override { return KeyState(KEY_LCTRL) || KeyState(KEY_RCTRL) || KeyState(KEY_LGUI) || KeyState(KEY_RGUI); }
 	bool ShiftIsPressed() const override { return KeyState(KEY_LSHIFT) || KeyState(KEY_RSHIFT); }
 	bool AltIsPressed() const override { return KeyState(KEY_LALT) || KeyState(KEY_RALT); }
 	bool KeyIsPressed(int Key) const override { return KeyState(Key); }
 	bool KeyPress(int Key, bool CheckCounter) const override { return CheckCounter ? (m_aInputCount[Key] == m_InputCounter) : m_aInputCount[Key]; }
+	int FindKeyByName(const char *pKeyName) const override;
 
 	size_t NumJoysticks() const override { return m_vJoysticks.size(); }
 	CJoystick *GetJoystick(size_t Index) override { return &m_vJoysticks[Index]; }
@@ -132,19 +142,20 @@ public:
 	bool MouseRelative(float *pX, float *pY) override;
 	void MouseModeAbsolute() override;
 	void MouseModeRelative() override;
-	void NativeMousePos(int *pX, int *pY) const override;
-	bool NativeMousePressed(int Index) override;
-	bool MouseDoubleClick() override;
+	vec2 NativeMousePos() const override;
+	bool NativeMousePressed(int Index) const override;
 
-	const char *GetClipboardText() override;
+	const std::vector<CTouchFingerState> &TouchFingerStates() const override;
+
+	std::string GetClipboardText() override;
 	void SetClipboardText(const char *pText) override;
 
 	void StartTextInput() override;
 	void StopTextInput() override;
-	const char *GetComposition() const override { return m_aComposition; }
-	bool HasComposition() const override { return m_CompositionLength != COMP_LENGTH_INACTIVE; }
+	const char *GetComposition() const override { return m_CompositionString.c_str(); }
+	bool HasComposition() const override { return !m_CompositionString.empty(); }
 	int GetCompositionCursor() const override { return m_CompositionCursor; }
-	int GetCompositionLength() const override { return m_CompositionLength; }
+	int GetCompositionLength() const override { return m_CompositionString.length(); }
 	const char *GetCandidate(int Index) const override { return m_vCandidates[Index].c_str(); }
 	int GetCandidateCount() const override { return m_vCandidates.size(); }
 	int GetCandidateSelectedIndex() const override { return m_CandidateSelectedIndex; }

@@ -11,7 +11,9 @@
 
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
+#include <game/client/render.h>
 #include <game/client/skin.h>
+#include <game/generated/protocol7.h>
 
 class CChat : public CComponent
 {
@@ -30,7 +32,7 @@ class CChat : public CComponent
 	{
 		int64_t m_Time;
 		float m_aYOffset[2];
-		int m_ClientID;
+		int m_ClientId;
 		int m_TeamNumber;
 		bool m_Team;
 		bool m_Whisper;
@@ -44,13 +46,9 @@ class CChat : public CComponent
 		int m_QuadContainerIndex;
 
 		char m_aSkinName[std::size(g_Config.m_ClPlayerSkin)];
-		CSkin::SSkinTextures m_RenderSkin;
-		CSkin::SSkinMetrics m_RenderSkinMetrics;
-		bool m_CustomColoredSkin;
-		ColorRGBA m_ColorBody;
-		ColorRGBA m_ColorFeet;
-
 		bool m_HasRenderTee;
+		CTeeRenderInfo m_TeeRenderInfo;
+
 		float m_TextYOffset;
 
 		int m_TimesRepeated;
@@ -88,7 +86,7 @@ class CChat : public CComponent
 	static char ms_aDisplayText[MAX_LINE_LENGTH];
 	struct CRateablePlayer
 	{
-		int ClientID;
+		int ClientId;
 		int Score;
 	};
 	CRateablePlayer m_aPlayerCompletionList[MAX_CLIENTS];
@@ -114,7 +112,6 @@ class CChat : public CComponent
 	};
 
 	std::vector<CCommand> m_vCommands;
-	std::vector<CCommand> m_vDefaultCommands;
 	bool m_CommandsNeedSorting;
 
 	struct CHistoryEntry
@@ -153,11 +150,9 @@ public:
 	static constexpr float MESSAGE_TEE_PADDING_RIGHT = 0.5f;
 
 	bool IsActive() const { return m_Mode != MODE_NONE; }
-	void AddLine(int ClientID, int Team, const char *pLine);
+	void AddLine(int ClientId, int Team, const char *pLine);
 	void EnableMode(int Team);
 	void DisableMode();
-	void Say(int Team, const char *pLine);
-	void SayChat(const char *pLine);
 	void RegisterCommand(const char *pName, const char *pParams, const char *pHelpText);
 	void UnregisterCommand(const char *pName);
 	void Echo(const char *pString);
@@ -165,15 +160,14 @@ public:
 	void OnWindowResize() override;
 	void OnConsoleInit() override;
 	void OnStateChange(int NewState, int OldState) override;
+	void OnRefreshSkins() override;
 	void OnRender() override;
-	void RefindSkins();
 	void OnPrepareLines(float y);
 	void Reset();
 	void OnRelease() override;
 	void OnMessage(int MsgType, void *pRawMsg) override;
 	bool OnInput(const IInput::CEvent &Event) override;
 	void OnInit() override;
-	void OnMapLoad() override;
 
 	void RebuildChat();
 
@@ -185,5 +179,22 @@ public:
 	float MessagePaddingY() const { return FontSize() * (1 / 6.f); }
 	float MessageTeeSize() const { return FontSize() * (7 / 6.f); }
 	float MessageRounding() const { return FontSize() * (1 / 2.f); }
+
+	// ----- send functions -----
+
+	// Sends a chat message to the server.
+	//
+	// @param Team MODE_ALL=0 MODE_TEAM=1
+	// @param pLine the chat message
+	void SendChat(int Team, const char *pLine);
+
+	// Sends a chat message to the server.
+	//
+	// It uses a queue with a maximum of 3 entries
+	// that ensures there is a minimum delay of one second
+	// between sent messages.
+	//
+	// It uses team or public chat depending on m_Mode.
+	void SendChatQueued(const char *pLine);
 };
 #endif
