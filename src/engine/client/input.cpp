@@ -25,6 +25,7 @@
 #endif
 
 #if defined(CONF_FAMILY_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 // windows.h must be included before imm.h, but clang-format requires includes to be sorted alphabetically, hence this comment.
 #include <imm.h>
@@ -33,25 +34,19 @@
 // for platform specific features that aren't available or are broken in SDL
 #include <SDL_syswm.h>
 
-void CInput::AddKeyEvent(int Key, int Flags)
+void CInput::AddEvent(char *pText, int Key, int Flags)
 {
-	dbg_assert((Flags & (FLAG_PRESS | FLAG_RELEASE)) != 0 && (Flags & ~(FLAG_PRESS | FLAG_RELEASE)) == 0, "Flags invalid");
-	CEvent Event;
-	Event.m_Key = Key;
-	Event.m_Flags = Flags;
-	Event.m_aText[0] = '\0';
-	Event.m_InputCount = m_InputCounter;
-	m_vInputEvents.emplace_back(Event);
-}
-
-void CInput::AddTextEvent(const char *pText)
-{
-	CEvent Event;
-	Event.m_Key = KEY_UNKNOWN;
-	Event.m_Flags = FLAG_TEXT;
-	str_copy(Event.m_aText, pText);
-	Event.m_InputCount = m_InputCounter;
-	m_vInputEvents.emplace_back(Event);
+	if(m_NumEvents != INPUT_BUFFER_SIZE)
+	{
+		m_aInputEvents[m_NumEvents].m_Key = Key;
+		m_aInputEvents[m_NumEvents].m_Flags = Flags;
+		if(pText == nullptr)
+			m_aInputEvents[m_NumEvents].m_aText[0] = '\0';
+		else
+			str_copy(m_aInputEvents[m_NumEvents].m_aText, pText);
+		m_aInputEvents[m_NumEvents].m_InputCount = m_InputCounter;
+		m_NumEvents++;
+	}
 }
 
 CInput::CInput()
@@ -59,15 +54,20 @@ CInput::CInput()
 	mem_zero(m_aInputCount, sizeof(m_aInputCount));
 	mem_zero(m_aInputState, sizeof(m_aInputState));
 
-	m_vInputEvents.reserve(32);
 	m_LastUpdate = 0;
 	m_UpdateTime = 0.0f;
 
 	m_InputCounter = 1;
 	m_InputGrabbed = false;
 
+	m_MouseDoubleClick = false;
+
+	m_NumEvents = 0;
 	m_MouseFocus = true;
 
+	m_pClipboardText = nullptr;
+
+	m_CompositionLength = COMP_LENGTH_INACTIVE;
 	m_CompositionCursor = 0;
 	m_CandidateSelectedIndex = -1;
 
@@ -80,7 +80,6 @@ void CInput::Init()
 
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pConfigManager = Kernel()->RequestInterface<IConfigManager>();
 
 	MouseModeRelative();
 
@@ -89,6 +88,7 @@ void CInput::Init()
 
 void CInput::Shutdown()
 {
+	SDL_free(m_pClipboardText);
 	CloseJoysticks();
 }
 
@@ -175,7 +175,7 @@ CInput::CJoystick::CJoystick(CInput *pInput, int Index, SDL_Joystick *pDelegate)
 	m_NumHats = SDL_JoystickNumHats(pDelegate);
 	str_copy(m_aName, SDL_JoystickName(pDelegate));
 	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(pDelegate), m_aGUID, sizeof(m_aGUID));
-	m_InstanceId = SDL_JoystickInstanceID(pDelegate);
+	m_InstanceID = SDL_JoystickInstanceID(pDelegate);
 }
 
 void CInput::CloseJoysticks()
@@ -217,7 +217,7 @@ void CInput::CJoystick::GetJoystickHatKeys(int Hat, int HatValue, int (&HatKeys)
 
 void CInput::CJoystick::GetHatValue(int Hat, int (&HatKeys)[2])
 {
-	GetJoystickHatKeys(Hat, SDL_JoystickGetHat(m_pDelegate, Hat), HatKeys);
+	return GetJoystickHatKeys(Hat, SDL_JoystickGetHat(m_pDelegate, Hat), HatKeys);
 }
 
 bool CInput::CJoystick::Relative(float *pX, float *pY)
@@ -260,7 +260,14 @@ bool CInput::MouseRelative(float *pX, float *pY)
 		return false;
 
 	ivec2 Relative;
+#if defined(CONF_PLATFORM_ANDROID) // No relative mouse on Android
+	ivec2 CurrentPos;
+	SDL_GetMouseState(&CurrentPos.x, &CurrentPos.y);
+	Relative = CurrentPos - m_LastMousePos;
+	m_LastMousePos = CurrentPos;
+#else
 	SDL_GetRelativeMouseState(&Relative.x, &Relative.y);
+#endif
 
 	*pX = Relative.x;
 	*pY = Relative.y;
@@ -277,36 +284,40 @@ void CInput::MouseModeAbsolute()
 void CInput::MouseModeRelative()
 {
 	m_InputGrabbed = true;
+#if !defined(CONF_PLATFORM_ANDROID) // No relative mouse on Android
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+#endif
 	Graphics()->SetWindowGrab(true);
 	// Clear pending relative mouse motion
 	SDL_GetRelativeMouseState(nullptr, nullptr);
 }
 
-vec2 CInput::NativeMousePos() const
+void CInput::NativeMousePos(int *pX, int *pY) const
 {
-	ivec2 Position;
-	SDL_GetMouseState(&Position.x, &Position.y);
-	return vec2(Position.x, Position.y);
+	SDL_GetMouseState(pX, pY);
 }
 
-bool CInput::NativeMousePressed(int Index) const
+bool CInput::NativeMousePressed(int Index)
 {
 	int i = SDL_GetMouseState(nullptr, nullptr);
 	return (i & SDL_BUTTON(Index)) != 0;
 }
 
-const std::vector<IInput::CTouchFingerState> &CInput::TouchFingerStates() const
+bool CInput::MouseDoubleClick()
 {
-	return m_vTouchFingerStates;
+	if(m_MouseDoubleClick)
+	{
+		m_MouseDoubleClick = false;
+		return true;
+	}
+	return false;
 }
 
-std::string CInput::GetClipboardText()
+const char *CInput::GetClipboardText()
 {
-	char *pClipboardText = SDL_GetClipboardText();
-	std::string ClipboardText = pClipboardText;
-	SDL_free(pClipboardText);
-	return ClipboardText;
+	SDL_free(m_pClipboardText);
+	m_pClipboardText = SDL_GetClipboardText();
+	return m_pClipboardText;
 }
 
 void CInput::SetClipboardText(const char *pText)
@@ -326,37 +337,17 @@ void CInput::StopTextInput()
 	SDL_StopTextInput();
 	// disable system messages for performance
 	SDL_EventState(SDL_SYSWMEVENT, SDL_DISABLE);
-	m_CompositionString = "";
+	m_CompositionLength = COMP_LENGTH_INACTIVE;
 	m_CompositionCursor = 0;
+	m_aComposition[0] = '\0';
 	m_vCandidates.clear();
-}
-
-void CInput::ConsumeEvents(std::function<void(const CEvent &Event)> Consumer) const
-{
-	for(const CEvent &Event : m_vInputEvents)
-	{
-		// Only propagate valid input events
-		if(Event.m_InputCount == m_InputCounter)
-		{
-			Consumer(Event);
-		}
-	}
 }
 
 void CInput::Clear()
 {
 	mem_zero(m_aInputState, sizeof(m_aInputState));
 	mem_zero(m_aInputCount, sizeof(m_aInputCount));
-	m_vInputEvents.clear();
-	for(CTouchFingerState &TouchFingerState : m_vTouchFingerStates)
-	{
-		TouchFingerState.m_Delta = vec2(0.0f, 0.0f);
-	}
-}
-
-float CInput::GetUpdateTime() const
-{
-	return m_UpdateTime;
+	m_NumEvents = 0;
 }
 
 bool CInput::KeyState(int Key) const
@@ -364,26 +355,6 @@ bool CInput::KeyState(int Key) const
 	if(Key < KEY_FIRST || Key >= KEY_LAST)
 		return false;
 	return m_aInputState[Key];
-}
-
-int CInput::FindKeyByName(const char *pKeyName) const
-{
-	// check for numeric
-	if(pKeyName[0] == '&')
-	{
-		int Key = str_toint(pKeyName + 1);
-		if(Key > KEY_FIRST && Key < KEY_LAST)
-			return Key; // numeric
-	}
-
-	// search for key
-	for(int Key = KEY_FIRST; Key < KEY_LAST; Key++)
-	{
-		if(str_comp_nocase(pKeyName, KeyName(Key)) == 0)
-			return Key;
-	}
-
-	return KEY_UNKNOWN;
 }
 
 void CInput::UpdateMouseState()
@@ -441,7 +412,7 @@ void CInput::HandleJoystickAxisMotionEvent(const SDL_JoyAxisEvent &Event)
 	if(!g_Config.m_InpControllerEnable)
 		return;
 	CJoystick *pJoystick = GetActiveJoystick();
-	if(!pJoystick || pJoystick->GetInstanceId() != Event.which)
+	if(!pJoystick || pJoystick->GetInstanceID() != Event.which)
 		return;
 	if(Event.axis >= NUM_JOYSTICK_AXES)
 		return;
@@ -454,24 +425,24 @@ void CInput::HandleJoystickAxisMotionEvent(const SDL_JoyAxisEvent &Event)
 	{
 		m_aInputState[LeftKey] = true;
 		m_aInputCount[LeftKey] = m_InputCounter;
-		AddKeyEvent(LeftKey, IInput::FLAG_PRESS);
+		AddEvent(nullptr, LeftKey, IInput::FLAG_PRESS);
 	}
 	else if(Event.value > SDL_JOYSTICK_AXIS_MIN * DeadZone && m_aInputState[LeftKey])
 	{
 		m_aInputState[LeftKey] = false;
-		AddKeyEvent(LeftKey, IInput::FLAG_RELEASE);
+		AddEvent(nullptr, LeftKey, IInput::FLAG_RELEASE);
 	}
 
 	if(Event.value >= SDL_JOYSTICK_AXIS_MAX * DeadZone && !m_aInputState[RightKey])
 	{
 		m_aInputState[RightKey] = true;
 		m_aInputCount[RightKey] = m_InputCounter;
-		AddKeyEvent(RightKey, IInput::FLAG_PRESS);
+		AddEvent(nullptr, RightKey, IInput::FLAG_PRESS);
 	}
 	else if(Event.value < SDL_JOYSTICK_AXIS_MAX * DeadZone && m_aInputState[RightKey])
 	{
 		m_aInputState[RightKey] = false;
-		AddKeyEvent(RightKey, IInput::FLAG_RELEASE);
+		AddEvent(nullptr, RightKey, IInput::FLAG_RELEASE);
 	}
 }
 
@@ -480,7 +451,7 @@ void CInput::HandleJoystickButtonEvent(const SDL_JoyButtonEvent &Event)
 	if(!g_Config.m_InpControllerEnable)
 		return;
 	CJoystick *pJoystick = GetActiveJoystick();
-	if(!pJoystick || pJoystick->GetInstanceId() != Event.which)
+	if(!pJoystick || pJoystick->GetInstanceID() != Event.which)
 		return;
 	if(Event.button >= NUM_JOYSTICK_BUTTONS)
 		return;
@@ -491,12 +462,12 @@ void CInput::HandleJoystickButtonEvent(const SDL_JoyButtonEvent &Event)
 	{
 		m_aInputState[Key] = true;
 		m_aInputCount[Key] = m_InputCounter;
-		AddKeyEvent(Key, IInput::FLAG_PRESS);
+		AddEvent(nullptr, Key, IInput::FLAG_PRESS);
 	}
 	else if(Event.type == SDL_JOYBUTTONUP)
 	{
 		m_aInputState[Key] = false;
-		AddKeyEvent(Key, IInput::FLAG_RELEASE);
+		AddEvent(nullptr, Key, IInput::FLAG_RELEASE);
 	}
 }
 
@@ -505,7 +476,7 @@ void CInput::HandleJoystickHatMotionEvent(const SDL_JoyHatEvent &Event)
 	if(!g_Config.m_InpControllerEnable)
 		return;
 	CJoystick *pJoystick = GetActiveJoystick();
-	if(!pJoystick || pJoystick->GetInstanceId() != Event.which)
+	if(!pJoystick || pJoystick->GetInstanceID() != Event.which)
 		return;
 	if(Event.hat >= NUM_JOYSTICK_HATS)
 		return;
@@ -518,7 +489,7 @@ void CInput::HandleJoystickHatMotionEvent(const SDL_JoyHatEvent &Event)
 		if(Key != HatKeys[0] && Key != HatKeys[1] && m_aInputState[Key])
 		{
 			m_aInputState[Key] = false;
-			AddKeyEvent(Key, IInput::FLAG_RELEASE);
+			AddEvent(nullptr, Key, IInput::FLAG_RELEASE);
 		}
 	}
 
@@ -528,7 +499,7 @@ void CInput::HandleJoystickHatMotionEvent(const SDL_JoyHatEvent &Event)
 		{
 			m_aInputState[CurrentKey] = true;
 			m_aInputCount[CurrentKey] = m_InputCounter;
-			AddKeyEvent(CurrentKey, IInput::FLAG_PRESS);
+			AddEvent(nullptr, CurrentKey, IInput::FLAG_PRESS);
 		}
 	}
 }
@@ -543,7 +514,7 @@ void CInput::HandleJoystickAddedEvent(const SDL_JoyDeviceEvent &Event)
 
 void CInput::HandleJoystickRemovedEvent(const SDL_JoyDeviceEvent &Event)
 {
-	auto RemovedJoystick = std::find_if(m_vJoysticks.begin(), m_vJoysticks.end(), [Event](const CJoystick &Joystick) -> bool { return Joystick.GetInstanceId() == Event.which; });
+	auto RemovedJoystick = std::find_if(m_vJoysticks.begin(), m_vJoysticks.end(), [Event](const CJoystick &Joystick) -> bool { return Joystick.GetInstanceID() == Event.which; });
 	if(RemovedJoystick != m_vJoysticks.end())
 	{
 		dbg_msg("joystick", "Closed joystick %d '%s'", (*RemovedJoystick).GetIndex(), (*RemovedJoystick).GetName());
@@ -558,59 +529,6 @@ void CInput::HandleJoystickRemovedEvent(const SDL_JoyDeviceEvent &Event)
 	}
 }
 
-void CInput::HandleTouchDownEvent(const SDL_TouchFingerEvent &Event)
-{
-	CTouchFingerState TouchFingerState;
-	TouchFingerState.m_Finger.m_DeviceId = Event.touchId;
-	TouchFingerState.m_Finger.m_FingerId = Event.fingerId;
-	TouchFingerState.m_Position = vec2(Event.x, Event.y);
-	TouchFingerState.m_Delta = vec2(Event.dx, Event.dy);
-	m_vTouchFingerStates.emplace_back(TouchFingerState);
-}
-
-void CInput::HandleTouchUpEvent(const SDL_TouchFingerEvent &Event)
-{
-	auto FoundState = std::find_if(m_vTouchFingerStates.begin(), m_vTouchFingerStates.end(), [Event](const CTouchFingerState &State) {
-		return State.m_Finger.m_DeviceId == Event.touchId && State.m_Finger.m_FingerId == Event.fingerId;
-	});
-	if(FoundState != m_vTouchFingerStates.end())
-	{
-		m_vTouchFingerStates.erase(FoundState);
-	}
-}
-
-void CInput::HandleTouchMotionEvent(const SDL_TouchFingerEvent &Event)
-{
-	auto FoundState = std::find_if(m_vTouchFingerStates.begin(), m_vTouchFingerStates.end(), [Event](const CTouchFingerState &State) {
-		return State.m_Finger.m_DeviceId == Event.touchId && State.m_Finger.m_FingerId == Event.fingerId;
-	});
-	if(FoundState != m_vTouchFingerStates.end())
-	{
-		FoundState->m_Position = vec2(Event.x, Event.y);
-		FoundState->m_Delta += vec2(Event.dx, Event.dy);
-	}
-}
-
-void CInput::HandleTextEditingEvent(const char *pText, int Start, int Length)
-{
-	if(pText[0] != '\0')
-	{
-		m_CompositionString = pText;
-		m_CompositionCursor = 0;
-		for(int i = 0; i < Start; i++)
-		{
-			m_CompositionCursor = str_utf8_forward(m_CompositionString.c_str(), m_CompositionCursor);
-		}
-		// Length is currently unused on Windows and will always be 0, so we don't support selecting composition text
-		AddTextEvent("");
-	}
-	else
-	{
-		m_CompositionString = "";
-		m_CompositionCursor = 0;
-	}
-}
-
 void CInput::SetCompositionWindowPosition(float X, float Y, float H)
 {
 	SDL_Rect Rect;
@@ -619,40 +537,6 @@ void CInput::SetCompositionWindowPosition(float X, float Y, float H)
 	Rect.h = H / m_pGraphics->ScreenHiDPIScale();
 	Rect.w = 0;
 	SDL_SetTextInputRect(&Rect);
-}
-
-static int TranslateScancode(const SDL_KeyboardEvent &KeyEvent)
-{
-	// See SDL_Keymod for possible modifiers:
-	// NONE   =     0
-	// LSHIFT =     1
-	// RSHIFT =     2
-	// LCTRL  =    64
-	// RCTRL  =   128
-	// LALT   =   256
-	// RALT   =   512
-	// LGUI   =  1024
-	// RGUI   =  2048
-	// NUM    =  4096
-	// CAPS   =  8192
-	// MODE   = 16384
-	// Sum if you want to ignore multiple modifiers.
-	if(KeyEvent.keysym.mod & g_Config.m_InpIgnoredModifiers)
-	{
-		return 0;
-	}
-
-	int Scancode = g_Config.m_InpTranslatedKeys ? SDL_GetScancodeFromKey(KeyEvent.keysym.sym) : KeyEvent.keysym.scancode;
-
-#if defined(CONF_PLATFORM_ANDROID)
-	// Translate the Android back-button to the escape-key so it can be used to open/close the menu, close popups etc.
-	if(Scancode == KEY_AC_BACK)
-	{
-		Scancode = KEY_ESCAPE;
-	}
-#endif
-
-	return Scancode;
 }
 
 int CInput::Update()
@@ -665,8 +549,8 @@ int CInput::Update()
 	}
 	m_LastUpdate = Now;
 
-	// keep the counter between 1..0xFFFFFFFF, 0 means not pressed
-	m_InputCounter = (m_InputCounter % std::numeric_limits<decltype(m_InputCounter)>::max()) + 1;
+	// keep the counter between 1..0xFFFF, 0 means not pressed
+	m_InputCounter = (m_InputCounter % 0xFFFF) + 1;
 
 	// Ensure that we have the latest keyboard, mouse and joystick state
 	SDL_PumpEvents();
@@ -695,29 +579,57 @@ int CInput::Update()
 			break;
 
 		case SDL_TEXTEDITING:
-			HandleTextEditingEvent(Event.edit.text, Event.edit.start, Event.edit.length);
+		{
+			m_CompositionLength = str_length(Event.edit.text);
+			if(m_CompositionLength)
+			{
+				str_copy(m_aComposition, Event.edit.text);
+				m_CompositionCursor = 0;
+				for(int i = 0; i < Event.edit.start; i++)
+					m_CompositionCursor = str_utf8_forward(m_aComposition, m_CompositionCursor);
+				// Event.edit.length is currently unused on Windows and will always be 0, so we don't support selecting composition text
+				AddEvent(nullptr, KEY_UNKNOWN, IInput::FLAG_TEXT);
+			}
+			else
+			{
+				m_aComposition[0] = '\0';
+				m_CompositionLength = 0;
+				m_CompositionCursor = 0;
+			}
 			break;
-
-#if SDL_VERSION_ATLEAST(2, 0, 22)
-		case SDL_TEXTEDITING_EXT:
-			HandleTextEditingEvent(Event.editExt.text, Event.editExt.start, Event.editExt.length);
-			SDL_free(Event.editExt.text);
-			break;
-#endif
+		}
 
 		case SDL_TEXTINPUT:
-			m_CompositionString = "";
+			m_aComposition[0] = '\0';
+			m_CompositionLength = COMP_LENGTH_INACTIVE;
 			m_CompositionCursor = 0;
-			AddTextEvent(Event.text.text);
+			AddEvent(Event.text.text, KEY_UNKNOWN, IInput::FLAG_TEXT);
 			break;
 
 		// handle keys
 		case SDL_KEYDOWN:
-			Scancode = TranslateScancode(Event.key);
+			// See SDL_Keymod for possible modifiers:
+			// NONE   =     0
+			// LSHIFT =     1
+			// RSHIFT =     2
+			// LCTRL  =    64
+			// RCTRL  =   128
+			// LALT   =   256
+			// RALT   =   512
+			// LGUI   =  1024
+			// RGUI   =  2048
+			// NUM    =  4096
+			// CAPS   =  8192
+			// MODE   = 16384
+			// Sum if you want to ignore multiple modifiers.
+			if(!(Event.key.keysym.mod & g_Config.m_InpIgnoredModifiers))
+			{
+				Scancode = g_Config.m_InpTranslatedKeys ? SDL_GetScancodeFromKey(Event.key.keysym.sym) : Event.key.keysym.scancode;
+			}
 			break;
 		case SDL_KEYUP:
 			Action = IInput::FLAG_RELEASE;
-			Scancode = TranslateScancode(Event.key);
+			Scancode = g_Config.m_InpTranslatedKeys ? SDL_GetScancodeFromKey(Event.key.keysym.sym) : Event.key.keysym.scancode;
 			break;
 
 		// handle the joystick events
@@ -766,6 +678,13 @@ int CInput::Update()
 				Scancode = KEY_MOUSE_8;
 			if(Event.button.button == 9)
 				Scancode = KEY_MOUSE_9;
+			if(Event.button.button == SDL_BUTTON_LEFT)
+			{
+				if(Event.button.clicks % 2 == 0)
+					m_MouseDoubleClick = true;
+				if(Event.button.clicks == 1)
+					m_MouseDoubleClick = false;
+			}
 			break;
 
 		case SDL_MOUSEWHEEL:
@@ -778,18 +697,6 @@ int CInput::Update()
 			if(Event.wheel.x < 0)
 				Scancode = KEY_MOUSE_WHEEL_RIGHT;
 			Action |= IInput::FLAG_RELEASE;
-			break;
-
-		case SDL_FINGERDOWN:
-			HandleTouchDownEvent(Event.tfinger);
-			break;
-
-		case SDL_FINGERUP:
-			HandleTouchUpEvent(Event.tfinger);
-			break;
-
-		case SDL_FINGERMOTION:
-			HandleTouchMotionEvent(Event.tfinger);
 			break;
 
 		case SDL_WINDOWEVENT:
@@ -825,9 +732,6 @@ int CInput::Update()
 				}
 				break;
 			case SDL_WINDOWEVENT_MINIMIZED:
-#if defined(CONF_PLATFORM_ANDROID) // Save the config when minimized on Android.
-				m_pConfigManager->Save();
-#endif
 				Graphics()->WindowDestroyNtf(Event.window.windowID);
 				break;
 
@@ -860,9 +764,12 @@ int CInput::Update()
 				m_aInputState[Scancode] = 1;
 				m_aInputCount[Scancode] = m_InputCounter;
 			}
-			AddKeyEvent(Scancode, Action);
+			AddEvent(nullptr, Scancode, Action);
 		}
 	}
+
+	if(m_CompositionLength == 0)
+		m_CompositionLength = COMP_LENGTH_INACTIVE;
 
 	return 0;
 }

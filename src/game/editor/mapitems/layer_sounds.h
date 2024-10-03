@@ -15,9 +15,9 @@ public:
 
 	void BrushSelecting(CUIRect Rect) override;
 	int BrushGrab(std::shared_ptr<CLayerGroup> pBrush, CUIRect Rect) override;
-	void BrushPlace(std::shared_ptr<CLayer> pBrush, vec2 WorldPos) override;
+	void BrushPlace(std::shared_ptr<CLayer> pBrush, float wx, float wy) override;
 
-	CUi::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
+	CUI::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
 
 	void ModifyEnvelopeIndex(FIndexModifyFunction pfnFunc) override;
 	void ModifySoundIndex(FIndexModifyFunction pfnFunc) override;

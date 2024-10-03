@@ -34,13 +34,12 @@ class CSounds : public CComponent
 	std::shared_ptr<CSoundLoading> m_pSoundJob;
 	bool m_WaitForSoundJob;
 
-	void UpdateChannels();
 	int GetSampleId(int SetId);
 
-	float m_GuiSoundVolume = -1.0f;
-	float m_GameSoundVolume = -1.0f;
-	float m_MapSoundVolume = -1.0f;
-	float m_BackgroundMusicVolume = -1.0f;
+	float m_GuiSoundVolume;
+	float m_GameSoundVolume;
+	float m_MapSoundVolume;
+	float m_BackgroundMusicVolume;
 
 public:
 	// sound channels
@@ -61,14 +60,14 @@ public:
 
 	void ClearQueue();
 	void Enqueue(int Channel, int SetId);
-	void Play(int Channel, int SetId, float Volume);
-	void PlayAt(int Channel, int SetId, float Volume, vec2 Position);
-	void PlayAndRecord(int Channel, int SetId, float Volume, vec2 Position);
+	void Play(int Channel, int SetId, float Vol);
+	void PlayAt(int Channel, int SetId, float Vol, vec2 Pos);
+	void PlayAndRecord(int Channel, int SetId, float Vol, vec2 Pos);
 	void Stop(int SetId);
 	bool IsPlaying(int SetId);
 
-	ISound::CVoiceHandle PlaySample(int Channel, int SampleId, int Flags, float Volume);
-	ISound::CVoiceHandle PlaySampleAt(int Channel, int SampleId, int Flags, float Volume, vec2 Position);
+	ISound::CVoiceHandle PlaySample(int Channel, int SampleId, float Vol, int Flags = 0);
+	ISound::CVoiceHandle PlaySampleAt(int Channel, int SampleId, float Vol, vec2 Pos, int Flags = 0);
 };
 
 #endif

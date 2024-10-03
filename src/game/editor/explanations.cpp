@@ -14,7 +14,7 @@ const char *CEditor::ExplainDDNet(int Tile, int Layer)
 			return "HOOKABLE: It's possible to hook and collide with it.";
 		break;
 	case TILE_DEATH:
-		if(Layer == LAYER_GAME || Layer == LAYER_FRONT)
+		if(Layer == LAYER_GAME)
 			return "KILL: Kills the tee.";
 		break;
 	case TILE_NOHOOK:

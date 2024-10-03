@@ -61,14 +61,13 @@ public:
 		POS_BROWSER_CUSTOM1,
 		POS_BROWSER_CUSTOM2,
 		POS_BROWSER_CUSTOM3,
-		POS_BROWSER_CUSTOM4,
 		POS_RESERVED0,
 		POS_RESERVED1,
 		POS_RESERVED2,
 
 		NUM_POS,
 
-		POS_BROWSER_CUSTOM_NUM = (POS_BROWSER_CUSTOM4 - POS_BROWSER_CUSTOM0) + 1,
+		POS_BROWSER_CUSTOM_NUM = (POS_BROWSER_CUSTOM3 - POS_BROWSER_CUSTOM0) + 1,
 		POS_SETTINGS_RESERVED_NUM = (POS_SETTINGS_RESERVED1 - POS_SETTINGS_RESERVED0) + 1,
 		POS_RESERVED_NUM = (POS_RESERVED2 - POS_RESERVED0) + 1,
 	};
@@ -85,7 +84,6 @@ public:
 	vec2 m_RotationCenter;
 	std::array<vec2, NUM_POS> m_aPositions;
 	int m_CurrentPosition;
-	vec2 m_CurrentDirection = vec2(1.0f, 0.0f);
 	vec2 m_AnimationStartPos;
 	bool m_ChangedPosition;
 	float m_MoveTime;

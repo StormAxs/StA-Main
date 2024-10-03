@@ -36,13 +36,6 @@
 # 2023-07-20 By
 # 2023-08-11 By
 # 2023-11-25 By
-# 2024-01-15 By
-# 2024-03-03 Bamcane
-# 2024-04-21 By
-# 2024-06-10 By
-# 2024-07-21 By
-# 2024-08-29 Pioooooo
-# 2024-09-29 Pioooooo
 ##### /authors #####
 
 ##### translated strings #####
@@ -65,6 +58,9 @@
 %s wins!
 == %s 胜利！
 
+-Page %d-
+== -第 %d 页-
+
 Abort
 == 取消
 
@@ -81,7 +77,7 @@ All
 == 全体
 
 Are you sure that you want to quit?
-== 确定要退出吗？
+== 你确定要退出吗？
 
 Automatically record demos
 == 自动录制回放
@@ -116,8 +112,8 @@ Client
 Connecting to
 == 正在连接到
 
-Connection Problems…
-== 连接中断…
+Connection Problems...
+== 连接中断...
 
 Console
 == 控制台
@@ -344,6 +340,9 @@ HUD
 Player country:
 == 玩家国家 / 地区：
 
+Player options
+== 玩家选项
+
 Players
 == 玩家
 
@@ -417,7 +416,7 @@ Show name plates
 == 显示昵称
 
 Show only chat messages from friends
-== 只显示好友聊天消息
+== 只显示好友消息
 
 Sound
 == 声音
@@ -473,6 +472,9 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == 此服务器运行着经过调整的非标准游戏模式。
 
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== 编辑器中的地图尚未保存，建议你在退出游戏之前返回编辑器进行保存。
+
 Time limit
 == 规定时限
 
@@ -492,7 +494,7 @@ Use sounds
 == 开启声音
 
 Use team colors for name plates
-== 用队伍颜色显示昵称
+== 用队伍颜色标注昵称
 
 V-Sync
 == 垂直同步
@@ -569,6 +571,9 @@ Map sound volume
 Max Screenshots
 == 最大截图数
 
+Dummy settings
+== 分身设置
+
 Laser
 == 激光
 
@@ -583,6 +588,12 @@ Your skin
 
 Reset to defaults
 == 恢复默认设置
+
+Quit anyway?
+== 无论如何都要退出吗？
+
+Round
+== 回合
 
 Lht.
 == 亮度
@@ -601,6 +612,9 @@ LAN
 
 Name plates size
 == 昵称大小
+
+Use DDRace Scoreboard
+== 使用 DDRace 计分板
 
 Show score
 == 显示分数
@@ -683,8 +697,8 @@ DDNet %s is available:
 Update now
 == 现在更新
 
-Updating…
-== 更新中…
+Updating...
+== 更新中...
 
 DDNet Client updated!
 == DDNet 客户端更新成功！
@@ -696,7 +710,7 @@ Check now
 == 检查更新
 
 Loading DDNet Client
-== 加载 DDNet 客户端中…
+== 加载 DDNet 客户端中...
 
 Browser
 == 浏览
@@ -735,6 +749,9 @@ DDNet
 
 Deaths
 == 死亡数
+
+Please use a different filename
+== 
 
 Restart
 == 重新开始
@@ -830,6 +847,9 @@ Show DDNet map finishes in server browser
 transmits your player name to info.ddnet.org
 == 将会发送你的玩家昵称到 info.ddnet.org
 
+Reload
+== 刷新
+
 Enable replays
 == 启用短时回放
 
@@ -875,8 +895,8 @@ Zoom in
 1 new mention
 == 1 条新被提及消息
 
-Update failed! Check log…
-== 更新失败！请检查日志…
+Update failed! Check log...
+== 更新失败！请检查日志...
 
 Pause
 == 暂停
@@ -990,7 +1010,7 @@ Speed
 == 速度
 
 Skip the main menu
-== 跳过主菜单
+== 跳过主界面
 
 Website
 == 官网
@@ -1025,6 +1045,9 @@ Auto
 
 Replay
 == 回放
+
+Saving ddnet-settings.cfg failed
+== 配置文件 ddnet-settings.cfg 保存失败
 
 Debug mode enabled. Press Ctrl+Shift+D to disable debug mode.
 == 调试模式已启用。按 Ctrl+Shift+D 禁用调试模式。
@@ -1159,7 +1182,10 @@ Desktop fullscreen
 == 无边框全屏
 
 Are you sure that you want to disconnect and switch to a different server?
-== 确定要断开此服务器连接并进入其他服务器吗？
+== 你确定要断开此服务器连接并进入其他服务器吗？
+
+Kill Messages
+== 击杀消息
 
 Show local player's key presses
 == 显示自己的按键
@@ -1206,6 +1232,9 @@ Tutorial
 Can't find a Tutorial server
 == 无法找到教学服务器
 
+Toggle to edit your dummy settings
+== 编辑分身设置
+
 Choose default eyes when joining a server
 == 进入服务器时的默认表情
 
@@ -1242,8 +1271,8 @@ Speed:
 Angle:
 == 角度
 
-Trying to determine UDP connectivity…
-== 正在尝试检测 UDP 连接…
+Trying to determine UDP connectivity...
+== 正在尝试检测 UDP 连接...
 
 UDP seems to be filtered.
 == UDP 疑似被过滤
@@ -1385,14 +1414,20 @@ Show health, shields and ammo
 DDRace HUD
 == DDRace HUD
 
+Show client IDs in scoreboard
+== 显示客户端 IDs （计分板中）
+
 Show DDRace HUD
 == 显示 DDRace HUD
 
 Show jumps indicator
 == 显示可跳跃次数
 
+Show hook strength indicator
+== 显示对其他玩家的钩索强度
+
 Hook collision line
-== 钩索辅助线
+== 瞄准辅助线
 
 Hook collision line width
 == 辅助线宽度
@@ -1485,10 +1520,10 @@ File '%s' already exists, do you want to overwrite it?
 == 文件名 "%s" 已经存在，是否要覆盖该文件？
 
 Are you sure that you want to remove the player '%s' from your friends list?
-== 确定要将好友 "%s" 从你的好友列表中删除？
+== 你确定要将好友 "%s" 从你的好友列表中删除？
 
 Are you sure that you want to remove the clan '%s' from your friends list?
-== 确定要将战队 "%s" 从你的好友列表中删除？
+== 你确定要将战队 "%s" 从你的好友列表中删除？
 
 Go back one tick
 == 上一个 tick
@@ -1503,7 +1538,7 @@ Go forward one marker
 == 跳至下一个标记
 
 Are you sure that you want to delete the demo '%s'?
-== 确定要删除回放文件 "%s" ？
+== 你确定要删除回放文件 "%s" ？
 
 Unable to delete the demo '%s'
 == 无法删除回放文件 "%s"
@@ -1512,11 +1547,11 @@ Reset controls
 == 恢复默认设置
 
 Are you sure that you want to reset the controls to their defaults?
-== 确定要将当前的控制恢复至默认设置？
+== 你确定要将当前的控制恢复至默认设置？
 
 [Graphics error]
 Failed during initialization. Try to change gfx_backend to OpenGL or Vulkan in settings_ddnet.cfg in the config directory and try again.
-== 初始化失败。请尝试打开配置目录中的设置文件（settings_ddnet.cfg）并将 “gfx_backend” 设置为 “gfx_backend OpenGL” 或 “gfx_backend Vulkan” 再重试。
+== 初始化失败。请尝试打开配置目录中的设置文件（settings_ddnet.cfg）并将“gfx_backend OpenGL”修改为“gfx_backend Vulkan”（若没有前者则可直接输入后者）再重试。
 
 [Graphics error]
 Out of VRAM. Try removing custom assets (skins, entities, etc.), especially those with high resolution.
@@ -1540,7 +1575,7 @@ Failed to swap framebuffers. Try to update your GPU drivers.
 
 [Graphics error]
 Unknown error. Try to change gfx_backend to OpenGL or Vulkan in settings_ddnet.cfg in the config directory and try again.
-== 未知错误。请尝试打开配置目录中的设置文件（settings_ddnet.cfg）并将 “gfx_backend” 设置为 “gfx_backend OpenGL” 或 “gfx_backend Vulkan” 再重试。
+== 未知错误。请尝试打开配置目录中的设置文件（settings_ddnet.cfg）并将“gfx_backend OpenGL”修改为“gfx_backend Vulkan”（若没有前者则可直接输入后者）再重试。
 
 [Graphics error]
 Could not initialize the given graphics backend, reverting to the default backend now.
@@ -1568,7 +1603,7 @@ No controller found. Plug in a controller.
 == 未检测到任何控制器。请尝试重新连接控制器。
 
 Unregister protocol and file extensions
-== 解除协议与文件类型关联
+== 未注册的协议与扩充文件
 
 Open the directory to add custom assets
 == 打开用以添加自定义资源的文件夹路径
@@ -1669,7 +1704,7 @@ Folder Link
 == 文件夹链接
 
 Are you sure that you want to delete the folder '%s'?
-== 确定要删除文件夹 "%s" ？
+== 你确定要删除文件夹 "%s" ？
 
 Delete folder
 == 删除文件夹
@@ -1754,232 +1789,3 @@ Regular background color
 
 Entities background color
 == 实体层背景颜色
-
-Saving settings to '%s' failed
-== 无法保存设置至 "%s"
-
-Searching
-== 正在搜索
-
-Enter Username
-== 输入账号名称
-
-Enter Password
-== 输入密码
-
-NOT CONNECTED
-== 连接未成功
-
-Match %d of %d
-== 结果 %d / 总共 %d 则
-
-No results
-== 无结果
-
-Lines %d - %d (%s)
-== 行 %d - %d (%s)
-
-Locked
-== 锁定
-
-Following
-== 当前
-
-Press a key…
-== 按任意键…
-
-Are you sure that you want to restart?
-== 确定要重新开始？
-
-There's an unsaved map in the editor, you might want to save it.
-== 编辑器中有尚未保存的地图，你或需要保存
-
-Continue anyway?
-== 仍要退出？
-
-Communities
-== 社区
-
-Please use a different filename
-== 请使用不同的文件名
-
-Info Messages
-== 消息
-
-Show local time always
-== 始终显示本地时间
-
-Chat font size
-== 聊天字体大小
-
-Chat width
-== 聊天框宽度
-
-Authed name color in scoreboard
-== 管理权限者名字计分板显示颜色
-
-Same clan color in scoreboard
-== 相同战队计分板显示颜色
-
-Show finish messages
-== 显示完成消息
-
-Failed saving the replay!
-== 保存回放失败！
-
-Error saving settings
-== 保存设置错误
-
-Loading commands…
-== 正在加载指令…
-
-Main menu
-== 主菜单
-
-Server filter
-== 服务器筛选
-
-Friends
-== 好友
-
-Loading…
-== 正在加载…
-
-Loading demo file from storage
-== 正在从硬盘中加载回放文件
-
-No login required
-== 无需登录
-
-Player info change cooldown
-== 玩家信息更改冷却时间
-
-Always show chat
-== 始终显示聊天框
-
-Show friend mark (♥) in name plates
-== 在昵称上显示好友标记 (♥)
-
-Show hook strength icon indicator
-== 显示钩索强度图标
-
-Show hook strength number indicator
-== 显示钩索强度数值
-
-Show own player's hook collision line
-== 显示自己的钩索辅助线
-
-Always show own player's hook collision line
-== 始终显示自己的钩索辅助线
-
-Always show other players' hook collision lines
-== 始终显示其他玩家的钩索辅助线
-
-%d/%d KiB (%.1f KiB/s)
-== %d/%d KiB (%.1f KiB/s)
-
-Tee
-== Tee
-
-Show only chat messages from team members
-== 只显示队伍聊天消息
-
-[Spectating]
-Following %s
-== 正在旁观 %s
-
-Example of usage
-== 用途示例
-
-Round %d/%d
-== 轮次 %d/%d
-
-[Spectators]
-%d others…
-== %d 其他…
-
-[Team and size]
-%d\n(%d/%d)
-== %d\n(%d/%d)
-
-Team %d (%d/%d)
-== 队伍 %d (%d/%d)
-
-https://wiki.ddnet.org/wiki/Mapping
-== https://wiki.ddnet.org/index.php?title=Mapping/zh&variant=zh-hans
-
-Could not resolve connect address '%s'. See local console for details.
-== 无法解析连接地址 '%s'。检查本地控制台以获取详情。
-
-Connect address error
-== 连接地址错误
-
-Could not connect dummy
-== 无法连接分身
-
-Dummy is not allowed on this server
-== 此服务器禁止使用分身
-
-Please wait…
-== 请稍等…
-
-Show client IDs (scoreboard, chat, spectator)
-== 显示客户端 ID（计分板、聊天、观战者）
-
-Are you sure that you want to delete '%s'?
-== 你确定要删除'%s'吗？
-
-Delete skin
-== 删除皮肤
-
-Basic
-== 基本
-
-Custom
-== 自定义
-
-Unable to delete skin
-== 无法删除皮肤
-
-Save skin
-== 保存皮肤
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== 你确定要保存皮肤吗？如果已经存在同名皮肤，将会被替换。
-
-Unable to save the skin
-== 无法保存皮肤
-
-Unable to save the skin with a reserved name
-== 无法保存使用保留名称的皮肤
-
-No local servers found (ports %d-%d)
-== 未找到本地服务器（端口 %d-%d）
-
-[Hertz]
-Hz
-== Hz
-
-[skins]
-Body
-== 身体
-
-[skins]
-Marking
-== 标记
-
-[skins]
-Decoration
-== 装饰
-
-[skins]
-Hands
-== 手
-
-[skins]
-Feet
-== 脚
-
-[skins]
-Eyes
-== 眼睛

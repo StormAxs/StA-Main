@@ -40,26 +40,22 @@ float CConsole::CResult::GetFloat(unsigned Index) const
 	return str_tofloat(m_apArgs[Index]);
 }
 
-std::optional<ColorHSLA> CConsole::CResult::GetColor(unsigned Index, float DarkestLighting) const
+ColorHSLA CConsole::CResult::GetColor(unsigned Index, bool Light) const
 {
 	if(Index >= m_NumArgs)
-		return std::nullopt;
+		return ColorHSLA(0, 0, 0);
 
 	const char *pStr = m_apArgs[Index];
 	if(str_isallnum(pStr) || ((pStr[0] == '-' || pStr[0] == '+') && str_isallnum(pStr + 1))) // Teeworlds Color (Packed HSL)
 	{
-		unsigned long Value = str_toulong_base(pStr, 10);
-		if(Value == std::numeric_limits<unsigned long>::max())
-			return std::nullopt;
-		return ColorHSLA(Value, true).UnclampLighting(DarkestLighting);
+		const ColorHSLA Hsla = ColorHSLA(str_toulong_base(pStr, 10), true);
+		if(Light)
+			return Hsla.UnclampLighting();
+		return Hsla;
 	}
 	else if(*pStr == '$') // Hex RGB/RGBA
 	{
-		auto ParsedColor = color_parse<ColorRGBA>(pStr + 1);
-		if(ParsedColor)
-			return color_cast<ColorHSLA>(ParsedColor.value());
-		else
-			return std::nullopt;
+		return color_cast<ColorHSLA>(color_parse<ColorRGBA>(pStr + 1).value_or(ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f)));
 	}
 	else if(!str_comp_nocase(pStr, "red"))
 		return ColorHSLA(0.0f / 6.0f, 1, .5f);
@@ -80,7 +76,7 @@ std::optional<ColorHSLA> CConsole::CResult::GetColor(unsigned Index, float Darke
 	else if(!str_comp_nocase(pStr, "black"))
 		return ColorHSLA(0, 0, 0);
 
-	return std::nullopt;
+	return ColorHSLA(0, 0, 0);
 }
 
 const IConsole::CCommandInfo *CConsole::CCommand::NextCommandInfo(int AccessLevel, int FlagMask) const
@@ -133,12 +129,12 @@ int CConsole::ParseStart(CResult *pResult, const char *pString, int Length)
 	return 0;
 }
 
-int CConsole::ParseArgs(CResult *pResult, const char *pFormat, bool IsColor)
+int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 {
 	char Command = *pFormat;
 	char *pStr;
 	int Optional = 0;
-	int Error = PARSEARGS_OK;
+	int Error = 0;
 
 	pResult->ResetVictim();
 
@@ -159,7 +155,7 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat, bool IsColor)
 			{
 				if(!Optional)
 				{
-					Error = PARSEARGS_MISSING_VALUE;
+					Error = 1;
 					break;
 				}
 
@@ -195,7 +191,7 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat, bool IsColor)
 							pStr++; // skip due to escape
 					}
 					else if(pStr[0] == 0)
-						return PARSEARGS_MISSING_VALUE; // return error
+						return 1; // return error
 
 					*pDst = *pStr;
 					pDst++;
@@ -219,39 +215,19 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat, bool IsColor)
 
 				if(Command == 'r') // rest of the string
 					break;
-				else if(Command == 'v' || Command == 'i' || Command == 'f' || Command == 's')
+				else if(Command == 'v') // validate victim
+					pStr = str_skip_to_whitespace(pStr);
+				else if(Command == 'i') // validate int
+					pStr = str_skip_to_whitespace(pStr);
+				else if(Command == 'f') // validate float
+					pStr = str_skip_to_whitespace(pStr);
+				else if(Command == 's') // validate string
 					pStr = str_skip_to_whitespace(pStr);
 
 				if(pStr[0] != 0) // check for end of string
 				{
 					pStr[0] = 0;
 					pStr++;
-				}
-
-				// validate args
-				if(Command == 'i')
-				{
-					// don't validate colors here
-					if(!IsColor)
-					{
-						int Value;
-						if(!str_toint(pResult->GetString(pResult->NumArguments() - 1), &Value) ||
-							Value == std::numeric_limits<int>::max() || Value == std::numeric_limits<int>::min())
-						{
-							Error = PARSEARGS_INVALID_INTEGER;
-							break;
-						}
-					}
-				}
-				else if(Command == 'f')
-				{
-					float Value;
-					if(!str_tofloat(pResult->GetString(pResult->NumArguments() - 1), &Value) ||
-						Value == std::numeric_limits<float>::max() || Value == std::numeric_limits<float>::min())
-					{
-						Error = PARSEARGS_INVALID_FLOAT;
-						break;
-					}
 				}
 
 				if(pVictim)
@@ -338,7 +314,7 @@ void CConsole::Print(int Level, const char *pFrom, const char *pStr, ColorRGBA P
 {
 	LEVEL LogLevel = IConsole::ToLogLevel(Level);
 	// if console colors are not enabled or if the color is pure white, use default terminal color
-	if(g_Config.m_ConsoleEnableColors && PrintColor != gs_ConsoleDefaultColor)
+	if(g_Config.m_ConsoleEnableColors && mem_comp(&PrintColor, &gs_ConsoleDefaultColor, sizeof(ColorRGBA)) != 0)
 	{
 		log_log_color(LogLevel, ColorToLogColor(PrintColor), pFrom, "%s", pStr);
 	}
@@ -426,7 +402,7 @@ bool CConsole::LineIsValid(const char *pStr)
 	return true;
 }
 
-void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bool InterpretSemicolons)
+void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientID, bool InterpretSemicolons)
 {
 	const char *pWithoutPrefix = str_startswith(pStr, "mc;");
 	if(pWithoutPrefix)
@@ -437,7 +413,7 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 	while(pStr && *pStr)
 	{
 		CResult Result;
-		Result.m_ClientId = ClientId;
+		Result.m_ClientID = ClientID;
 		const char *pEnd = pStr;
 		const char *pNextPart = 0;
 		int InString = 0;
@@ -472,14 +448,14 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 			return;
 
 		CCommand *pCommand;
-		if(ClientId == IConsole::CLIENT_ID_GAME)
+		if(ClientID == IConsole::CLIENT_ID_GAME)
 			pCommand = FindCommand(Result.m_pCommand, m_FlagMask | CFGFLAG_GAME);
 		else
 			pCommand = FindCommand(Result.m_pCommand, m_FlagMask);
 
 		if(pCommand)
 		{
-			if(ClientId == IConsole::CLIENT_ID_GAME && !(pCommand->m_Flags & CFGFLAG_GAME))
+			if(ClientID == IConsole::CLIENT_ID_GAME && !(pCommand->m_Flags & CFGFLAG_GAME))
 			{
 				if(Stroke)
 				{
@@ -488,7 +464,7 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 					Print(OUTPUT_LEVEL_STANDARD, "console", aBuf);
 				}
 			}
-			else if(ClientId == IConsole::CLIENT_ID_NO_GAME && pCommand->m_Flags & CFGFLAG_GAME)
+			else if(ClientID == IConsole::CLIENT_ID_NO_GAME && pCommand->m_Flags & CFGFLAG_GAME)
 			{
 				if(Stroke)
 				{
@@ -511,15 +487,10 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 
 				if(Stroke || IsStrokeCommand)
 				{
-					if(int Error = ParseArgs(&Result, pCommand->m_pParams, pCommand->m_pfnCallback == &SColorConfigVariable::CommandCallback))
+					if(ParseArgs(&Result, pCommand->m_pParams))
 					{
-						char aBuf[CMDLINE_LENGTH + 64];
-						if(Error == PARSEARGS_INVALID_INTEGER)
-							str_format(aBuf, sizeof(aBuf), "%s is not a valid integer.", Result.GetString(Result.NumArguments() - 1));
-						else if(Error == PARSEARGS_INVALID_FLOAT)
-							str_format(aBuf, sizeof(aBuf), "%s is not a valid decimal number.", Result.GetString(Result.NumArguments() - 1));
-						else
-							str_format(aBuf, sizeof(aBuf), "Invalid arguments. Usage: %s %s", pCommand->m_pName, pCommand->m_pParams);
+						char aBuf[TEMPCMD_NAME_LENGTH + TEMPCMD_PARAMS_LENGTH + 32];
+						str_format(aBuf, sizeof(aBuf), "Invalid arguments. Usage: %s %s", pCommand->m_pName, pCommand->m_pParams);
 						Print(OUTPUT_LEVEL_STANDARD, "chatresp", aBuf);
 					}
 					else if(m_StoreCommands && pCommand->m_Flags & CFGFLAG_STORE)
@@ -531,18 +502,15 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 					else
 					{
 						if(pCommand->m_Flags & CMDFLAG_TEST && !g_Config.m_SvTestingCommands)
-						{
-							Print(OUTPUT_LEVEL_STANDARD, "console", "Test commands aren't allowed, enable them with 'sv_test_cmds 1' in your initial config.");
 							return;
-						}
 
 						if(m_pfnTeeHistorianCommandCallback && !(pCommand->m_Flags & CFGFLAG_NONTEEHISTORIC))
 						{
-							m_pfnTeeHistorianCommandCallback(ClientId, m_FlagMask, pCommand->m_pName, &Result, m_pTeeHistorianCommandUserdata);
+							m_pfnTeeHistorianCommandCallback(ClientID, m_FlagMask, pCommand->m_pName, &Result, m_pTeeHistorianCommandUserdata);
 						}
 
 						if(Result.GetVictim() == CResult::VICTIM_ME)
-							Result.SetVictim(ClientId);
+							Result.SetVictim(ClientID);
 
 						if(Result.HasVictim() && Result.GetVictim() == CResult::VICTIM_ALL)
 						{
@@ -576,10 +544,7 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientId, bo
 			if(!m_pfnUnknownCommandCallback(pStr, m_pUnknownCommandUserdata))
 			{
 				char aBuf[CMDLINE_LENGTH + 32];
-				if(m_FlagMask & CFGFLAG_CHAT)
-					str_format(aBuf, sizeof(aBuf), "No such command: %s. Use /cmdlist for a list of all commands.", Result.m_pCommand);
-				else
-					str_format(aBuf, sizeof(aBuf), "No such command: %s.", Result.m_pCommand);
+				str_format(aBuf, sizeof(aBuf), "No such command: %s.", Result.m_pCommand);
 				Print(OUTPUT_LEVEL_STANDARD, "chatresp", aBuf);
 			}
 		}
@@ -619,21 +584,21 @@ CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 	return 0x0;
 }
 
-void CConsole::ExecuteLine(const char *pStr, int ClientId, bool InterpretSemicolons)
+void CConsole::ExecuteLine(const char *pStr, int ClientID, bool InterpretSemicolons)
 {
-	CConsole::ExecuteLineStroked(1, pStr, ClientId, InterpretSemicolons); // press it
-	CConsole::ExecuteLineStroked(0, pStr, ClientId, InterpretSemicolons); // then release it
+	CConsole::ExecuteLineStroked(1, pStr, ClientID, InterpretSemicolons); // press it
+	CConsole::ExecuteLineStroked(0, pStr, ClientID, InterpretSemicolons); // then release it
 }
 
-void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask, int ClientId, bool InterpretSemicolons)
+void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID, bool InterpretSemicolons)
 {
 	int Temp = m_FlagMask;
 	m_FlagMask = FlagMask;
-	ExecuteLine(pStr, ClientId, InterpretSemicolons);
+	ExecuteLine(pStr, ClientID, InterpretSemicolons);
 	m_FlagMask = Temp;
 }
 
-bool CConsole::ExecuteFile(const char *pFilename, int ClientId, bool LogFailure, int StorageType)
+bool CConsole::ExecuteFile(const char *pFilename, int ClientID, bool LogFailure, int StorageType)
 {
 	// make sure that this isn't being executed already
 	for(CExecFile *pCur = m_pFirstExec; pCur; pCur = pCur->m_pPrev)
@@ -651,19 +616,23 @@ bool CConsole::ExecuteFile(const char *pFilename, int ClientId, bool LogFailure,
 	m_pFirstExec = &ThisFile;
 
 	// exec the file
-	CLineReader LineReader;
+	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, StorageType);
+
 	bool Success = false;
 	char aBuf[32 + IO_MAX_PATH_LENGTH];
-	if(LineReader.OpenFile(m_pStorage->OpenFile(pFilename, IOFLAG_READ, StorageType)))
+	if(File)
 	{
 		str_format(aBuf, sizeof(aBuf), "executing '%s'", pFilename);
 		Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 
-		while(const char *pLine = LineReader.Get())
-		{
-			ExecuteLine(pLine, ClientId);
-		}
+		CLineReader Reader;
+		Reader.Init(File);
 
+		char *pLine;
+		while((pLine = Reader.Get()))
+			ExecuteLine(pLine, ClientID);
+
+		io_close(File);
 		Success = true;
 	}
 	else if(LogFailure)
@@ -758,10 +727,10 @@ void CConsole::ConUserCommandStatus(IResult *pResult, void *pUser)
 	CResult Result;
 	Result.m_pCommand = "access_status";
 	char aBuf[4];
-	str_format(aBuf, sizeof(aBuf), "%d", (int)IConsole::ACCESS_LEVEL_USER);
+	str_from_int((int)IConsole::ACCESS_LEVEL_USER, aBuf);
 	Result.AddArgument(aBuf);
 
-	CConsole::ConCommandStatus(&Result, pConsole);
+	pConsole->ConCommandStatus(&Result, pConsole);
 }
 
 void CConsole::TraverseChain(FCommandCallback *ppfnCallback, void **ppUserData)

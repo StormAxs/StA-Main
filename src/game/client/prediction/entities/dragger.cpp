@@ -66,7 +66,7 @@ void CDragger::LookForPlayersToDrag()
 				!Collision()->IntersectNoLaser(m_Pos, pTarget->m_Pos, 0, 0);
 		if(IsReachable)
 		{
-			const int &TargetClientId = pTarget->GetCid();
+			const int &TargetClientId = pTarget->GetCID();
 			int Distance = distance(pTarget->m_Pos, m_Pos);
 			if(MinDistInTeam == 0 || MinDistInTeam > Distance)
 			{
@@ -94,7 +94,7 @@ void CDragger::DraggerBeamReset()
 
 void CDragger::DraggerBeamTick()
 {
-	CCharacter *pTarget = GameWorld()->GetCharacterById(m_TargetId);
+	CCharacter *pTarget = GameWorld()->GetCharacterByID(m_TargetId);
 	if(!pTarget)
 	{
 		DraggerBeamReset();
@@ -124,15 +124,16 @@ void CDragger::DraggerBeamTick()
 	// In the center of the dragger a tee does not experience speed-up
 	else if(distance(pTarget->m_Pos, m_Pos) > 28)
 	{
-		pTarget->AddVelocity(normalize(m_Pos - pTarget->m_Pos) * m_Strength);
+		vec2 Temp = pTarget->Core()->m_Vel + (normalize(m_Pos - pTarget->m_Pos) * m_Strength);
+		pTarget->Core()->m_Vel = ClampVel(pTarget->m_MoveRestrictions, Temp);
 	}
 }
 
-CDragger::CDragger(CGameWorld *pGameWorld, int Id, const CLaserData *pData) :
+CDragger::CDragger(CGameWorld *pGameWorld, int ID, const CLaserData *pData) :
 	CEntity(pGameWorld, CGameWorld::ENTTYPE_DRAGGER)
 {
 	m_Core = vec2(0.f, 0.f);
-	m_Id = Id;
+	m_ID = ID;
 	m_TargetId = -1;
 
 	m_Strength = 0;

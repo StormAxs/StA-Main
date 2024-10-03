@@ -7,7 +7,7 @@
 #	3edcxzaq1		2020-06-25 00:00:00
 #	cur.ie			2020-09-28 00:00:00
 #	simpygirl		2022-02-20 00:00:00
-#	furo			2024-09-29 00:00:00
+#	furo			2023-11-12 00:00:00
 ##### /authors #####
 
 ##### translated strings #####
@@ -29,6 +29,9 @@
 
 %s wins!
 == %s vinner!
+
+-Page %d-
+== -Sida %d-
 
 Abort
 == Avbryt
@@ -81,8 +84,8 @@ Client
 Connecting to
 == Ansluter till
 
-Connection Problems…
-== Anslutningsproblem…
+Connection Problems...
+== Anslutningsproblem...
 
 Console
 == Konsol
@@ -282,6 +285,9 @@ Player
 Player country:
 == Land
 
+Player options
+== Spelaralternativ
+
 Players
 == Spelare
 
@@ -399,6 +405,9 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == Denna server kör inte standardinställningar på en reserverad speltyp.
 
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Det finns en osparad bana i redigeraren, du kanske vill spara den innan du avslutar.
+
 Time limit
 == Tidsbegränsning
 
@@ -497,6 +506,12 @@ Your skin
 
 Reset to defaults
 == Nollställ till standard
+
+Quit anyway?
+== Avsluta i alla fall?
+
+Round
+== Runda
 
 Lht.
 == Ljusstyrka
@@ -681,8 +696,8 @@ Max CSVs
 Zoom in
 == Zooma in
 
-Update failed! Check log…
-== Updatering misslyckades! Kolla logg…
+Update failed! Check log...
+== Updatering misslyckades! Kolla logg...
 
 %d new mentions
 == %d nya nämningar
@@ -796,7 +811,7 @@ Demo
 == Demo
 
 Show only chat messages from friends
-== Visa bara chatt meddelanden från kompisar
+== Visa bara chatt meddelanden från vänner
 
 DDNet Client updated!
 == DDNet Klienten uppdaterades!
@@ -840,8 +855,8 @@ AntiPing: predict grenade paths
 Best
 == Bäst
 
-Updating…
-== Uppdaterar…
+Updating...
+== Uppdaterar...
 
 Clan plates size
 == Klanskylt storlek
@@ -861,6 +876,9 @@ DDNet %s is out!
 Highlighted message
 == Betona meddelande
 
+Use DDRace Scoreboard
+== Använd DDRace poänglista
+
 AntiPing: predict weapons
 == AntiPing: predicera vapen
 
@@ -869,6 +887,9 @@ Length
 
 Skin prefix
 == Skin prefix
+
+Please use a different filename
+== 
 
 Game paused
 == Spel pausad
@@ -897,6 +918,9 @@ Show HUD
 Pause
 == Pausa
 
+Reload
+== Ladda om
+
 Spree
 == Spree
 
@@ -917,6 +941,9 @@ Update now
 
 Toggle ghost
 == Växla spöke
+
+Dummy settings
+== Dummy inställningar
 
 Team message
 == Lag meddelande
@@ -999,6 +1026,9 @@ Auto
 
 Replay
 == Repris
+
+Saving ddnet-settings.cfg failed
+== Det gick inte att spara ddnet-settings.cfg
 
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
 == Bredden på texturen %s är inte delbar med %d, eller är höjden inte delbar med %d, vilket kan orsaka visuella buggar.
@@ -1098,6 +1128,9 @@ Background music volume
 
 Assets
 == Assets
+
+Kill Messages
+== Döds meddelanden
 
 Use old chat style
 == Använd gammal chatt stil
@@ -1228,8 +1261,8 @@ Team %d
 Uploading map data to GPU
 == Laddar upp bana data till grafikkortet
 
-Trying to determine UDP connectivity…
-== Försöker att bestämma UDP anslutning…
+Trying to determine UDP connectivity...
+== Försöker att bestämma UDP anslutning...
 
 UDP seems to be filtered.
 == UDP verkar vara filtrerad.
@@ -1409,6 +1442,9 @@ Open the directory to add custom themes
 Loading skin files
 == Laddar skin filer
 
+Toggle to edit your dummy settings
+== Växla till att ändra dina dummy inställningar
+
 Download community skins
 == Ladda ner community skins
 
@@ -1510,6 +1546,9 @@ Show health, shields and ammo
 DDRace HUD
 == DDRace HUD
 
+Show client IDs in scoreboard
+== Visa klient ID i poänglista
+
 Show DDRace HUD
 == Visa DDRace HUD
 
@@ -1533,6 +1572,9 @@ Show freeze bars
 
 Opacity of freeze bars inside freeze
 == Opacitet av freeze bars i freeze
+
+Show hook strength indicator
+== Visa hook styrka indikator
 
 Hook collision line
 == Hook kollisions linje
@@ -1663,10 +1705,10 @@ Error playing demo
 == Ett fel uppstod under uppspelning av demo
 
 Some map images could not be loaded. Check the local console for details.
-== Vissa map bilder kunde inte laddas in. Se den lokala konsolen för detaljer.
+== Vissa map bilder kunde inte laddas in. See den lokala konsolen för detaljer.
 
 Some map sounds could not be loaded. Check the local console for details.
-== Vissa map ljud kunde inte laddas in. Se den lokala konsolen för detaljer.
+== Vissa map ljud kunde inte laddas in. See den lokala konsolen för detaljer.
 
 Loading menu themes
 == Laddar menyteman
@@ -1713,232 +1755,3 @@ Regular background color
 
 Entities background color
 == Entities bakgrunds färg
-
-Saving settings to '%s' failed
-== Sparning av inställningar till '%s' misslyckades
-
-Searching
-== Söker
-
-Enter Username
-== Ange Användarnamn
-
-Enter Password
-== Ange Lösenord
-
-NOT CONNECTED
-== INTE ANSLUTEN
-
-Match %d of %d
-== Resultat %d av %d
-
-No results
-== Inga resultat
-
-Lines %d - %d (%s)
-== Rader %d - %d (%s)
-
-Locked
-== Låst
-
-Following
-== Följer
-
-Press a key…
-== Tryck en knapp…
-
-Are you sure that you want to restart?
-== Är du säker att du vill starta om?
-
-There's an unsaved map in the editor, you might want to save it.
-== Det finns en osparad bana i redigeraren, du kanske vill spara den.
-
-Continue anyway?
-== Fortsätt ändå?
-
-Communities
-== Gemenskaper
-
-Please use a different filename
-== Använd ett annat filnamn
-
-Info Messages
-== Info Meddelanden
-
-Show local time always
-== Visa alltid lokal tid
-
-Chat font size
-== Chatt textstorlek
-
-Chat width
-== Chatt bredd
-
-Authed name color in scoreboard
-== Autentiserade namn färg i poänglistan
-
-Same clan color in scoreboard
-== Samma klan färg i poänglistan
-
-Show finish messages
-== Visa avklarnings meddelanden
-
-Failed saving the replay!
-== Misslyckades att spara repris!
-
-Error saving settings
-== Misslyckades att spara inställningar
-
-Loading commands…
-== Laddar kommandon…
-
-Main menu
-== Huvudmeny
-
-Server filter
-== Server filter
-
-Friends
-== Kompisar
-
-Loading…
-== Laddar…
-
-Loading demo file from storage
-== Laddar demo fil från lagring
-
-No login required
-== Ingen inloggning krävs
-
-Player info change cooldown
-== Spelarinfo ändring cooldown
-
-Always show chat
-== Visa alltid chatt
-
-Show friend mark (♥) in name plates
-== Visa kompis markering (♥) i namnskyltar
-
-Show hook strength icon indicator
-== Visa hook styrka med en ikon
-
-Show hook strength number indicator
-== Visa hook styrka med ett nummer 
-
-Show own player's hook collision line
-== Visa din egen hook kollisions linje
-
-Always show own player's hook collision line
-== Visa alltid din egna hook kollisions linje
-
-Always show other players' hook collision lines
-== Visa alltid andra spelares hook kollisions linjer
-
-%d/%d KiB (%.1f KiB/s)
-== %d/%d KiB (%.1f KiB/s)
-
-Tee
-== Tee
-
-Show only chat messages from team members
-== Visa bara chattmeddelanden från lagkamrater
-
-[Spectating]
-Following %s
-== Följer %s
-
-Example of usage
-== Exempel på användning
-
-Round %d/%d
-== Runda %d/%d
-
-[Spectators]
-%d others…
-== %d andra…
-
-[Team and size]
-%d\n(%d/%d)
-== %d\n(%d/%d)
-
-Team %d (%d/%d)
-== Lag %d (%d/%d)
-
-https://wiki.ddnet.org/wiki/Mapping
-== https://wiki.ddnet.org/wiki/Mapping
-
-Could not resolve connect address '%s'. See local console for details.
-== Kunde inte förstå anslutnings adress '%s'. Se den lokala konsolen för detaljer.
-
-Connect address error
-== Anslutnings problem
-
-Could not connect dummy
-== Kunde inte ansluta dummy
-
-Dummy is not allowed on this server
-== Dummy är inte tillåten på denna server
-
-Please wait…
-== Vänligen vänta…
-
-Show client IDs (scoreboard, chat, spectator)
-== Visa klient IDen (poänglistan, chatt, åskadarmeny)
-
-Are you sure that you want to delete '%s'?
-== Är du säker att du vill ta bort '%s'?
-
-Delete skin
-== Ta bort skin
-
-Basic
-== Enkel
-
-Custom
-== Anpassa
-
-Unable to delete skin
-== Kunde inte ta bort skin
-
-Save skin
-== Spara skin
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== Är du säker på att du vill spara ditt skin? Om detta skin finns redan, så kommer den att ersättas.
-
-Unable to save the skin
-== Misslyckades att spara skin
-
-Unable to save the skin with a reserved name
-== Misslyckades med att spara skin med reserverat namn
-
-No local servers found (ports %d-%d)
-== Inga lokala servrar hittades (portar %d-%d)
-
-[Hertz]
-Hz
-== Hz
-
-[skins]
-Body
-== Kropp
-
-[skins]
-Marking
-== Märkning
-
-[skins]
-Decoration
-== Dekoration
-
-[skins]
-Hands
-== Händer
-
-[skins]
-Feet
-== Fötter
-
-[skins]
-Eyes
-== Ögon

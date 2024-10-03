@@ -49,7 +49,7 @@ protected:
 	/**
 	 * Get the ui interface.
 	 */
-	class CUi *Ui() const;
+	class CUI *UI() const;
 	/**
 	 * Get the sound interface.
 	 */
@@ -104,21 +104,29 @@ protected:
 	class IUpdater *Updater() const;
 #endif
 
+#if defined(CONF_VIDEORECORDER)
 	/**
 	 * Gets the current time.
 	 * @see time_get()
 	 */
-	int64_t time() const;
-
+	int64_t time() const
+	{
+		return IVideo::Current() ? IVideo::Time() : time_get();
+	}
+#else
+	/**
+	 * Gets the current time.
+	 * @see time_get()
+	 */
+	int64_t time() const
+	{
+		return time_get();
+	}
+#endif
 	/**
 	 * Gets the local time.
 	 */
 	float LocalTime() const;
-
-	/**
-	 * Get the http interface
-	 */
-	class IHttp *Http() const;
 
 public:
 	/**
@@ -169,10 +177,6 @@ public:
 	 * Called when the window has been resized.
 	 */
 	virtual void OnWindowResize() {}
-	/**
-	 * Called when skins have been invalidated and must be updated.
-	 */
-	virtual void OnRefreshSkins() {}
 	/**
 	 * Called when the component should get rendered.
 	 *

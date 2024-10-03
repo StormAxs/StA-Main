@@ -8,7 +8,6 @@
 #include <game/alloc.h>
 
 #include "gameworld.h"
-#include "save.h"
 
 class CCollision;
 class CGameContext;
@@ -30,7 +29,7 @@ private:
 	CGameWorld *m_pGameWorld;
 	CCollision *m_pCCollision;
 
-	int m_Id;
+	int m_ID;
 	int m_ObjType;
 
 	/*
@@ -51,7 +50,7 @@ public: // TODO: Maybe make protected
 	vec2 m_Pos;
 
 	/* Getters */
-	int GetId() const { return m_Id; }
+	int GetID() const { return m_ID; }
 
 	/* Constructor */
 	CEntity(CGameWorld *pGameWorld, int Objtype, vec2 Pos = vec2(0, 0), int ProximityRadius = 0);
@@ -124,12 +123,6 @@ public: // TODO: Maybe make protected
 	virtual void Snap(int SnappingClient) {}
 
 	/*
-		Function: PostSnap
-			Called after all clients received their snapshot.
-	*/
-	virtual void PostSnap() {}
-
-	/*
 		Function: SwapClients
 			Called when two players have swapped their client ids.
 
@@ -140,23 +133,14 @@ public: // TODO: Maybe make protected
 	virtual void SwapClients(int Client1, int Client2) {}
 
 	/*
-		Function: BlocksSave
-			Called to check if a team can be saved
-
-		Arguments:
-			ClientId - Client ID
-	*/
-	virtual ESaveResult BlocksSave(int ClientId) { return ESaveResult::SUCCESS; }
-
-	/*
-		Function GetOwnerId
+		Function GetOwnerID
 		Returns:
-			ClientId of the initiator from this entity. -1 created by map.
+			ClientID of the initiator from this entity. -1 created by map.
 			This is used by save/load to remove related entities to the tee.
 			CCharacter should not return the PlayerId, because they get
 			handled separately in save/load code.
 	*/
-	virtual int GetOwnerId() const { return -1; }
+	virtual int GetOwnerID() const { return -1; }
 
 	/*
 		Function: NetworkClipped

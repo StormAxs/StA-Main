@@ -13,7 +13,7 @@ class CLayerGroup;
 class CMapView : public CEditorComponent
 {
 public:
-	void OnInit(CEditor *pEditor) override;
+	void Init(CEditor *pEditor) override;
 	void OnReset() override;
 	void OnMapLoad() override;
 

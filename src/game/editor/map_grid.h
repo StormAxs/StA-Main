@@ -3,8 +3,6 @@
 
 #include "component.h"
 
-#include <game/client/ui.h>
-
 class CMapGrid : public CEditorComponent
 {
 public:
@@ -22,16 +20,13 @@ public:
 	void Toggle();
 
 	int Factor() const;
-	void SetFactor(int Factor);
-
-	void DoSettingsPopup(vec2 Position);
+	void ResetFactor();
+	void IncreaseFactor();
+	void DecreaseFactor();
 
 private:
 	bool m_GridActive;
 	int m_GridFactor;
-
-	SPopupMenuId m_PopupGridSettingsId;
-	static CUi::EPopupMenuFunctionResult PopupGridSettings(void *pContext, CUIRect View, bool Active);
 };
 
 #endif

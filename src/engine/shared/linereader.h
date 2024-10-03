@@ -4,20 +4,17 @@
 #define ENGINE_SHARED_LINEREADER_H
 #include <base/types.h>
 
-// buffered stream for reading lines
+// buffered stream for reading lines, should perhaps be something smaller
 class CLineReader
 {
-	char *m_pBuffer;
+	char m_aBuffer[4 * 8192 + 1]; // 1 additional byte for null termination
 	unsigned m_BufferPos;
-	bool m_ReadLastLine;
+	unsigned m_BufferSize;
+	unsigned m_BufferMaxSize;
+	IOHANDLE m_File;
 
 public:
-	CLineReader();
-	~CLineReader();
-
-	bool OpenFile(IOHANDLE File);
-	void OpenBuffer(char *pBuffer); // Buffer must have been allocated with malloc, will be freed by the line reader
-
-	const char *Get(); // Returned string is valid until the line reader is destroyed
+	void Init(IOHANDLE File);
+	char *Get(); // Returned string is only valid until next Get() call
 };
 #endif

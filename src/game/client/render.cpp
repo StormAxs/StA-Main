@@ -13,7 +13,6 @@
 #include <game/generated/client_data.h>
 #include <game/generated/client_data7.h>
 #include <game/generated/protocol.h>
-#include <game/generated/protocol7.h>
 
 #include <game/mapitems.h>
 
@@ -58,14 +57,14 @@ void CRenderTools::Init(IGraphics *pGraphics, ITextRender *pTextRender)
 	Graphics()->QuadContainerUpload(m_TeeQuadContainerIndex);
 }
 
-void CRenderTools::SelectSprite(const CDataSprite *pSprite, int Flags) const
+void CRenderTools::SelectSprite(CDataSprite *pSpr, int Flags, int sx, int sy) const
 {
-	int x = pSprite->m_X;
-	int y = pSprite->m_Y;
-	int w = pSprite->m_W;
-	int h = pSprite->m_H;
-	int cx = pSprite->m_pSet->m_Gridx;
-	int cy = pSprite->m_pSet->m_Gridy;
+	int x = pSpr->m_X + sx;
+	int y = pSpr->m_Y + sy;
+	int w = pSpr->m_W;
+	int h = pSpr->m_H;
+	int cx = pSpr->m_pSet->m_Gridx;
+	int cy = pSpr->m_pSet->m_Gridy;
 
 	GetSpriteScaleImpl(w, h, gs_SpriteWScale, gs_SpriteHScale);
 
@@ -83,16 +82,11 @@ void CRenderTools::SelectSprite(const CDataSprite *pSprite, int Flags) const
 	Graphics()->QuadsSetSubset(x1, y1, x2, y2);
 }
 
-void CRenderTools::SelectSprite(int Id, int Flags) const
+void CRenderTools::SelectSprite(int Id, int Flags, int sx, int sy) const
 {
-	dbg_assert(Id >= 0 && Id < g_pData->m_NumSprites, "Id invalid");
-	SelectSprite(&g_pData->m_aSprites[Id], Flags);
-}
-
-void CRenderTools::SelectSprite7(int Id, int Flags) const
-{
-	dbg_assert(Id >= 0 && Id < client_data7::g_pData->m_NumSprites, "Id invalid");
-	SelectSprite(&client_data7::g_pData->m_aSprites[Id], Flags);
+	if(Id < 0 || Id >= g_pData->m_NumSprites)
+		return;
+	SelectSprite(&g_pData->m_aSprites[Id], Flags, sx, sy);
 }
 
 void CRenderTools::GetSpriteScale(const CDataSprite *pSprite, float &ScaleX, float &ScaleY) const
@@ -275,17 +269,19 @@ void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInf
 
 	const CSkin::SSkinTextures *pSkinTextures = pInfo->m_CustomColoredSkin ? &pInfo->m_ColorableRenderSkin : &pInfo->m_OriginalRenderSkin;
 
+	static vec2 s_aFootPositions[MAX_CLIENTS][2];
+
 	// first pass we draw the outline
 	// second pass we draw the filling
-	for(int Pass = 0; Pass < 2; Pass++)
+	for(int p = 0; p < 2; p++)
 	{
-		int OutLine = Pass == 0 ? 1 : 0;
+		int OutLine = p == 0 ? 1 : 0;
 
-		for(int Filling = 0; Filling < 2; Filling++)
+		for(int f = 0; f < 2; f++)
 		{
 			float AnimScale, BaseSize;
 			GetRenderTeeAnimScaleAndBaseSize(pInfo, AnimScale, BaseSize);
-			if(Filling == 1)
+			if(f == 1)
 			{
 				Graphics()->QuadsSetRotation(pAnim->GetBody()->m_Angle * pi * 2);
 
@@ -298,7 +294,7 @@ void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInf
 				Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, OutLine, BodyPos.x, BodyPos.y, BodyScale, BodyScale);
 
 				// draw eyes
-				if(Pass == 1)
+				if(p == 1)
 				{
 					int QuadOffset = 2;
 					int EyeQuadOffset = 0;
@@ -339,7 +335,7 @@ void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInf
 			}
 
 			// draw feet
-			const CAnimKeyframe *pFoot = Filling ? pAnim->GetFrontFoot() : pAnim->GetBackFoot();
+			const CAnimKeyframe *pFoot = f ? pAnim->GetFrontFoot() : pAnim->GetBackFoot();
 
 			float w = BaseSize;
 			float h = BaseSize / 2;
@@ -376,8 +372,10 @@ void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInf
 			Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, QuadOffset, FootPos.x, FootPos.y, w / 64.f, h / 32.f);
 		}
 	}
-}
 
+	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
+	Graphics()->QuadsSetRotation(0);
+}
 void CRenderTools::CalcScreenParams(float Aspect, float Zoom, float *pWidth, float *pHeight)
 {
 	const float Amount = 1150 * 1000;

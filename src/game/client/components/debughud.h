@@ -21,7 +21,6 @@ class CDebugHud : public CComponent
 	float m_OldVelrampCurvature;
 
 public:
-	CDebugHud();
 	virtual int Sizeof() const override { return sizeof(*this); }
 	virtual void OnRender() override;
 };

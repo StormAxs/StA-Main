@@ -34,7 +34,7 @@ class CPlayer
 	MACRO_ALLOC_POOL_ID()
 
 public:
-	CPlayer(CGameContext *pGameServer, uint32_t UniqueClientId, int ClientId, int Team);
+	CPlayer(CGameContext *pGameServer, uint32_t UniqueClientID, int ClientID, int Team);
 	~CPlayer();
 
 	void Reset();
@@ -44,8 +44,8 @@ public:
 	CCharacter *ForceSpawn(vec2 Pos); // required for loading savegames
 	void SetTeam(int Team, bool DoChatMsg = true);
 	int GetTeam() const { return m_Team; }
-	int GetCid() const { return m_ClientId; }
-	uint32_t GetUniqueCid() const { return m_UniqueClientId; }
+	int GetCID() const { return m_ClientID; }
+	uint32_t GetUniqueCID() const { return m_UniqueClientID; }
 	int GetClientVersion() const;
 	bool SetTimerType(int TimerType);
 
@@ -80,10 +80,8 @@ public:
 	// used for snapping to just update latency if the scoreboard is active
 	int m_aCurLatency[MAX_CLIENTS];
 
-	int m_SentSnaps = 0;
-
 	// used for spectator mode
-	int m_SpectatorId;
+	int m_SpectatorID;
 
 	bool m_IsReady;
 
@@ -129,7 +127,7 @@ public:
 	} m_Latency;
 
 private:
-	const uint32_t m_UniqueClientId;
+	const uint32_t m_UniqueClientID;
 	CCharacter *m_pCharacter;
 	int m_NumInputs;
 	CGameContext *m_pGameServer;
@@ -140,7 +138,7 @@ private:
 	//
 	bool m_Spawning;
 	bool m_WeakHookSpawn;
-	int m_ClientId;
+	int m_ClientID;
 	int m_Team;
 
 	int m_Paused;
@@ -172,7 +170,6 @@ public:
 	};
 
 	bool m_DND;
-	bool m_Whispers;
 	int64_t m_FirstVoteTick;
 	char m_aTimeoutCode[64];
 
@@ -180,7 +177,6 @@ public:
 	int Pause(int State, bool Force);
 	int ForcePause(int Time);
 	int IsPaused() const;
-	bool CanSpec() const;
 
 	bool IsPlaying() const;
 	int64_t m_Last_KickVote;
@@ -217,17 +213,15 @@ public:
 	bool CanOverrideDefaultEmote() const;
 
 	bool m_FirstPacket;
-	int64_t m_LastSqlQuery;
+	int64_t m_LastSQLQuery;
 	void ProcessScoreResult(CScorePlayerResult &Result);
 	std::shared_ptr<CScorePlayerResult> m_ScoreQueryResult;
 	std::shared_ptr<CScorePlayerResult> m_ScoreFinishResult;
 	bool m_NotEligibleForFinish;
 	int64_t m_EligibleForFinishCheck;
 	bool m_VotedForPractice;
-	int m_SwapTargetsClientId; //Client ID of the swap target for the given player
+	int m_SwapTargetsClientID; //Client ID of the swap target for the given player
 	bool m_BirthdayAnnounced;
-
-	int m_RescueMode;
 
 	CSaveTee m_LastTeleTee;
 };

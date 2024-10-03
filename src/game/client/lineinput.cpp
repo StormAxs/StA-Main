@@ -199,7 +199,6 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 	if((Event.m_Flags & IInput::FLAG_TEXT) && !(KEY_LCTRL <= Event.m_Key && Event.m_Key <= KEY_RGUI))
 	{
 		SetRange(Event.m_aText, m_SelectionStart, m_SelectionEnd);
-		KeyHandled = true;
 	}
 
 	if(Event.m_Flags & IInput::FLAG_PRESS)
@@ -232,7 +231,6 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 				}
 				m_SelectionStart = m_SelectionEnd = m_CursorPos;
 			}
-			KeyHandled = true;
 		}
 		else if(Event.m_Key == KEY_DELETE)
 		{
@@ -253,7 +251,6 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 				}
 				m_SelectionStart = m_SelectionEnd = m_CursorPos;
 			}
-			KeyHandled = true;
 		}
 		else if(Event.m_Key == KEY_LEFT)
 		{
@@ -274,10 +271,7 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 			}
 
 			if(!Selecting)
-			{
 				m_SelectionStart = m_SelectionEnd = m_CursorPos;
-			}
-			KeyHandled = true;
 		}
 		else if(Event.m_Key == KEY_RIGHT)
 		{
@@ -298,10 +292,7 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 			}
 
 			if(!Selecting)
-			{
 				m_SelectionStart = m_SelectionEnd = m_CursorPos;
-			}
-			KeyHandled = true;
 		}
 		else if(Event.m_Key == KEY_HOME)
 		{
@@ -314,7 +305,6 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 				m_SelectionEnd = 0;
 			m_CursorPos = 0;
 			m_SelectionStart = 0;
-			KeyHandled = true;
 		}
 		else if(Event.m_Key == KEY_END)
 		{
@@ -327,13 +317,13 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 				m_SelectionStart = m_Len;
 			m_CursorPos = m_Len;
 			m_SelectionEnd = m_Len;
-			KeyHandled = true;
 		}
 		else if(ModPressed && !AltPressed && Event.m_Key == KEY_V)
 		{
-			std::string ClipboardText = Input()->GetClipboardText();
-			if(!ClipboardText.empty())
+			const char *pClipboardText = Input()->GetClipboardText();
+			if(pClipboardText)
 			{
+				std::string ClipboardText = Input()->GetClipboardText();
 				if(m_pfnClipboardLineCallback)
 				{
 					// Split clipboard text into multiple lines. Send all complete lines to callback.
@@ -391,16 +381,15 @@ bool CLineInput::ProcessInput(const IInput::CEvent &Event)
 		{
 			m_SelectionStart = 0;
 			m_SelectionEnd = m_CursorPos = m_Len;
-			KeyHandled = true;
 		}
 	}
 
 	m_WasCursorChanged |= OldCursorPos != m_CursorPos;
 	m_WasCursorChanged |= SelectionLength != GetSelectionLength();
-	return KeyHandled;
+	return m_WasChanged || m_WasCursorChanged || KeyHandled;
 }
 
-STextBoundingBox CLineInput::Render(const CUIRect *pRect, float FontSize, int Align, bool Changed, float LineWidth, float LineSpacing, const std::vector<STextColorSplit> &vColorSplits)
+STextBoundingBox CLineInput::Render(const CUIRect *pRect, float FontSize, int Align, bool Changed, float LineWidth, float LineSpacing)
 {
 	// update derived attributes to handle external changes to the buffer
 	UpdateStrData();
@@ -435,7 +424,7 @@ STextBoundingBox CLineInput::Render(const CUIRect *pRect, float FontSize, int Al
 		}
 
 		const STextBoundingBox BoundingBox = TextRender()->TextBoundingBox(FontSize, pDisplayStr, -1, LineWidth, LineSpacing);
-		const vec2 CursorPos = CUi::CalcAlignedCursorPos(pRect, BoundingBox.Size(), Align);
+		const vec2 CursorPos = CUI::CalcAlignedCursorPos(pRect, BoundingBox.Size(), Align);
 
 		TextRender()->SetCursor(&Cursor, CursorPos.x, CursorPos.y, FontSize, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = LineWidth;
@@ -443,7 +432,6 @@ STextBoundingBox CLineInput::Render(const CUIRect *pRect, float FontSize, int Al
 		Cursor.m_LineSpacing = LineSpacing;
 		Cursor.m_PressMouse.x = m_MouseSelection.m_PressMouse.x;
 		Cursor.m_ReleaseMouse.x = m_MouseSelection.m_ReleaseMouse.x;
-		Cursor.m_vColorSplits = vColorSplits;
 		if(LineWidth < 0.0f)
 		{
 			// Using a Y position that's always inside the line input makes it so the selection does not reset when
@@ -520,11 +508,10 @@ STextBoundingBox CLineInput::Render(const CUIRect *pRect, float FontSize, int Al
 	else
 	{
 		const STextBoundingBox BoundingBox = TextRender()->TextBoundingBox(FontSize, pDisplayStr, -1, LineWidth, LineSpacing);
-		const vec2 CursorPos = CUi::CalcAlignedCursorPos(pRect, BoundingBox.Size(), Align);
+		const vec2 CursorPos = CUI::CalcAlignedCursorPos(pRect, BoundingBox.Size(), Align);
 		TextRender()->SetCursor(&Cursor, CursorPos.x, CursorPos.y, FontSize, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = LineWidth;
 		Cursor.m_LineSpacing = LineSpacing;
-		Cursor.m_vColorSplits = vColorSplits;
 		TextRender()->TextEx(&Cursor, pDisplayStr);
 	}
 
@@ -672,7 +659,7 @@ void CLineInputNumber::SetInteger(int Number, int Base, int HexPrefix)
 	switch(Base)
 	{
 	case 10:
-		str_format(aBuf, sizeof(aBuf), "%d", Number);
+		str_from_int(Number, aBuf);
 		break;
 	case 16:
 		str_format(aBuf, sizeof(aBuf), "%0*X", HexPrefix, Number);

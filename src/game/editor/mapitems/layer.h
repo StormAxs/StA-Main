@@ -46,8 +46,8 @@ public:
 	virtual void BrushSelecting(CUIRect Rect) {}
 	virtual int BrushGrab(std::shared_ptr<CLayerGroup> pBrush, CUIRect Rect) { return 0; }
 	virtual void FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRect Rect) {}
-	virtual void BrushDraw(std::shared_ptr<CLayer> pBrush, vec2 WorldPos) {}
-	virtual void BrushPlace(std::shared_ptr<CLayer> pBrush, vec2 WorldPos) {}
+	virtual void BrushDraw(std::shared_ptr<CLayer> pBrush, float x, float y) {}
+	virtual void BrushPlace(std::shared_ptr<CLayer> pBrush, float x, float y) {}
 	virtual void BrushFlipX() {}
 	virtual void BrushFlipY() {}
 	virtual void BrushRotate(float Amount) {}
@@ -55,7 +55,7 @@ public:
 	virtual bool IsEntitiesLayer() const { return false; }
 
 	virtual void Render(bool Tileset = false) {}
-	virtual CUi::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) { return CUi::POPUP_KEEP_OPEN; }
+	virtual CUI::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) { return CUI::POPUP_KEEP_OPEN; }
 
 	virtual void ModifyImageIndex(FIndexModifyFunction pfnFunc) {}
 	virtual void ModifyEnvelopeIndex(FIndexModifyFunction pfnFunc) {}

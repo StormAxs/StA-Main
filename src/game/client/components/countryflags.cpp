@@ -16,8 +16,8 @@
 void CCountryFlags::LoadCountryflagsIndexfile()
 {
 	const char *pFilename = "countryflags/index.txt";
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(Storage()->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL)))
+	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	if(!File)
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "couldn't open index file '%s'", pFilename);
@@ -26,13 +26,16 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 	}
 
 	char aOrigin[128];
-	while(const char *pLine = LineReader.Get())
+	CLineReader LineReader;
+	LineReader.Init(File);
+	char *pLine;
+	while((pLine = LineReader.Get()))
 	{
 		if(!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
 			continue;
 
 		str_copy(aOrigin, pLine);
-		const char *pReplacement = LineReader.Get();
+		char *pReplacement = LineReader.Get();
 		if(!pReplacement)
 		{
 			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "countryflags", "unexpected end of index file");
@@ -60,7 +63,7 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 		char aBuf[128];
 		CImageInfo Info;
 		str_format(aBuf, sizeof(aBuf), "countryflags/%s.png", aOrigin);
-		if(!Graphics()->LoadPng(Info, aBuf, IStorage::TYPE_ALL))
+		if(!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 		{
 			char aMsg[128];
 			str_format(aMsg, sizeof(aMsg), "failed to load '%s'", aBuf);
@@ -72,7 +75,8 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 		CCountryFlag CountryFlag;
 		CountryFlag.m_CountryCode = CountryCode;
 		str_copy(CountryFlag.m_aCountryCodeString, aOrigin);
-		CountryFlag.m_Texture = Graphics()->LoadTextureRawMove(Info, 0, aBuf);
+		CountryFlag.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, 0, aOrigin);
+		Graphics()->FreePNG(&Info);
 
 		if(g_Config.m_Debug)
 		{
@@ -81,7 +85,7 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 		}
 		m_vCountryFlags.push_back(CountryFlag);
 	}
-
+	io_close(File);
 	std::sort(m_vCountryFlags.begin(), m_vCountryFlags.end());
 
 	// find index of default item

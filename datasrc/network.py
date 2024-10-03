@@ -1,7 +1,7 @@
 # pylint: skip-file
 # See https://github.com/ddnet/ddnet/issues/3507
 
-from datatypes import Enum, Flags, NetArray, NetBool, NetEvent, NetEventEx, NetIntAny, NetIntRange, NetMessage, NetMessageEx, NetObject, NetObjectEx, NetString, NetStringHalfStrict, NetStringStrict, NetTick
+from datatypes import Enum, Flags, NetArray, NetBool, NetEvent, NetIntAny, NetIntRange, NetMessage, NetMessageEx, NetObject, NetObjectEx, NetString, NetStringHalfStrict, NetStringStrict, NetTick
 
 Emotes = ["NORMAL", "PAIN", "HAPPY", "SURPRISE", "ANGRY", "BLINK"]
 PlayerFlags = ["PLAYING", "IN_MENU", "CHATTING", "SCOREBOARD", "AIM"]
@@ -11,7 +11,7 @@ CharacterFlags = ["SOLO", "JETPACK", "COLLISION_DISABLED", "ENDLESS_HOOK", "ENDL
                   "HAMMER_HIT_DISABLED", "SHOTGUN_HIT_DISABLED", "GRENADE_HIT_DISABLED", "LASER_HIT_DISABLED", "HOOK_HIT_DISABLED",
                   "TELEGUN_GUN", "TELEGUN_GRENADE", "TELEGUN_LASER",
                   "WEAPON_HAMMER", "WEAPON_GUN", "WEAPON_SHOTGUN", "WEAPON_GRENADE", "WEAPON_LASER", "WEAPON_NINJA",
-				  "MOVEMENTS_DISABLED", "IN_FREEZE", "PRACTICE_MODE", "LOCK_MODE", "TEAM0_MODE"]
+				  "MOVEMENTS_DISABLED", "IN_FREEZE", "PRACTICE_MODE"]
 GameInfoFlags = [
 	"TIMESCORE", "GAMETYPE_RACE", "GAMETYPE_FASTCAP", "GAMETYPE_FNG",
 	"GAMETYPE_DDRACE", "GAMETYPE_DDNET", "GAMETYPE_BLOCK_WORLDS",
@@ -49,7 +49,6 @@ Emoticons = ["OOP", "EXCLAMATION", "HEARTS", "DROP", "DOTDOT", "MUSIC", "SORRY",
 Powerups = ["HEALTH", "ARMOR", "WEAPON", "NINJA", "ARMOR_SHOTGUN", "ARMOR_GRENADE", "ARMOR_NINJA", "ARMOR_LASER"]
 Authed = ["NO", "HELPER", "MOD", "ADMIN"]
 EntityClasses = ["PROJECTILE", "DOOR", "DRAGGER_WEAK", "DRAGGER_NORMAL", "DRAGGER_STRONG", "GUN_NORMAL", "GUN_EXPLOSIVE", "GUN_FREEZE", "GUN_UNFREEZE", "LIGHT", "PICKUP"]
-Teams = ["ALL", "SPECTATORS", "RED", "BLUE", "WHISPER_SEND", "WHISPER_RECV"]
 
 RawHeader = '''
 #include <engine/shared/teehistorian_ex.h>
@@ -61,6 +60,10 @@ enum
 
 enum
 {
+	TEAM_SPECTATORS=-1,
+	TEAM_RED,
+	TEAM_BLUE,
+
 	FLAG_MISSING=-3,
 	FLAG_ATSTAND,
 	FLAG_TAKEN,
@@ -84,7 +87,6 @@ Enums = [
 	Enum("LASERTYPE", LaserTypes),
 	Enum("LASERDRAGGERTYPE", DraggerTypes),
 	Enum("LASERGUNTYPE", GunTypes),
-	Enum("TEAM", Teams, -2),
 ]
 
 Flags = [
@@ -186,7 +188,7 @@ Objects = [
 		NetIntRange("m_Jumped", 0, 3),
 		NetIntRange("m_HookedPlayer", -1, 'MAX_CLIENTS-1'),
 		NetIntRange("m_HookState", -1, 5),
-		NetIntAny("m_HookTick"),
+		NetTick("m_HookTick"),
 
 		NetIntAny("m_HookX"),
 		NetIntAny("m_HookY"),
@@ -206,7 +208,7 @@ Objects = [
 
 	NetObject("PlayerInfo", [
 		NetIntRange("m_Local", 0, 1),
-		NetIntRange("m_ClientId", 0, 'MAX_CLIENTS-1'),
+		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntRange("m_Team", 'TEAM_SPECTATORS', 'TEAM_BLUE'),
 
 		NetIntAny("m_Score"),
@@ -234,7 +236,7 @@ Objects = [
 	]),
 
 	NetObject("SpectatorInfo", [
-		NetIntRange("m_SpectatorId", 'SPEC_FREEVIEW', 'MAX_CLIENTS-1'),
+		NetIntRange("m_SpectatorID", 'SPEC_FREEVIEW', 'MAX_CLIENTS-1'),
 		NetIntAny("m_X"),
 		NetIntAny("m_Y"),
 	]),
@@ -248,7 +250,7 @@ Objects = [
 		NetTick("m_FreezeEnd", 0),
 		NetIntRange("m_Jumps", -1, 255, 2),
 		NetIntAny("m_TeleCheckpoint", -1),
-		NetIntRange("m_StrongWeakId", 0, 'MAX_CLIENTS-1', 0),
+		NetIntRange("m_StrongWeakID", 0, 'MAX_CLIENTS-1', 0),
 
 		# New data fields for jump display, freeze bar and ninja bar
 		# Default values indicate that these values should not be used
@@ -328,26 +330,21 @@ Objects = [
 	NetEvent("Spawn:Common", []),
 	NetEvent("HammerHit:Common", []),
 
-
 	NetEvent("Death:Common", [
-		NetIntRange("m_ClientId", 0, 'MAX_CLIENTS-1'),
+		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 	]),
 
 	NetEvent("SoundGlobal:Common", [ #TODO 0.7: remove me
-		NetIntRange("m_SoundId", 0, 'NUM_SOUNDS-1'),
+		NetIntRange("m_SoundID", 0, 'NUM_SOUNDS-1'),
 	]),
 
 	NetEvent("SoundWorld:Common", [
-		NetIntRange("m_SoundId", 0, 'NUM_SOUNDS-1'),
+		NetIntRange("m_SoundID", 0, 'NUM_SOUNDS-1'),
 	]),
 
 	NetEvent("DamageInd:Common", [
 		NetIntAny("m_Angle"),
 	]),
-
-	NetEventEx("Birthday:Common", "birthday@netevent.ddnet.org", []),
-
-	NetEventEx("Finish:Common", "finish@netevent.ddnet.org", []),
 
 	NetObjectEx("MyOwnEvent", "my-own-event@heinrich5991.de", [
 		NetIntAny("m_Test"),
@@ -374,10 +371,6 @@ Objects = [
 		NetIntAny("m_Layer"),
 		NetIntAny("m_EntityClass"),
 	]),
-
-	NetEventEx("MapSoundWorld:Common", "map-sound-world@netevent.ddnet.org", [
-		NetIntAny("m_SoundId"),
-	]),
 ]
 
 Messages = [
@@ -393,7 +386,7 @@ Messages = [
 
 	NetMessage("Sv_Chat", [
 		NetIntRange("m_Team", -2, 3),
-		NetIntRange("m_ClientId", -1, 'MAX_CLIENTS-1'),
+		NetIntRange("m_ClientID", -1, 'MAX_CLIENTS-1'),
 		NetStringHalfStrict("m_pMessage"),
 	]),
 
@@ -405,7 +398,7 @@ Messages = [
 	]),
 
 	NetMessage("Sv_SoundGlobal", [
-		NetIntRange("m_SoundId", 0, 'NUM_SOUNDS-1'),
+		NetIntRange("m_SoundID", 0, 'NUM_SOUNDS-1'),
 	]),
 
 	NetMessage("Sv_TuneParams", []),
@@ -417,7 +410,7 @@ Messages = [
 	]),
 
 	NetMessage("Sv_Emoticon", [
-		NetIntRange("m_ClientId", 0, 'MAX_CLIENTS-1'),
+		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntRange("m_Emoticon", 0, 'NUM_EMOTICONS-1'),
 	]),
 
@@ -465,7 +458,7 @@ Messages = [
 	]),
 
 	NetMessage("Cl_SetSpectatorMode", [
-		NetIntRange("m_SpectatorId", 'SPEC_FREEVIEW', 'MAX_CLIENTS-1'),
+		NetIntRange("m_SpectatorID", 'SPEC_FREEVIEW', 'MAX_CLIENTS-1'),
 	]),
 
 	NetMessage("Cl_StartInfo", [
@@ -563,7 +556,7 @@ Messages = [
 	]),
 
 	NetMessageEx("Sv_RaceFinish", "racefinish@netmsg.ddnet.org", [
-		NetIntRange("m_ClientId", 0, 'MAX_CLIENTS-1'),
+		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntAny("m_Time"),
 		NetIntAny("m_Diff"),
 		NetBool("m_RecordPersonal"),
@@ -578,19 +571,5 @@ Messages = [
 
 	NetMessageEx("Sv_CommandInfoRemove", "commandinfo-remove@netmsg.ddnet.org", [
 			NetStringStrict("m_pName")
-	]),
-
-	NetMessageEx("Sv_VoteOptionGroupStart", "sv-vote-option-group-start@netmsg.ddnet.org", []),
-	NetMessageEx("Sv_VoteOptionGroupEnd", "sv-vote-option-group-end@netmsg.ddnet.org", []),
-
-	NetMessageEx("Sv_CommandInfoGroupStart", "sv-commandinfo-group-start@netmsg.ddnet.org", []),
-	NetMessageEx("Sv_CommandInfoGroupEnd", "sv-commandinfo-group-end@netmsg.ddnet.org", []),
-
-	NetMessageEx("Sv_ChangeInfoCooldown", "change-info-cooldown@netmsg.ddnet.org", [
-		NetTick("m_WaitUntil")
-	]),
-
-	NetMessageEx("Sv_MapSoundGlobal", "map-sound-global@netmsg.ddnet.org", [
-		NetIntAny("m_SoundId"),
 	]),
 ]

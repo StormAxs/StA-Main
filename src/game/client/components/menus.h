@@ -17,18 +17,14 @@
 #include <engine/serverbrowser.h>
 #include <engine/shared/config.h>
 #include <engine/shared/http.h>
-#include <engine/shared/jobs.h>
 #include <engine/shared/linereader.h>
 #include <engine/textrender.h>
 
 #include <game/client/component.h>
 #include <game/client/components/mapimages.h>
-#include <game/client/lineinput.h>
 #include <game/client/render.h>
 #include <game/client/ui.h>
 #include <game/voting.h>
-
-#include <game/client/components/skins7.h>
 
 struct CServerProcess
 {
@@ -39,7 +35,6 @@ struct CServerProcess
 class CMenusKeyBinder : public CComponent
 {
 public:
-	const void *m_pKeyReaderId;
 	bool m_TakeKey;
 	bool m_GotKey;
 	IInput::CEvent m_Key;
@@ -47,14 +42,6 @@ public:
 	CMenusKeyBinder();
 	virtual int Sizeof() const override { return sizeof(*this); }
 	virtual bool OnInput(const IInput::CEvent &Event) override;
-};
-
-struct SCommunityIcon
-{
-	char m_aCommunityId[CServerInfo::MAX_COMMUNITY_ID_LENGTH];
-	SHA256_DIGEST m_Sha256;
-	IGraphics::CTextureHandle m_OrgTexture;
-	IGraphics::CTextureHandle m_GreyTexture;
 };
 
 class CMenus : public CComponent
@@ -71,22 +58,21 @@ class CMenus : public CComponent
 	static ColorRGBA ms_ColorTabbarHover;
 
 	int DoButton_FontIcon(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, int Corners = IGraphics::CORNER_ALL, bool Enabled = true);
-	int DoButton_Toggle(const void *pId, int Checked, const CUIRect *pRect, bool Active);
+	int DoButton_Toggle(const void *pID, int Checked, const CUIRect *pRect, bool Active);
 	int DoButton_Menu(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, const char *pImageName = nullptr, int Corners = IGraphics::CORNER_ALL, float Rounding = 5.0f, float FontFactor = 0.0f, ColorRGBA Color = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f));
-	int DoButton_MenuTab(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, int Corners, SUIAnimator *pAnimator = nullptr, const ColorRGBA *pDefaultColor = nullptr, const ColorRGBA *pActiveColor = nullptr, const ColorRGBA *pHoverColor = nullptr, float EdgeRounding = 10.0f, const SCommunityIcon *pCommunityIcon = nullptr);
+	int DoButton_MenuTab(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, int Corners, SUIAnimator *pAnimator = nullptr, const ColorRGBA *pDefaultColor = nullptr, const ColorRGBA *pActiveColor = nullptr, const ColorRGBA *pHoverColor = nullptr, float EdgeRounding = 10);
 
-	int DoButton_CheckBox_Common(const void *pId, const char *pText, const char *pBoxText, const CUIRect *pRect);
-	int DoButton_CheckBox(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
-	int DoButton_CheckBoxAutoVMarginAndSet(const void *pId, const char *pText, int *pValue, CUIRect *pRect, float VMargin);
-	int DoButton_CheckBox_Number(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
+	int DoButton_CheckBox_Common(const void *pID, const char *pText, const char *pBoxText, const CUIRect *pRect);
+	int DoButton_CheckBox(const void *pID, const char *pText, int Checked, const CUIRect *pRect);
+	int DoButton_CheckBoxAutoVMarginAndSet(const void *pID, const char *pText, int *pValue, CUIRect *pRect, float VMargin);
+	int DoButton_CheckBox_Number(const void *pID, const char *pText, int Checked, const CUIRect *pRect);
 
-	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetId, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
+	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetID, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
 	ColorHSLA DoButton_ColorPicker(const CUIRect *pRect, unsigned int *pHslaColor, bool Alpha);
 	void DoLaserPreview(const CUIRect *pRect, ColorHSLA OutlineColor, ColorHSLA InnerColor, const int LaserType);
-	int DoButton_GridHeader(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
-	int DoButton_Favorite(const void *pButtonId, const void *pParentId, bool Checked, const CUIRect *pRect);
+	int DoButton_GridHeader(const void *pID, const char *pText, int Checked, const CUIRect *pRect);
 
-	int DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int ModifierCombination, int *pNewModifierCombination);
+	int DoKeyReader(const void *pID, const CUIRect *pRect, int Key, int ModifierCombination, int *pNewModifierCombination);
 
 	void DoSettingsControlsButtons(int Start, int Stop, CUIRect View);
 
@@ -94,7 +80,9 @@ class CMenus : public CComponent
 	void DoJoystickAxisPicker(CUIRect View);
 	void DoJoystickBar(const CUIRect *pRect, float Current, float Tolerance, bool Active);
 
-	bool m_SkinListNeedsUpdate = false;
+	void RefreshSkins();
+
+	void RandomSkin();
 
 	// menus_settings_assets.cpp
 public:
@@ -167,12 +155,10 @@ protected:
 	int m_MenuPage;
 	int m_GamePage;
 	int m_Popup;
+	int m_ActivePage;
 	bool m_ShowStart;
 	bool m_MenuActive;
-
-	bool m_JoinTutorial = false;
-	bool m_CreateDefaultFavoriteCommunities = false;
-	bool m_ForceRefreshLanPage = false;
+	bool m_JoinTutorial;
 
 	char m_aNextServer[256];
 
@@ -188,14 +174,8 @@ protected:
 	const CMenuImage *FindMenuImage(const char *pName);
 
 	// loading
-	class CLoadingState
-	{
-	public:
-		std::chrono::nanoseconds m_LastRender{0};
-		int m_Current;
-		int m_Total;
-	};
-	CLoadingState m_LoadingState;
+	int m_LoadCurrent;
+	int m_LoadTotal;
 
 	//
 	char m_aMessageTopic[512];
@@ -239,20 +219,15 @@ protected:
 	static float ms_ListitemAdditionalHeight;
 
 	// for settings
+	bool m_NeedRestartGeneral;
+	bool m_NeedRestartSkins;
 	bool m_NeedRestartGraphics;
 	bool m_NeedRestartSound;
 	bool m_NeedRestartUpdate;
+	bool m_NeedRestartDDNet;
 	bool m_NeedSendinfo;
 	bool m_NeedSendDummyinfo;
 	int m_SettingPlayerPage;
-
-	// 0.7 skins
-	bool m_CustomSkinMenu = false;
-	int m_TeePartSelected = protocol7::SKINPART_BODY;
-	const CSkins7::CSkin *m_pSelectedSkin = nullptr;
-	CLineInputBuffered<protocol7::MAX_SKIN_ARRAY_SIZE, protocol7::MAX_SKIN_LENGTH> m_SkinNameInput;
-	bool m_SkinPartListNeedsUpdate = false;
-	void PopupConfirmDeleteSkin7();
 
 	// for map download popup
 	int64_t m_DownloadLastCheckTime;
@@ -419,12 +394,11 @@ protected:
 		const void *ListItemId() const { return &m_aName; }
 		const void *RemoveButtonId() const { return &m_FriendState; }
 		const void *CommunityTooltipId() const { return &m_IsPlayer; }
-		const void *SkinTooltipId() const { return &m_aSkin; }
 
 		bool operator<(const CFriendItem &Other) const
 		{
-			const int Result = str_comp_nocase(m_aName, Other.m_aName);
-			return Result < 0 || (Result == 0 && str_comp_nocase(m_aClan, Other.m_aClan) < 0);
+			const int Result = str_comp(m_aName, Other.m_aName);
+			return Result < 0 || (Result == 0 && str_comp(m_aClan, Other.m_aClan) < 0);
 		}
 	};
 
@@ -439,16 +413,12 @@ protected:
 	const CFriendItem *m_pRemoveFriend = nullptr;
 
 	// found in menus.cpp
-	void Render();
-	void RenderPopupFullscreen(CUIRect Screen);
-	void RenderPopupConnecting(CUIRect Screen);
-	void RenderPopupLoading(CUIRect Screen);
+	int Render();
 #if defined(CONF_VIDEORECORDER)
 	void PopupConfirmDemoReplaceVideo();
 #endif
-	void RenderMenubar(CUIRect Box, IClient::EClientState ClientState);
+	int RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
-	static void ConchainBackgroundEntities(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainUpdateMusicState(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	void UpdateMusicState();
 
@@ -472,8 +442,6 @@ protected:
 
 	// found in menus_start.cpp
 	void RenderStartMenu(CUIRect MainView);
-	bool m_EditorHotkeyWasPressed = true;
-	float m_EditorHotKeyChecktime = 0.0f;
 
 	// found in menus_ingame.cpp
 	STextContainerIndex m_MotdTextContainerIndex;
@@ -498,7 +466,6 @@ protected:
 	void Connect(const char *pAddress);
 	void PopupConfirmSwitchServer();
 	void RenderServerbrowserFilters(CUIRect View);
-	void ResetServerbrowserFilters();
 	void RenderServerbrowserDDNetFilter(CUIRect View,
 		IFilterList &Filter,
 		float ItemHeight, int MaxItems, int ItemsPerRow,
@@ -515,7 +482,7 @@ protected:
 		int m_Selection;
 		bool m_New;
 	};
-	static CUi::EPopupMenuFunctionResult PopupCountrySelection(void *pContext, CUIRect View, bool Active);
+	static CUI::EPopupMenuFunctionResult PopupCountrySelection(void *pContext, CUIRect View, bool Active);
 	void RenderServerbrowserInfo(CUIRect View);
 	void RenderServerbrowserInfoScoreboard(CUIRect View, const CServerInfo *pSelectedServer);
 	void RenderServerbrowserFriends(CUIRect View);
@@ -530,7 +497,16 @@ protected:
 	static void ConchainFriendlistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainFavoritesUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainCommunitiesUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainUiPageUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	struct SCommunityCache
+	{
+		int64_t m_UpdateTime = 0;
+		bool m_PageWithCommunities;
+		std::vector<const CCommunity *> m_vpSelectedCommunities;
+		std::vector<const CCommunityCountry *> m_vpSelectableCountries;
+		std::vector<const CCommunityType *> m_vpSelectableTypes;
+		bool m_AnyRanksAvailable;
+	};
+	SCommunityCache m_CommunityCache;
 	void UpdateCommunityCache(bool Force);
 
 	// community icons
@@ -542,45 +518,49 @@ protected:
 		char m_aPath[IO_MAX_PATH_LENGTH];
 		int m_StorageType;
 		bool m_Success = false;
+		CImageInfo m_ImageInfo;
 		SHA256_DIGEST m_Sha256;
 
 		CAbstractCommunityIconJob(CMenus *pMenus, const char *pCommunityId, int StorageType);
-		virtual ~CAbstractCommunityIconJob(){};
+		virtual ~CAbstractCommunityIconJob();
 
 	public:
 		const char *CommunityId() const { return m_aCommunityId; }
 		bool Success() const { return m_Success; }
-		const SHA256_DIGEST &Sha256() const { return m_Sha256; }
+		CImageInfo &&ImageInfo() { return std::move(m_ImageInfo); }
+		SHA256_DIGEST &&Sha256() { return std::move(m_Sha256); }
 	};
-
 	class CCommunityIconLoadJob : public IJob, public CAbstractCommunityIconJob
 	{
-		CImageInfo m_ImageInfo;
-
 	protected:
 		void Run() override;
 
 	public:
 		CCommunityIconLoadJob(CMenus *pMenus, const char *pCommunityId, int StorageType);
-		~CCommunityIconLoadJob();
-
-		CImageInfo &ImageInfo() { return m_ImageInfo; }
 	};
-
 	class CCommunityIconDownloadJob : public CHttpRequest, public CAbstractCommunityIconJob
 	{
+	protected:
+		int OnCompletion(int State) override;
+
 	public:
 		CCommunityIconDownloadJob(CMenus *pMenus, const char *pCommunityId, const char *pUrl, const SHA256_DIGEST &Sha256);
 	};
-
+	struct SCommunityIcon
+	{
+		char m_aCommunityId[CServerInfo::MAX_COMMUNITY_ID_LENGTH];
+		SHA256_DIGEST m_Sha256;
+		IGraphics::CTextureHandle m_OrgTexture;
+		IGraphics::CTextureHandle m_GreyTexture;
+	};
 	std::vector<SCommunityIcon> m_vCommunityIcons;
 	std::deque<std::shared_ptr<CCommunityIconLoadJob>> m_CommunityIconLoadJobs;
 	std::deque<std::shared_ptr<CCommunityIconDownloadJob>> m_CommunityIconDownloadJobs;
-	SHA256_DIGEST m_CommunityIconsInfoSha256 = SHA256_ZEROED;
+	int64_t m_CommunityIconsUpdateTime = 0;
 	static int CommunityIconScan(const char *pName, int IsDir, int DirType, void *pUser);
 	const SCommunityIcon *FindCommunityIcon(const char *pCommunityId);
 	bool LoadCommunityIconFile(const char *pPath, int DirType, CImageInfo &Info, SHA256_DIGEST &Sha256);
-	void LoadCommunityIconFinish(const char *pCommunityId, CImageInfo &Info, const SHA256_DIGEST &Sha256);
+	void LoadCommunityIconFinish(const char *pCommunityId, CImageInfo &&Info, SHA256_DIGEST &&Sha256);
 	void RenderCommunityIcon(const SCommunityIcon *pIcon, CUIRect Rect, bool Active);
 	void UpdateCommunityIcons();
 
@@ -599,46 +579,12 @@ protected:
 	int RenderSettingsPlayer(CUIRect MainView);
 	void RenderSettingsDummyPlayer(CUIRect MainView);
 	void RenderSettingsTee(CUIRect MainView);
-	void RenderSettingsTee7(CUIRect MainView);
-	void RenderSettingsTeeCustom7(CUIRect MainView);
-	void RenderSkinSelection7(CUIRect MainView);
-	void RenderSkinPartSelection7(CUIRect MainView);
 	void RenderSettingsControls(CUIRect MainView);
 	void ResetSettingsControls();
 	void RenderSettingsGraphics(CUIRect MainView);
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 	void RenderSettingsCustom(CUIRect MainView);
-
-	class CMapListItem
-	{
-	public:
-		char m_aFilename[IO_MAX_PATH_LENGTH];
-		bool m_IsDirectory;
-	};
-	class CPopupMapPickerContext
-	{
-	public:
-		std::vector<CMapListItem> m_vMaps;
-		char m_aCurrentMapFolder[IO_MAX_PATH_LENGTH] = "";
-		static int MapListFetchCallback(const CFsFileInfo *pInfo, int IsDir, int StorageType, void *pUser);
-		void MapListPopulate();
-		CMenus *m_pMenus;
-		int m_Selection;
-	};
-
-	static bool CompareFilenameAscending(const CMapListItem Lhs, const CMapListItem Rhs)
-	{
-		if(str_comp(Lhs.m_aFilename, "..") == 0)
-			return true;
-		if(str_comp(Rhs.m_aFilename, "..") == 0)
-			return false;
-		if(Lhs.m_IsDirectory != Rhs.m_IsDirectory)
-			return Lhs.m_IsDirectory;
-		return str_comp_filenames(Lhs.m_aFilename, Rhs.m_aFilename) < 0;
-	}
-
-	static CUi::EPopupMenuFunctionResult PopupMapPicker(void *pContext, CUIRect View, bool Active);
 
 	void SetNeedSendInfo();
 	void SetActive(bool Active);
@@ -648,8 +594,12 @@ protected:
 
 	bool CheckHotKey(int Key) const;
 
+	class CMenuBackground *m_pBackground;
+
 public:
 	void RenderBackground();
+
+	void SetMenuBackground(class CMenuBackground *pBackground) { m_pBackground = pBackground; }
 
 	static CMenusKeyBinder m_Binder;
 
@@ -668,7 +618,6 @@ public:
 
 	virtual void OnStateChange(int NewState, int OldState) override;
 	virtual void OnWindowResize() override;
-	virtual void OnRefreshSkins() override;
 	virtual void OnReset() override;
 	virtual void OnRender() override;
 	virtual bool OnInput(const IInput::CEvent &Event) override;
@@ -690,6 +639,7 @@ public:
 		PAGE_KOG_LEGACY, // removed, redirects to PAGE_INTERNET //fuckers ;c
 		PAGE_DEMOS,
 		PAGE_SETTINGS,
+		PAGE_SYSTEM,
 		PAGE_NETWORK,
 		PAGE_GHOST,
 
@@ -737,7 +687,7 @@ public:
 	SUIAnimator m_aAnimatorsSettingsTab[SETTINGS_LENGTH];
 
 	// DDRace
-	int DoButton_CheckBox_Tristate(const void *pId, const char *pText, TRISTATE Checked, const CUIRect *pRect);
+	int DoButton_CheckBox_Tristate(const void *pID, const char *pText, TRISTATE Checked, const CUIRect *pRect);
 	std::vector<CDemoItem> m_vDemos;
 	std::vector<CDemoItem *> m_vpFilteredDemos;
 	void DemolistPopulate();
@@ -768,14 +718,6 @@ public:
 		bool HasFile() const { return m_aFilename[0]; }
 	};
 
-	enum
-	{
-		GHOST_SORT_NONE = -1,
-		GHOST_SORT_NAME,
-		GHOST_SORT_TIME,
-		GHOST_SORT_DATE,
-	};
-
 	std::vector<CGhostItem> m_vGhosts;
 
 	std::chrono::nanoseconds m_GhostPopulateStartTime{0};
@@ -784,8 +726,8 @@ public:
 	CGhostItem *GetOwnGhost();
 	void UpdateOwnGhost(CGhostItem Item);
 	void DeleteGhostItem(int Index);
-	void SortGhostlist();
 
+	int GetCurPopup() const { return m_Popup; }
 	bool CanDisplayWarning() const;
 
 	void PopupWarning(const char *pTopic, const char *pBody, const char *pButton, std::chrono::nanoseconds Duration);
@@ -802,6 +744,7 @@ public:
 		POPUP_CONFIRM, // generic confirmation popup (two buttons)
 		POPUP_FIRST_LAUNCH,
 		POPUP_POINTS,
+		POPUP_CONNECTING,
 		POPUP_DISCONNECTED,
 		POPUP_LANGUAGE,
 		POPUP_RENAME_DEMO,
@@ -809,9 +752,7 @@ public:
 		POPUP_RENDER_DONE,
 		POPUP_PASSWORD,
 		POPUP_QUIT,
-		POPUP_RESTART,
 		POPUP_WARNING,
-		POPUP_SAVE_SKIN,
 
 		// demo player states
 		DEMOPLAYER_NONE = 0,
@@ -821,7 +762,7 @@ public:
 private:
 	static int GhostlistFetchCallback(const CFsFileInfo *pInfo, int IsDir, int StorageType, void *pUser);
 	void SetMenuPage(int NewPage);
-	void RefreshBrowserTab(bool Force);
+	void RefreshBrowserTab(int UiPage);
 
 	// found in menus_ingame.cpp
 	void RenderInGameNetwork(CUIRect MainView);

@@ -6,7 +6,7 @@
 #include <engine/input.h>
 #include <game/client/ui_rect.h>
 
-class CUi;
+class CUI;
 class CEditor;
 class IClient;
 class CConfig;
@@ -26,14 +26,14 @@ public:
 	/**
 	 * Initialise the component and interface pointers.
 	 * Needs to be the first function that is called.
-	 * The default implentation also resets the component.
+     * The default implentation also resets the component.
 	 */
-	virtual void OnInit(CEditor *pEditor);
+	virtual void Init(CEditor *pEditor);
 
 	/**
-	 * Maybe calls `OnHot` or `OnActive`.
+	 * Calls `OnRender` and then maybe `OnHot` or `OnActive`.
 	 */
-	virtual void OnUpdate();
+	void OnUpdate(CUIRect View);
 
 	/**
 	 * Gets called before `OnRender`. Should return true
@@ -45,6 +45,7 @@ public:
 
 	/**
 	 * Gets called after `OnRender` when the component is hot but not active.
+	 * I
 	 */
 	virtual void OnHot();
 
@@ -75,7 +76,7 @@ public:
 	ISound *Sound();
 	ITextRender *TextRender();
 	IStorage *Storage();
-	CUi *Ui();
+	CUI *UI();
 	CRenderTools *RenderTools();
 
 private:

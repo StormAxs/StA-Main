@@ -5,7 +5,6 @@
 #include <base/vmath.h>
 
 #include <engine/shared/protocol.h>
-#include <engine/textrender.h>
 
 #include <game/client/component.h>
 
@@ -22,26 +21,34 @@ struct SPlayerNamePlate
 	void Reset()
 	{
 		m_NameTextContainerIndex.Reset();
-		m_ClanTextContainerIndex.Reset();
-		m_aName[0] = '\0';
-		m_aClan[0] = '\0';
-		m_NameTextFontSize = m_ClanTextFontSize = 0.0f;
+		m_ClanNameTextContainerIndex.Reset();
+		m_aName[0] = 0;
+		m_aClanName[0] = 0;
+		m_NameTextWidth = m_ClanNameTextWidth = 0.f;
+		m_NameTextFontSize = m_ClanNameTextFontSize = 0;
 	}
 
 	char m_aName[MAX_NAME_LENGTH];
+	float m_NameTextWidth;
 	STextContainerIndex m_NameTextContainerIndex;
 	float m_NameTextFontSize;
 
-	char m_aClan[MAX_CLAN_LENGTH];
-	STextContainerIndex m_ClanTextContainerIndex;
-	float m_ClanTextFontSize;
+	char m_aClanName[MAX_CLAN_LENGTH];
+	float m_ClanNameTextWidth;
+	STextContainerIndex m_ClanNameTextContainerIndex;
+	float m_ClanNameTextFontSize;
 };
 
 class CNamePlates : public CComponent
 {
-	void RenderNameplate(vec2 Position, const CNetObj_PlayerInfo *pPlayerInfo, float Alpha, bool ForceAlpha);
+	void RenderNameplate(
+		const CNetObj_Character *pPrevChar,
+		const CNetObj_Character *pPlayerChar,
+		const CNetObj_PlayerInfo *pPlayerInfo);
+	void RenderNameplatePos(vec2 Position, const CNetObj_PlayerInfo *pPlayerInfo, float Alpha, bool ForceAlpha = false);
 
 	SPlayerNamePlate m_aNamePlates[MAX_CLIENTS];
+	class CPlayers *m_pPlayers;
 
 	void ResetNamePlates();
 
@@ -52,6 +59,8 @@ public:
 	virtual void OnWindowResize() override;
 	virtual void OnInit() override;
 	virtual void OnRender() override;
+
+	void SetPlayers(class CPlayers *pPlayers);
 };
 
 #endif

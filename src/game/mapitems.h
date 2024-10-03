@@ -277,7 +277,7 @@ struct CMapItemImage_v2 : public CMapItemImage_v1
 		CURRENT_VERSION = 2,
 	};
 
-	int m_MustBe1;
+	int m_Format; // Default before this version is CImageInfo::FORMAT_RGBA
 };
 
 typedef CMapItemImage_v1 CMapItemImage;
@@ -520,9 +520,6 @@ struct CMapItemSound
 
 	int m_SoundName;
 	int m_SoundData;
-	// Deprecated. Do not read this value, it could be wrong.
-	// Use GetDataSize instead, which returns the de facto size.
-	// Value must still be written for compatibility.
 	int m_SoundDataSize;
 };
 
@@ -571,9 +568,7 @@ public:
 bool IsValidGameTile(int Index);
 bool IsValidFrontTile(int Index);
 bool IsValidTeleTile(int Index);
-bool IsTeleTileCheckpoint(int Index); // Assumes that Index is a valid tele tile index
-bool IsTeleTileNumberUsed(int Index, bool Checkpoint); // Assumes that Index is a valid tele tile index
-bool IsTeleTileNumberUsedAny(int Index); // Does not check for checkpoint only
+bool IsTeleTileNumberUsed(int Index); // Assumes that Index is a valid tele tile index
 bool IsValidSpeedupTile(int Index);
 bool IsValidSwitchTile(int Index);
 bool IsSwitchTileFlagsUsed(int Index); // Assumes that Index is a valid switch tile index

@@ -38,6 +38,9 @@
 %s wins!
 == %s wint!
 
+-Page %d-
+== -Pagina %d-
+
 Abort
 == Afbreken
 
@@ -89,8 +92,8 @@ Client
 Connecting to
 == Verbinden met
 
-Connection Problems…
-== Verbindingsproblemen…
+Connection Problems...
+== Verbindingsproblemen...
 
 Console
 == Console
@@ -290,6 +293,9 @@ Player
 Player country:
 == Speler land:
 
+Player options
+== Speler opties
+
 Players
 == Spelers
 
@@ -407,6 +413,9 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == The server draait geen standaard spel type.
 
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Er is een onopgeslagen kaart in de editor, misschien wil je deze opslaan voordat je stopt.
+
 Time limit
 == Tijdslimiet
 
@@ -507,6 +516,12 @@ Your skin
 
 Reset to defaults
 == Terugzetten naar standaardinstellingen
+
+Quit anyway?
+== Toch afsluiten?
+
+Round
+== Ronde
 
 Lht.
 == Licht
@@ -619,8 +634,8 @@ DDNet %s is out!
 Downloading %s:
 == Downloaden %s:
 
-Update failed! Check log…
-== Update fout! Check log…
+Update failed! Check log...
+== Update fout! Check log...
 
 DDNet Client updated!
 == DDNet Client is geüpdate
@@ -630,6 +645,9 @@ Update now
 
 Restart
 == Herstarten
+
+Please use a different filename
+== 
 
 Remove chat
 == Verwijder chat
@@ -659,6 +677,9 @@ Connecting dummy
 
 Connect Dummy
 == Verbind Dummy
+
+Reload
+== Herladen
 
 Deactivate
 == Deactiveren
@@ -692,6 +713,9 @@ Automatically create statboard csv
 
 Max CSVs
 == Max CSVs
+
+Dummy settings
+== Dummy instellingen
 
 Vanilla skins only
 == Alleen vanilla skins
@@ -798,6 +822,9 @@ DDNet
 DDNet Client needs to be restarted to complete update!
 == DDNet Client moet herstart worden om de update te voltooien!
 
+Use DDRace Scoreboard
+== Gebruik DDrace Scorebord
+
 Show score
 == Laat score zien
 
@@ -888,7 +915,7 @@ Show tiles layers from BG map
 DDNet %s is available:
 == DDNet %s is beschikbaar
 
-Updating…
+Updating...
 == Aan het updaten
 
 No updates available
@@ -947,6 +974,9 @@ Auto
 
 Replay
 == Herhaling
+
+Saving ddnet-settings.cfg failed
+== Het opslaan van ddnet-settings.cfg is mislukt
 
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
 == De wijdte van de texture %s is niet te delen door %d, of de hoogte is niet te delen door %d wat visuele bugs kan veroorzaken.
@@ -1044,6 +1074,9 @@ Config directory
 Themes directory
 == Thema map
 
+Toggle to edit your dummy settings
+== Schakel in om je dummyinstellingen te bewerken
+
 Download skins
 == Skins downloaden
 
@@ -1100,6 +1133,9 @@ Background music volume
 
 Assets
 == Assets
+
+Kill Messages
+== Kill Berichten
 
 Use old chat style
 == Oude chatstijl gebruiken
@@ -1237,28 +1273,10 @@ Could not initialize the given graphics backend, reverting to the default backen
 Could not initialize the given graphics backend, this is probably because you didn't install the driver of the integrated graphics card.
 == 
 
-Could not resolve connect address '%s'. See local console for details.
-== 
-
-Connect address error
-== 
-
 Could not save downloaded map. Try manually deleting this file: %s
 == 
 
-Could not connect dummy
-== 
-
 Error playing demo
-== 
-
-Failed saving the replay!
-== 
-
-Saving settings to '%s' failed
-== 
-
-Error saving settings
 == 
 
 Preparing demo playback
@@ -1270,13 +1288,10 @@ Connected
 Loading map file from storage
 == 
 
-Loading demo file from storage
+Why are you slowmo replaying to read this?
 == 
 
 Initializing components
-== 
-
-Why are you slowmo replaying to read this?
 == 
 
 Initializing assets
@@ -1294,39 +1309,6 @@ Quitting. Please wait…
 Restarting. Please wait…
 == 
 
-Loading skin files
-== 
-
-Searching
-== 
-
-Enter Username
-== 
-
-Enter Password
-== 
-
-NOT CONNECTED
-== 
-
-Match %d of %d
-== 
-
-No results
-== 
-
-Lines %d - %d (%s)
-== 
-
-Locked
-== 
-
-Following
-== 
-
-Loading commands…
-== 
-
 Position:
 == 
 
@@ -1337,10 +1319,6 @@ Angle:
 == 
 
 Multi-View
-== 
-
-[Spectating]
-Following %s
 == 
 
 Some map images could not be loaded. Check the local console for details.
@@ -1355,31 +1333,28 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
-Press a key…
+Trying to determine UDP connectivity...
 == 
 
-Main menu
+UDP seems to be filtered.
+== 
+
+UDP and TCP IP addresses seem to be different. Try disabling VPN, proxy or network accelerators.
+== 
+
+No answer from server yet.
+== 
+
+Getting game info
+== 
+
+Requesting to join the game
 == 
 
 Rename folder
 == 
 
 Render complete
-== 
-
-Are you sure that you want to restart?
-== 
-
-Save skin
-== 
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== 
-
-There's an unsaved map in the editor, you might want to save it.
-== 
-
-Continue anyway?
 == 
 
 A demo with this name already exists
@@ -1403,46 +1378,7 @@ Videos directory
 Video was saved to '%s'
 == 
 
-Unable to save the skin
-== 
-
-Unable to save the skin with a reserved name
-== 
-
-Trying to determine UDP connectivity…
-== 
-
-UDP seems to be filtered.
-== 
-
-UDP and TCP IP addresses seem to be different. Try disabling VPN, proxy or network accelerators.
-== 
-
-No answer from server yet.
-== 
-
-%d/%d KiB (%.1f KiB/s)
-== 
-
-Getting game info
-== 
-
-Requesting to join the game
-== 
-
 Loading menu images
-== 
-
-No local servers found (ports %d-%d)
-== 
-
-Example of usage
-== 
-
-No login required
-== 
-
-Communities
 == 
 
 Copy info
@@ -1480,12 +1416,6 @@ Are you sure that you want to remove the clan '%s' from your friends list?
 == 
 
 Add Clan
-== 
-
-Server filter
-== 
-
-Friends
 == 
 
 Play the current demo
@@ -1559,9 +1489,6 @@ Cut length
 Render cut to video
 == 
 
-Please use a different filename
-== 
-
 Loading demo files
 == 
 
@@ -1602,15 +1529,6 @@ Unable to delete the demo '%s'
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
-Dummy is not allowed on this server
-== 
-
-Please wait…
-== 
-
-Loading…
-== 
-
 Loading ghost files
 == 
 
@@ -1626,10 +1544,6 @@ Deactivate all
 Menu opened. Press Esc key again to close menu.
 == 
 
-[Hertz]
-Hz
-== 
-
 Save power by lowering refresh rate (higher input latency)
 == 
 
@@ -1642,7 +1556,7 @@ Open the directory that contains the configuration and user files
 Open the directory to add custom themes
 == 
 
-Player info change cooldown
+Loading skin files
 == 
 
 Download community skins
@@ -1713,9 +1627,6 @@ Cancel
 Graphics card
 == 
 
-Tee
-== 
-
 Appearance
 == 
 
@@ -1725,19 +1636,13 @@ Name Plate
 Hook Collisions
 == 
 
-Info Messages
-== 
-
 Show health, shields and ammo
-== 
-
-Show local time always
 == 
 
 DDRace HUD
 == 
 
-Show client IDs (scoreboard, chat, spectator)
+Show client IDs in scoreboard
 == 
 
 Show DDRace HUD
@@ -1764,43 +1669,10 @@ Show freeze bars
 Opacity of freeze bars inside freeze
 == 
 
-Always show chat
-== 
-
-Show only chat messages from team members
-== 
-
-Chat font size
-== 
-
-Chat width
-== 
-
-Show friend mark (♥) in name plates
-== 
-
-Show hook strength icon indicator
-== 
-
-Show hook strength number indicator
-== 
-
-Authed name color in scoreboard
-== 
-
-Same clan color in scoreboard
+Show hook strength indicator
 == 
 
 Hook collision line
-== 
-
-Show own player's hook collision line
-== 
-
-Always show own player's hook collision line
-== 
-
-Always show other players' hook collision lines
 == 
 
 Hook collision line width
@@ -1822,9 +1694,6 @@ Something hookable
 == 
 
 A Tee
-== 
-
-Show finish messages
 == 
 
 Normal Color
@@ -1878,21 +1747,6 @@ Entities background color
 Unregister protocol and file extensions
 == 
 
-Basic
-== 
-
-Custom
-== 
-
-Are you sure that you want to delete '%s'?
-== 
-
-Delete skin
-== 
-
-Unable to delete skin
-== 
-
 Extras
 == 
 
@@ -1905,49 +1759,8 @@ Open the directory to add custom assets
 Loading race demo files
 == 
 
-Round %d/%d
-== 
-
-[Spectators]
-%d others…
-== 
-
-[Team and size]
-%d\n(%d/%d)
-== 
-
-Team %d (%d/%d)
-== 
-
-[skins]
-Body
-== 
-
-[skins]
-Marking
-== 
-
-[skins]
-Decoration
-== 
-
-[skins]
-Hands
-== 
-
-[skins]
-Feet
-== 
-
-[skins]
-Eyes
-== 
-
 Loading sound files
 == 
 
 Moved ingame
-== 
-
-https://wiki.ddnet.org/wiki/Mapping
 == 

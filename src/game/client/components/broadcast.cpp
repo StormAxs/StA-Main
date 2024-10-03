@@ -74,20 +74,20 @@ void CBroadcast::OnMessage(int MsgType, void *pRawMsg)
 {
 	if(MsgType == NETMSGTYPE_SV_BROADCAST)
 	{
-		const CNetMsg_Sv_Broadcast *pMsg = (CNetMsg_Sv_Broadcast *)pRawMsg;
-		DoBroadcast(pMsg->m_pMessage);
+		OnBroadcastMessage((CNetMsg_Sv_Broadcast *)pRawMsg);
 	}
 }
 
-void CBroadcast::DoBroadcast(const char *pText)
+void CBroadcast::OnBroadcastMessage(const CNetMsg_Sv_Broadcast *pMsg)
 {
-	str_copy(m_aBroadcastText, pText);
+	str_copy(m_aBroadcastText, pMsg->m_pMessage);
 	m_BroadcastTick = Client()->GameTick(g_Config.m_ClDummy) + Client()->GameTickSpeed() * 10;
 	m_BroadcastRenderOffset = -1.0f;
 	TextRender()->DeleteTextContainer(m_TextContainerIndex);
 
 	if(g_Config.m_ClPrintBroadcasts)
 	{
+		const char *pText = m_aBroadcastText;
 		char aLine[sizeof(m_aBroadcastText)];
 		while((pText = str_next_token(pText, "\n", aLine, sizeof(aLine))))
 		{

@@ -10,9 +10,8 @@ def copy_fix(infile, delete_unused, append_missing, delete_empty):
 	trans = twlang.translations(infile)
 	if delete_unused or append_missing:
 		local = twlang.localizes()
-	else:
-		local = []
-	supported = []
+	if append_missing:
+		supported = []
 	for tran, (start, expr, end) in trans.items():
 		if delete_unused and tran not in local:
 			content[start:end] = [None]*(end-start)

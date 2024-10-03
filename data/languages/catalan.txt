@@ -21,6 +21,9 @@
 %s wins!
 == ¡%s ha guanyat!
 
+-Page %d-
+== -Pàgina %d-
+
 Abort
 == Cancelar
 
@@ -72,8 +75,8 @@ Client
 Connecting to
 == T'estàs unint a
 
-Connection Problems…
-== Problemes de connexió…
+Connection Problems...
+== Problemes de connexió...
 
 Console
 == Consola
@@ -275,6 +278,9 @@ Player
 Player country:
 == País del jugador
 
+Player options
+== Opcions del jugador
+
 Players
 == Jugadors
 
@@ -395,6 +401,9 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == El servidor està utilitzant una modificació en un mode de joc estàndard
 
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Tens un mapa sense guardar a l'editor, segurament vols guardar-lo abans de sortir.
+
 Time limit
 == Temps límit
 
@@ -503,6 +512,12 @@ Your skin
 Reset to defaults
 == Restaurar als valors predeterminats
 
+Quit anyway?
+== Sortir igualment?
+
+Round
+== Ronda
+
 Lht.
 == Lluminositat
 
@@ -520,6 +535,9 @@ Name plates size
 
 Ratio
 == Proporció
+
+Dummy settings
+== Configuració del maniquí
 
 AntiPing
 == AntiPing
@@ -574,6 +592,9 @@ Enable game sounds
 
 DDNet Client needs to be restarted to complete update!
 == El client DDNet necessita reiniciar-se per completar l'actualització!
+
+Please use a different filename
+== 
 
 Show others
 == Mostrar altres
@@ -641,8 +662,8 @@ Enable long pain sound (used when shooting in freeze)
 DDNet %s is available:
 == DDNet %s està disponible:
 
-Updating…
-== Actualitzant…
+Updating...
+== Actualitzant...
 
 Overlay entities
 == Entitats superposades
@@ -685,6 +706,9 @@ Max CSVs
 
 %.2f KiB
 == %.2f KiB
+
+Use DDRace Scoreboard
+== Utilitzar la taula d'estadístiques DDRace
 
 Best
 == Millor
@@ -779,6 +803,9 @@ Show DDNet map finishes in server browser
 transmits your player name to info.ddnet.org
 == retransmet el teu nom de jugar a info.ddnet.org
 
+Reload
+== Recarga
+
 Successfully saved the replay!
 == S'ha guardat la repetició correctament!
 
@@ -827,8 +854,8 @@ DDNet %s is out!
 Downloading %s:
 == Descarregant %s:
 
-Update failed! Check log…
-== L'actualització ha fallat! Mira el registre…
+Update failed! Check log...
+== L'actualització ha fallat! Mira el registre...
 
 Markers
 == Marques
@@ -935,6 +962,9 @@ Auto
 Replay
 == Repetició
 
+Saving ddnet-settings.cfg failed
+== Ha fallat el guardat del fitxer ddnet-settings.cfg
+
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
 == La mida de la textura %s no es divisible per %d, o l'altura no es divisible per %d, el qual pot resultar en errors visuals.
 
@@ -1030,6 +1060,9 @@ Background music volume
 
 Assets
 == Arxius
+
+Kill Messages
+== Missatges al matar
 
 Use old chat style
 == Utilitzar l'estil antic del xat
@@ -1191,28 +1224,10 @@ Could not initialize the given graphics backend, reverting to the default backen
 Could not initialize the given graphics backend, this is probably because you didn't install the driver of the integrated graphics card.
 == 
 
-Could not resolve connect address '%s'. See local console for details.
-== 
-
-Connect address error
-== 
-
 Could not save downloaded map. Try manually deleting this file: %s
 == 
 
-Could not connect dummy
-== 
-
 Error playing demo
-== 
-
-Failed saving the replay!
-== 
-
-Saving settings to '%s' failed
-== 
-
-Error saving settings
 == 
 
 Preparing demo playback
@@ -1224,13 +1239,10 @@ Connected
 Loading map file from storage
 == 
 
-Loading demo file from storage
+Why are you slowmo replaying to read this?
 == 
 
 Initializing components
-== 
-
-Why are you slowmo replaying to read this?
 == 
 
 Initializing assets
@@ -1248,39 +1260,6 @@ Quitting. Please wait…
 Restarting. Please wait…
 == 
 
-Loading skin files
-== 
-
-Searching
-== 
-
-Enter Username
-== 
-
-Enter Password
-== 
-
-NOT CONNECTED
-== 
-
-Match %d of %d
-== 
-
-No results
-== 
-
-Lines %d - %d (%s)
-== 
-
-Locked
-== 
-
-Following
-== 
-
-Loading commands…
-== 
-
 Position:
 == 
 
@@ -1291,10 +1270,6 @@ Angle:
 == 
 
 Multi-View
-== 
-
-[Spectating]
-Following %s
 == 
 
 Team %d
@@ -1312,31 +1287,28 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
-Press a key…
+Trying to determine UDP connectivity...
 == 
 
-Main menu
+UDP seems to be filtered.
+== 
+
+UDP and TCP IP addresses seem to be different. Try disabling VPN, proxy or network accelerators.
+== 
+
+No answer from server yet.
+== 
+
+Getting game info
+== 
+
+Requesting to join the game
 == 
 
 Rename folder
 == 
 
 Render complete
-== 
-
-Are you sure that you want to restart?
-== 
-
-Save skin
-== 
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== 
-
-There's an unsaved map in the editor, you might want to save it.
-== 
-
-Continue anyway?
 == 
 
 A demo with this name already exists
@@ -1360,46 +1332,7 @@ Videos directory
 Video was saved to '%s'
 == 
 
-Unable to save the skin
-== 
-
-Unable to save the skin with a reserved name
-== 
-
-Trying to determine UDP connectivity…
-== 
-
-UDP seems to be filtered.
-== 
-
-UDP and TCP IP addresses seem to be different. Try disabling VPN, proxy or network accelerators.
-== 
-
-No answer from server yet.
-== 
-
-%d/%d KiB (%.1f KiB/s)
-== 
-
-Getting game info
-== 
-
-Requesting to join the game
-== 
-
 Loading menu images
-== 
-
-No local servers found (ports %d-%d)
-== 
-
-Example of usage
-== 
-
-No login required
-== 
-
-Communities
 == 
 
 Copy info
@@ -1437,12 +1370,6 @@ Are you sure that you want to remove the clan '%s' from your friends list?
 == 
 
 Add Clan
-== 
-
-Server filter
-== 
-
-Friends
 == 
 
 Play the current demo
@@ -1516,9 +1443,6 @@ Cut length
 Render cut to video
 == 
 
-Please use a different filename
-== 
-
 Loading demo files
 == 
 
@@ -1559,15 +1483,6 @@ Unable to delete the demo '%s'
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
-Dummy is not allowed on this server
-== 
-
-Please wait…
-== 
-
-Loading…
-== 
-
 Loading ghost files
 == 
 
@@ -1583,10 +1498,6 @@ Deactivate all
 Menu opened. Press Esc key again to close menu.
 == 
 
-[Hertz]
-Hz
-== 
-
 Save power by lowering refresh rate (higher input latency)
 == 
 
@@ -1599,16 +1510,19 @@ Open the directory that contains the configuration and user files
 Open the directory to add custom themes
 == 
 
-Player info change cooldown
+Toggle to edit your dummy settings
+== 
+
+Loading skin files
 == 
 
 Download community skins
 == 
 
-Create a random skin
+Choose default eyes when joining a server
 == 
 
-Choose default eyes when joining a server
+Create a random skin
 == 
 
 Open the directory to add custom skins
@@ -1676,9 +1590,6 @@ Allows maps to render with more detail
 Graphics card
 == 
 
-Tee
-== 
-
 Appearance
 == 
 
@@ -1688,19 +1599,13 @@ Name Plate
 Hook Collisions
 == 
 
-Info Messages
-== 
-
 Show health, shields and ammo
-== 
-
-Show local time always
 == 
 
 DDRace HUD
 == 
 
-Show client IDs (scoreboard, chat, spectator)
+Show client IDs in scoreboard
 == 
 
 Show DDRace HUD
@@ -1727,43 +1632,10 @@ Show freeze bars
 Opacity of freeze bars inside freeze
 == 
 
-Always show chat
-== 
-
-Show only chat messages from team members
-== 
-
-Chat font size
-== 
-
-Chat width
-== 
-
-Show friend mark (♥) in name plates
-== 
-
-Show hook strength icon indicator
-== 
-
-Show hook strength number indicator
-== 
-
-Authed name color in scoreboard
-== 
-
-Same clan color in scoreboard
+Show hook strength indicator
 == 
 
 Hook collision line
-== 
-
-Show own player's hook collision line
-== 
-
-Always show own player's hook collision line
-== 
-
-Always show other players' hook collision lines
 == 
 
 Hook collision line width
@@ -1785,9 +1657,6 @@ Something hookable
 == 
 
 A Tee
-== 
-
-Show finish messages
 == 
 
 Normal Color
@@ -1856,21 +1725,6 @@ Entities background color
 Unregister protocol and file extensions
 == 
 
-Basic
-== 
-
-Custom
-== 
-
-Are you sure that you want to delete '%s'?
-== 
-
-Delete skin
-== 
-
-Unable to delete skin
-== 
-
 Extras
 == 
 
@@ -1883,52 +1737,11 @@ Open the directory to add custom assets
 Loading race demo files
 == 
 
-Round %d/%d
-== 
-
-[Spectators]
-%d others…
-== 
-
 Super
-== 
-
-[Team and size]
-%d\n(%d/%d)
-== 
-
-Team %d (%d/%d)
-== 
-
-[skins]
-Body
-== 
-
-[skins]
-Marking
-== 
-
-[skins]
-Decoration
-== 
-
-[skins]
-Hands
-== 
-
-[skins]
-Feet
-== 
-
-[skins]
-Eyes
 == 
 
 Loading sound files
 == 
 
 Moved ingame
-== 
-
-https://wiki.ddnet.org/wiki/Mapping
 == 

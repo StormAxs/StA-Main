@@ -41,7 +41,7 @@ jobs:
           fancy: false
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
       with:
         submodules: true
 
@@ -51,13 +51,11 @@ jobs:
         sudo apt-get update -y
         # mount: /var/lib/grub/esp: special device /dev/disk/by-id/scsi-... does not exist.
         # sudo apt-get upgrade -y
-        sudo apt-get install pkg-config cmake ninja-build libfreetype6-dev libnotify-dev libsdl2-dev libsqlite3-dev libvulkan-dev glslang-tools spirv-tools libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libpng-dev valgrind gcovr libglew-dev -y
+        sudo apt-get install pkg-config cmake ninja-build libfreetype6-dev libnotify-dev libsdl2-dev libsqlite3-dev libvulkan-dev glslang-tools spirv-tools libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libpng-dev valgrind gcovr -y
 
     - name: Prepare Linux (non-fancy)
       if: ${{ contains(matrix.os, 'ubuntu') && !matrix.fancy }}
       run: |
-        # Our minimum supported Rust version (MSRV)
-        rustup default 1.63.0
         sudo rm -rf /var/lib/mysql/ /var/run/mysqld
         sudo mkdir /var/lib/mysql/ /var/run/mysqld/
         sudo chown mysql:mysql /var/lib/mysql/ /var/run/mysqld/
@@ -91,10 +89,12 @@ jobs:
       if: contains(matrix.os, 'macOS')
       run: |
         brew update || true
-        brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools rust || true
+        brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
+        # --overwrite for:  Target /usr/local/bin/2to3 already exists.
+        brew link --overwrite python@3.11
         brew upgrade freetype
-        pip3 install --break-system-packages dmgbuild
-        echo /Library/Frameworks/Python.framework/Versions/3.12/bin >> $GITHUB_PATH
+        pip3 install dmgbuild
+        echo /Library/Frameworks/Python.framework/Versions/3.11/bin >> $GITHUB_PATH
         sudo rm -rf /Library/Developer/CommandLineTools
 
     - name: Cache Rust dependencies
@@ -151,8 +151,10 @@ jobs:
 
     - name: Upload Codecov report (unit tests)
       if: contains(matrix.os, 'ubuntu-latest')
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
+        gcov: true
+        gcov_include: src
         flags: unittests
 
     - name: Test headless client (start & connect)
@@ -166,8 +168,10 @@ jobs:
 
     - name: Upload Codecov report (start & connect)
       if: contains(matrix.os, 'ubuntu-latest')
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
+        gcov: true
+        gcov_include: src
         flags: startconnect
 
     - name: Build in release mode with debug info and all features on
@@ -200,8 +204,10 @@ jobs:
 
     - name: Upload Codecov report (integration tests)
       if: contains(matrix.os, 'ubuntu-latest')
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
+        gcov: true
+        gcov_include: src
         flags: integrationtests
 
     - name: Package
@@ -212,7 +218,8 @@ jobs:
         mv ${{ matrix.package-file }} artifacts
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: ddnet-${{ matrix.os }}
         path: release/artifacts
+

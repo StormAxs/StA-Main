@@ -1,3 +1,6 @@
+
+#define _WIN32_WINNT 0x0501
+
 #include <base/logger.h>
 #include <base/system.h>
 
@@ -20,6 +23,7 @@
 #include <vector>
 
 #if defined(CONF_FAMILY_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
@@ -43,8 +47,6 @@ void HandleSigIntTerm(int Param)
 
 int main(int argc, const char **argv)
 {
-	const int64_t MainStart = time_get();
-
 	CCmdlineFix CmdlineFix(&argc, &argv);
 	bool Silent = false;
 
@@ -88,12 +90,12 @@ int main(int argc, const char **argv)
 
 	if(secure_random_init() != 0)
 	{
-		log_error("secure", "could not initialize secure RNG");
+		dbg_msg("secure", "could not initialize secure RNG");
 		return -1;
 	}
 	if(MysqlInit() != 0)
 	{
-		log_error("mysql", "failed to initialize MySQL library");
+		dbg_msg("mysql", "failed to initialize MySQL library");
 		return -1;
 	}
 
@@ -171,13 +173,12 @@ int main(int argc, const char **argv)
 	if(argc > 1)
 		pConsole->ParseArguments(argc - 1, &argv[1]);
 
-	pConfigManager->SetReadOnly("sv_max_clients", true);
 	pConfigManager->SetReadOnly("sv_test_cmds", true);
 	pConfigManager->SetReadOnly("sv_rescue", true);
 
+	const int Mode = g_Config.m_Logappend ? IOFLAG_APPEND : IOFLAG_WRITE;
 	if(g_Config.m_Logfile[0])
 	{
-		const int Mode = g_Config.m_Logappend ? IOFLAG_APPEND : IOFLAG_WRITE;
 		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, Mode, IStorage::TYPE_SAVE_OR_ABSOLUTE);
 		if(Logfile)
 		{
@@ -185,20 +186,14 @@ int main(int argc, const char **argv)
 		}
 		else
 		{
-			log_error("server", "failed to open '%s' for logging", g_Config.m_Logfile);
-			pFutureFileLogger->Set(log_logger_noop());
+			dbg_msg("server", "failed to open '%s' for logging", g_Config.m_Logfile);
 		}
 	}
-	else
-	{
-		pFutureFileLogger->Set(log_logger_noop());
-	}
-
 	auto pServerLogger = std::make_shared<CServerLogger>(pServer);
 	pEngine->SetAdditionalLogger(pServerLogger);
 
 	// run the server
-	log_trace("server", "initialization finished after %.2fms, starting...", (time_get() - MainStart) * 1000.0f / (float)time_freq());
+	dbg_msg("server", "starting...");
 	int Ret = pServer->Run();
 
 	pServerLogger->OnServerDeletion();

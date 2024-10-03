@@ -26,11 +26,11 @@ inline void CTooltips::ClearActiveTooltip()
 	m_PreviousTooltip.reset();
 }
 
-void CTooltips::DoToolTip(const void *pId, const CUIRect *pNearRect, const char *pText, float WidthHint)
+void CTooltips::DoToolTip(const void *pID, const CUIRect *pNearRect, const char *pText, float WidthHint)
 {
-	uintptr_t Id = reinterpret_cast<uintptr_t>(pId);
-	const auto result = m_Tooltips.emplace(Id, CTooltip{
-							   pId,
+	uintptr_t ID = reinterpret_cast<uintptr_t>(pID);
+	const auto result = m_Tooltips.emplace(ID, CTooltip{
+							   pID,
 							   *pNearRect,
 							   pText,
 							   WidthHint,
@@ -45,7 +45,7 @@ void CTooltips::DoToolTip(const void *pId, const CUIRect *pNearRect, const char 
 
 	Tooltip.m_OnScreen = true;
 
-	if(Ui()->HotItem() == Tooltip.m_pId)
+	if(UI()->HotItem() == Tooltip.m_pID)
 	{
 		SetActiveTooltip(Tooltip);
 	}
@@ -57,7 +57,7 @@ void CTooltips::OnRender()
 	{
 		CTooltip &Tooltip = m_ActiveTooltip.value();
 
-		if(Ui()->HotItem() != Tooltip.m_pId)
+		if(UI()->HotItem() != Tooltip.m_pID)
 		{
 			Tooltip.m_OnScreen = false;
 			ClearActiveTooltip();
@@ -91,33 +91,33 @@ void CTooltips::OnRender()
 		Rect.w = BoundingBox.m_W + 2 * Padding;
 		Rect.h = BoundingBox.m_H + 2 * Padding;
 
-		const CUIRect *pScreen = Ui()->Screen();
+		const CUIRect *pScreen = UI()->Screen();
 		Rect.w = minimum(Rect.w, pScreen->w - 2 * Margin);
 		Rect.h = minimum(Rect.h, pScreen->h - 2 * Margin);
 
 		// Try the top side.
 		if(Tooltip.m_Rect.y - Rect.h - Margin > pScreen->y)
 		{
-			Rect.x = clamp(Ui()->MouseX() - Rect.w / 2.0f, Margin, pScreen->w - Rect.w - Margin);
+			Rect.x = clamp(UI()->MouseX() - Rect.w / 2.0f, Margin, pScreen->w - Rect.w - Margin);
 			Rect.y = Tooltip.m_Rect.y - Rect.h - Margin;
 		}
 		// Try the bottom side.
 		else if(Tooltip.m_Rect.y + Tooltip.m_Rect.h + Margin < pScreen->h)
 		{
-			Rect.x = clamp(Ui()->MouseX() - Rect.w / 2.0f, Margin, pScreen->w - Rect.w - Margin);
+			Rect.x = clamp(UI()->MouseX() - Rect.w / 2.0f, Margin, pScreen->w - Rect.w - Margin);
 			Rect.y = Tooltip.m_Rect.y + Tooltip.m_Rect.h + Margin;
 		}
 		// Try the right side.
 		else if(Tooltip.m_Rect.x + Tooltip.m_Rect.w + Margin + Rect.w < pScreen->w)
 		{
 			Rect.x = Tooltip.m_Rect.x + Tooltip.m_Rect.w + Margin;
-			Rect.y = clamp(Ui()->MouseY() - Rect.h / 2.0f, Margin, pScreen->h - Rect.h - Margin);
+			Rect.y = clamp(UI()->MouseY() - Rect.h / 2.0f, Margin, pScreen->h - Rect.h - Margin);
 		}
 		// Try the left side.
 		else if(Tooltip.m_Rect.x - Rect.w - Margin > pScreen->x)
 		{
 			Rect.x = Tooltip.m_Rect.x - Rect.w - Margin;
-			Rect.y = clamp(Ui()->MouseY() - Rect.h / 2.0f, Margin, pScreen->h - Rect.h - Margin);
+			Rect.y = clamp(UI()->MouseY() - Rect.h / 2.0f, Margin, pScreen->h - Rect.h - Margin);
 		}
 
 		Rect.Draw(ColorRGBA(0.2f, 0.2f, 0.2f, 0.8f * AlphaFactor), IGraphics::CORNER_ALL, Padding);

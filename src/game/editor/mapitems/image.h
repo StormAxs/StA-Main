@@ -12,7 +12,7 @@ public:
 	explicit CEditorImage(CEditor *pEditor);
 	~CEditorImage();
 
-	void OnInit(CEditor *pEditor) override;
+	void Init(CEditor *pEditor) override;
 	void AnalyseTileFlags();
 
 	IGraphics::CTextureHandle m_Texture;

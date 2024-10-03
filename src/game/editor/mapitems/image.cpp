@@ -5,7 +5,7 @@
 CEditorImage::CEditorImage(CEditor *pEditor) :
 	m_AutoMapper(pEditor)
 {
-	OnInit(pEditor);
+	Init(pEditor);
 	m_Texture.Invalidate();
 }
 
@@ -16,9 +16,9 @@ CEditorImage::~CEditorImage()
 	m_pData = nullptr;
 }
 
-void CEditorImage::OnInit(CEditor *pEditor)
+void CEditorImage::Init(CEditor *pEditor)
 {
-	CEditorComponent::OnInit(pEditor);
+	CEditorComponent::Init(pEditor);
 	RegisterSubComponent(m_AutoMapper);
 	InitSubComponents();
 }
@@ -27,20 +27,22 @@ void CEditorImage::AnalyseTileFlags()
 {
 	mem_zero(m_aTileFlags, sizeof(m_aTileFlags));
 
-	size_t tw = m_Width / 16; // tilesizes
-	size_t th = m_Height / 16;
+	int tw = m_Width / 16; // tilesizes
+	int th = m_Height / 16;
 	if(tw == th && m_Format == CImageInfo::FORMAT_RGBA)
 	{
-		int TileId = 0;
-		for(size_t ty = 0; ty < 16; ty++)
-			for(size_t tx = 0; tx < 16; tx++, TileId++)
+		unsigned char *pPixelData = (unsigned char *)m_pData;
+
+		int TileID = 0;
+		for(int ty = 0; ty < 16; ty++)
+			for(int tx = 0; tx < 16; tx++, TileID++)
 			{
 				bool Opaque = true;
-				for(size_t x = 0; x < tw; x++)
-					for(size_t y = 0; y < th; y++)
+				for(int x = 0; x < tw; x++)
+					for(int y = 0; y < th; y++)
 					{
-						size_t p = (ty * tw + y) * m_Width + tx * tw + x;
-						if(m_pData[p * 4 + 3] < 250)
+						int p = (ty * tw + y) * m_Width + tx * tw + x;
+						if(pPixelData[p * 4 + 3] < 250)
 						{
 							Opaque = false;
 							break;
@@ -48,7 +50,7 @@ void CEditorImage::AnalyseTileFlags()
 					}
 
 				if(Opaque)
-					m_aTileFlags[TileId] |= TILEFLAG_OPAQUE;
+					m_aTileFlags[TileID] |= TILEFLAG_OPAQUE;
 			}
 	}
 }

@@ -1,7 +1,4 @@
-# only find ssp when toolchain is gcc
-if(TARGET_OS STREQUAL "windows"
-  AND NOT CMAKE_C_COMPILER_ID STREQUAL "Clang"
-  AND NOT CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+if(TARGET_OS STREQUAL "windows")
   set_extra_dirs_lib(SSP ssp)
   find_file(SSP_LIBRARY
     NAMES libssp-0.dll

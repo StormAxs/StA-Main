@@ -66,7 +66,6 @@ enum class EFontPreset
 namespace FontIcons {
 // Each font icon is named according to its official name in Font Awesome
 MAYBE_UNUSED static const char *FONT_ICON_PLUS = "+";
-MAYBE_UNUSED static const char *FONT_ICON_MINUS = "-";
 MAYBE_UNUSED static const char *FONT_ICON_LOCK = "\xEF\x80\xA3";
 MAYBE_UNUSED static const char *FONT_ICON_MAGNIFYING_GLASS = "\xEF\x80\x82";
 MAYBE_UNUSED static const char *FONT_ICON_HEART = "\xEF\x80\x84";
@@ -90,10 +89,8 @@ MAYBE_UNUSED static const char *FONT_ICON_GEAR = "\xEF\x80\x93";
 MAYBE_UNUSED static const char *FONT_ICON_PEN_TO_SQUARE = "\xEF\x81\x84";
 MAYBE_UNUSED static const char *FONT_ICON_CLAPPERBOARD = "\xEE\x84\xB1";
 MAYBE_UNUSED static const char *FONT_ICON_EARTH_AMERICAS = "\xEF\x95\xBD";
-MAYBE_UNUSED static const char *FONT_ICON_NETWORK_WIRED = "\xEF\x9B\xBF";
 MAYBE_UNUSED static const char *FONT_ICON_LIST_UL = "\xEF\x83\x8A";
 MAYBE_UNUSED static const char *FONT_ICON_INFO = "\xEF\x84\xA9";
-MAYBE_UNUSED static const char *FONT_ICON_TERMINAL = "\xEF\x84\xA0";
 
 MAYBE_UNUSED static const char *FONT_ICON_SLASH = "\xEF\x9C\x95";
 MAYBE_UNUSED static const char *FONT_ICON_PLAY = "\xEF\x81\x8B";
@@ -134,7 +131,6 @@ MAYBE_UNUSED static const char *FONT_ICON_CIRCLE_PLAY = "\xEF\x85\x84";
 MAYBE_UNUSED static const char *FONT_ICON_BORDER_ALL = "\xEF\xA1\x8C";
 MAYBE_UNUSED static const char *FONT_ICON_EYE = "\xEF\x81\xAE";
 MAYBE_UNUSED static const char *FONT_ICON_EYE_SLASH = "\xEF\x81\xB0";
-MAYBE_UNUSED static const char *FONT_ICON_EYE_DROPPER = "\xEF\x87\xBB";
 
 MAYBE_UNUSED static const char *FONT_ICON_DICE_ONE = "\xEF\x94\xA5";
 MAYBE_UNUSED static const char *FONT_ICON_DICE_TWO = "\xEF\x94\xA8";
@@ -146,9 +142,6 @@ MAYBE_UNUSED static const char *FONT_ICON_DICE_SIX = "\xEF\x94\xA6";
 MAYBE_UNUSED static const char *FONT_ICON_LAYER_GROUP = "\xEF\x97\xBD";
 MAYBE_UNUSED static const char *FONT_ICON_UNDO = "\xEF\x8B\xAA";
 MAYBE_UNUSED static const char *FONT_ICON_REDO = "\xEF\x8B\xB9";
-
-MAYBE_UNUSED static const char *FONT_ICON_ARROWS_ROTATE = "\xEF\x80\xA1";
-MAYBE_UNUSED static const char *FONT_ICON_QUESTION = "?";
 } // end namespace FontIcons
 
 enum ETextCursorSelectionMode
@@ -219,7 +212,6 @@ public:
 	float m_FontSize;
 	float m_AlignedFontSize;
 	float m_LineSpacing;
-	float m_AlignedLineSpacing;
 
 	ETextCursorSelectionMode m_CalculateSelectionMode;
 	float m_SelectionHeightFactor;
@@ -245,7 +237,7 @@ public:
 
 	float Height() const
 	{
-		return m_LineCount * (m_AlignedFontSize + m_AlignedLineSpacing);
+		return m_LineCount * m_AlignedFontSize + std::max(0, m_LineCount - 1) * m_LineSpacing;
 	}
 
 	STextBoundingBox BoundingBox() const
@@ -345,18 +337,18 @@ public:
 
 	virtual STextBoundingBox GetBoundingBoxTextContainer(STextContainerIndex TextContainerIndex) = 0;
 
-	virtual void UploadEntityLayerText(const CImageInfo &TextImage, int TexSubWidth, int TexSubHeight, const char *pText, int Length, float x, float y, int FontSize) = 0;
+	virtual void UploadEntityLayerText(void *pTexBuff, size_t PixelSize, size_t TexWidth, size_t TexHeight, int TexSubWidth, int TexSubHeight, const char *pText, int Length, float x, float y, int FontSize) = 0;
 	virtual int AdjustFontSize(const char *pText, int TextLength, int MaxSize, int MaxWidth) const = 0;
 	virtual float GetGlyphOffsetX(int FontSize, char TextCharacter) const = 0;
 	virtual int CalculateTextWidth(const char *pText, int TextLength, int FontWidth, int FontSize) const = 0;
 
 	// old foolish interface
 	virtual void TextColor(float r, float g, float b, float a) = 0;
-	virtual void TextColor(ColorRGBA Color) = 0;
+	virtual void TextColor(ColorRGBA rgb) = 0;
 	virtual void TextOutlineColor(float r, float g, float b, float a) = 0;
-	virtual void TextOutlineColor(ColorRGBA Color) = 0;
+	virtual void TextOutlineColor(ColorRGBA rgb) = 0;
 	virtual void TextSelectionColor(float r, float g, float b, float a) = 0;
-	virtual void TextSelectionColor(ColorRGBA Color) = 0;
+	virtual void TextSelectionColor(ColorRGBA rgb) = 0;
 	virtual void Text(float x, float y, float Size, const char *pText, float LineWidth = -1.0f) = 0;
 	virtual float TextWidth(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, int Flags = 0, const STextSizeProperties &TextSizeProps = {}) = 0;
 	virtual STextBoundingBox TextBoundingBox(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, float LineSpacing = 0.0f, int Flags = 0) = 0;

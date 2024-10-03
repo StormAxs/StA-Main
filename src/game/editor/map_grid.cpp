@@ -4,9 +4,6 @@
 
 #include "editor.h"
 
-static constexpr int MIN_GRID_FACTOR = 1;
-static constexpr int MAX_GRID_FACTOR = 15;
-
 void CMapGrid::OnReset()
 {
 	m_GridActive = false;
@@ -26,7 +23,7 @@ void CMapGrid::OnRender(CUIRect View)
 		float aGroupPoints[4];
 		pGroup->Mapping(aGroupPoints);
 
-		const CUIRect *pScreen = Ui()->Screen();
+		const CUIRect *pScreen = UI()->Screen();
 
 		int LineDistance = GridLineDistance();
 
@@ -63,11 +60,7 @@ void CMapGrid::OnRender(CUIRect View)
 
 int CMapGrid::GridLineDistance() const
 {
-	if(Editor()->MapView()->Zoom()->GetValue() <= 10.0f)
-		return 4;
-	else if(Editor()->MapView()->Zoom()->GetValue() <= 50.0f)
-		return 8;
-	else if(Editor()->MapView()->Zoom()->GetValue() <= 100.0f)
+	if(Editor()->MapView()->Zoom()->GetValue() <= 100.0f)
 		return 16;
 	else if(Editor()->MapView()->Zoom()->GetValue() <= 250.0f)
 		return 32;
@@ -103,47 +96,19 @@ int CMapGrid::Factor() const
 	return m_GridFactor;
 }
 
-void CMapGrid::SetFactor(int Factor)
+void CMapGrid::ResetFactor()
 {
-	m_GridFactor = clamp(Factor, MIN_GRID_FACTOR, MAX_GRID_FACTOR);
+	m_GridFactor = 1;
 }
 
-void CMapGrid::DoSettingsPopup(vec2 Position)
+void CMapGrid::IncreaseFactor()
 {
-	Ui()->DoPopupMenu(&m_PopupGridSettingsId, Position.x, Position.y, 120.0f, 37.0f, this, PopupGridSettings);
+	if(m_GridFactor < 15)
+		m_GridFactor++;
 }
 
-CUi::EPopupMenuFunctionResult CMapGrid::PopupGridSettings(void *pContext, CUIRect View, bool Active)
+void CMapGrid::DecreaseFactor()
 {
-	CMapGrid *pMapGrid = static_cast<CMapGrid *>(pContext);
-
-	enum
-	{
-		PROP_SIZE = 0,
-		NUM_PROPS,
-	};
-	CProperty aProps[] = {
-		{"Size", pMapGrid->Factor(), PROPTYPE_INT, MIN_GRID_FACTOR, MAX_GRID_FACTOR},
-		{nullptr},
-	};
-
-	static int s_aIds[NUM_PROPS];
-	int NewVal;
-	int Prop = pMapGrid->Editor()->DoProperties(&View, aProps, s_aIds, &NewVal);
-
-	if(Prop == PROP_SIZE)
-	{
-		pMapGrid->SetFactor(NewVal);
-	}
-
-	CUIRect Button;
-	View.HSplitBottom(12.0f, &View, &Button);
-
-	static char s_DefaultButton;
-	if(pMapGrid->Editor()->DoButton_Ex(&s_DefaultButton, "Default", 0, &Button, 0, "Normal grid size", IGraphics::CORNER_ALL))
-	{
-		pMapGrid->SetFactor(1);
-	}
-
-	return CUi::POPUP_KEEP_OPEN;
+	if(m_GridFactor > 1)
+		m_GridFactor--;
 }

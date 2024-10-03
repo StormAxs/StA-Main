@@ -2,7 +2,6 @@
 #define GAME_EDITOR_MAPITEMS_LAYER_TILES_H
 
 #include <game/editor/editor_trackers.h>
-#include <game/editor/enums.h>
 #include <map>
 
 #include "layer.h"
@@ -123,9 +122,7 @@ public:
 	void BrushSelecting(CUIRect Rect) override;
 	int BrushGrab(std::shared_ptr<CLayerGroup> pBrush, CUIRect Rect) override;
 	void FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRect Rect) override;
-	void FillGameTiles(EGameTileOp Fill);
-	bool CanFillGameTiles() const;
-	void BrushDraw(std::shared_ptr<CLayer> pBrush, vec2 WorldPos) override;
+	void BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy) override;
 	void BrushFlipX() override;
 	void BrushFlipY() override;
 	void BrushRotate(float Amount) override;
@@ -134,7 +131,7 @@ public:
 	const char *TypeName() const override;
 
 	virtual void ShowInfo();
-	CUi::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
+	CUI::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
 
 	struct SCommonPropState
 	{
@@ -148,7 +145,7 @@ public:
 		int m_Height = -1;
 		int m_Color = 0;
 	};
-	static CUi::EPopupMenuFunctionResult RenderCommonProperties(SCommonPropState &State, CEditor *pEditor, CUIRect *pToolbox, std::vector<std::shared_ptr<CLayerTiles>> &vpLayers, std::vector<int> &vLayerIndices);
+	static CUI::EPopupMenuFunctionResult RenderCommonProperties(SCommonPropState &State, CEditor *pEditor, CUIRect *pToolbox, std::vector<std::shared_ptr<CLayerTiles>> &vpLayers, std::vector<int> &vLayerIndices);
 
 	void ModifyImageIndex(FIndexModifyFunction pfnFunc) override;
 	void ModifyEnvelopeIndex(FIndexModifyFunction pfnFunc) override;
@@ -188,12 +185,8 @@ public:
 	EditorTileStateChangeHistory<STileStateChange> m_TilesHistory;
 	inline virtual void ClearHistory() { m_TilesHistory.clear(); }
 
-	static bool HasAutomapEffect(ETilesProp Prop);
-
 protected:
 	void RecordStateChange(int x, int y, CTile Previous, CTile Tile);
-
-	void ShowPreventUnusedTilesWarning();
 
 	friend class CAutoMapper;
 };

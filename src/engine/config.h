@@ -10,7 +10,6 @@ class IConfigManager : public IInterface
 	MACRO_INTERFACE("config")
 public:
 	typedef void (*SAVECALLBACKFUNC)(IConfigManager *pConfig, void *pUserData);
-	typedef void (*POSSIBLECFGFUNC)(const struct SConfigVariable *, void *pUserData);
 
 	virtual void Init() = 0;
 	virtual void Reset(const char *pScriptName) = 0;
@@ -24,8 +23,6 @@ public:
 	virtual void WriteLine(const char *pLine) = 0;
 
 	virtual void StoreUnknownCommand(const char *pCommand) = 0;
-
-	virtual void PossibleConfigVariables(const char *pStr, int FlagMask, POSSIBLECFGFUNC pfnCallback, void *pUserData) = 0;
 };
 
 extern IConfigManager *CreateConfigManager();

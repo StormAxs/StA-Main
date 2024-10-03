@@ -23,21 +23,16 @@ public:
 
 	CTeleTile *m_pTeleTile;
 	unsigned char m_TeleNum;
-	unsigned char m_TeleCheckpointNum;
 
 	void Resize(int NewW, int NewH) override;
 	void Shift(int Direction) override;
 	bool IsEmpty(const std::shared_ptr<CLayerTiles> &pLayer) override;
-	void BrushDraw(std::shared_ptr<CLayer> pBrush, vec2 WorldPos) override;
+	void BrushDraw(std::shared_ptr<CLayer> pBrush, float wx, float wy) override;
 	void BrushFlipX() override;
 	void BrushFlipY() override;
 	void BrushRotate(float Amount) override;
 	void FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRect Rect) override;
-	virtual bool ContainsElementWithId(int Id, bool Checkpoint);
-	virtual void GetPos(int Number, int Offset, int &TeleX, int &TeleY);
-
-	int m_GotoTeleOffset;
-	ivec2 m_GotoTeleLastPos;
+	virtual bool ContainsElementWithId(int Id);
 
 	EditorTileStateChangeHistory<STeleTileStateChange> m_History;
 	inline void ClearHistory() override

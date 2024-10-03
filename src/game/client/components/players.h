@@ -11,39 +11,34 @@ class CPlayers : public CComponent
 {
 	friend class CGhost;
 
-	void RenderHand6(const CTeeRenderInfo *pInfo, vec2 CenterPos, vec2 Dir, float AngleOffset, vec2 PostRotOffset, float Alpha = 1.0f);
-	void RenderHand7(const CTeeRenderInfo *pInfo, vec2 CenterPos, vec2 Dir, float AngleOffset, vec2 PostRotOffset, float Alpha = 1.0f);
-
 	void RenderHand(const CTeeRenderInfo *pInfo, vec2 CenterPos, vec2 Dir, float AngleOffset, vec2 PostRotOffset, float Alpha = 1.0f);
 	void RenderPlayer(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
 		const CTeeRenderInfo *pRenderInfo,
-		int ClientId,
+		int ClientID,
 		float Intra = 0.f);
 	void RenderHook(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
 		const CTeeRenderInfo *pRenderInfo,
-		int ClientId,
+		int ClientID,
 		float Intra = 0.f);
 	void RenderHookCollLine(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
-		int ClientId,
+		int ClientID,
 		float Intra = 0.f);
-	bool IsPlayerInfoAvailable(int ClientId) const;
+	bool IsPlayerInfoAvailable(int ClientID) const;
 
 	int m_WeaponEmoteQuadContainerIndex;
 	int m_aWeaponSpriteMuzzleQuadContainerIndex[NUM_WEAPONS];
-
-	int64_t m_SkidSoundTime = 0;
 
 public:
 	float GetPlayerTargetAngle(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
-		int ClientId,
+		int ClientID,
 		float Intra = 0.f);
 
 	virtual int Sizeof() const override { return sizeof(*this); }

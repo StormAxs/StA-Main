@@ -17,8 +17,8 @@ CTile CLayerGame::GetTile(int x, int y)
 {
 	if(m_pEditor->m_Map.m_pFrontLayer && m_pEditor->m_Map.m_pFrontLayer->GetTile(x, y).m_Index == TILE_THROUGH_CUT)
 	{
-		CTile ThroughCut = {TILE_THROUGH_CUT};
-		return ThroughCut;
+		CTile through_cut = {TILE_THROUGH_CUT};
+		return through_cut;
 	}
 	else
 	{
@@ -38,8 +38,8 @@ void CLayerGame::SetTile(int x, int y, CTile Tile)
 		}
 		CTile nohook = {TILE_NOHOOK};
 		CLayerTiles::SetTile(x, y, nohook);
-		CTile ThroughCut = {TILE_THROUGH_CUT};
-		m_pEditor->m_Map.m_pFrontLayer->CLayerTiles::SetTile(x, y, ThroughCut); // NOLINT(bugprone-parent-virtual-call)
+		CTile through_cut = {TILE_THROUGH_CUT};
+		m_pEditor->m_Map.m_pFrontLayer->CLayerTiles::SetTile(x, y, through_cut); // NOLINT(bugprone-parent-virtual-call)
 	}
 	else
 	{
@@ -56,14 +56,19 @@ void CLayerGame::SetTile(int x, int y, CTile Tile)
 		{
 			CTile air = {TILE_AIR};
 			CLayerTiles::SetTile(x, y, air);
-			ShowPreventUnusedTilesWarning();
+			if(!m_pEditor->m_PreventUnusedTilesWasWarned)
+			{
+				m_pEditor->m_PopupEventType = CEditor::POPEVENT_PREVENTUNUSEDTILES;
+				m_pEditor->m_PopupEventActivated = true;
+				m_pEditor->m_PreventUnusedTilesWasWarned = true;
+			}
 		}
 	}
 }
 
-CUi::EPopupMenuFunctionResult CLayerGame::RenderProperties(CUIRect *pToolbox)
+CUI::EPopupMenuFunctionResult CLayerGame::RenderProperties(CUIRect *pToolbox)
 {
-	const CUi::EPopupMenuFunctionResult Result = CLayerTiles::RenderProperties(pToolbox);
+	const CUI::EPopupMenuFunctionResult Result = CLayerTiles::RenderProperties(pToolbox);
 	m_Image = -1;
 	return Result;
 }

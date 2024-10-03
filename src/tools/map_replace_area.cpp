@@ -2,6 +2,7 @@
 #include <base/system.h>
 #include <engine/shared/datafile.h>
 #include <engine/storage.h>
+#include <game/gamecore.h>
 #include <game/mapitems.h>
 
 // global new layers data (set by ReplaceAreaTiles and ReplaceAreaQuads)
@@ -9,9 +10,8 @@ void *g_apNewData[1024];
 void *g_apNewItem[1024];
 int g_aNewDataSize[1024];
 
-class CMapObject // quad pivot or tile layer
+struct MapObject // quad pivot or tile layer
 {
-public:
 	static constexpr float ms_aStandardScreen[2] = {1430 / 2.f, 1050 / 2.f};
 
 	float m_aLayerOffset[2];
@@ -33,22 +33,22 @@ const CMapItemGroup *GetLayerGroup(CDataFileReader &, int);
 void ReplaceAreaTiles(CDataFileReader[2], const float[][2][2], const CMapItemGroup *[2], CMapItemLayer *[2]);
 void RemoveDestinationTiles(CMapItemLayerTilemap *, CTile *, float[2][2]);
 void ReplaceDestinationTiles(CMapItemLayerTilemap *[2], CTile *[2], float[2][2][2]);
-bool AdaptVisibleAreas(const float[2][2][2], const CMapObject[2], float[2][2][2]);
-bool AdaptReplaceableAreas(const float[2][2][2], const float[2][2][2], const CMapObject[2], float[2][2][2]);
+bool AdaptVisibleAreas(const float[2][2][2], const MapObject[2], float[2][2][2]);
+bool AdaptReplaceableAreas(const float[2][2][2], const float[2][2][2], const MapObject[2], float[2][2][2]);
 
 void ReplaceAreaQuads(CDataFileReader[2], const float[][2][2], const CMapItemGroup *[2], CMapItemLayer *[2], int);
 bool RemoveDestinationQuads(const float[2][2], const CQuad *, int, const CMapItemGroup *, CQuad *, int &);
 bool InsertDestinationQuads(const float[2][2][2], const CQuad *, int, const CMapItemGroup *[2], CQuad *, int &);
-bool AdaptVisiblePoint(const float[2][2][2], const float[2][2], const CMapObject[2], float[2]);
+bool AdaptVisiblePoint(const float[2][2][2], const float[2][2], const MapObject[2], float[2]);
 
-CMapObject CreateMapObject(const CMapItemGroup *, int, int, int, int);
-void SetExtendedArea(CMapObject &);
-bool GetVisibleArea(const float[2][2], const CMapObject &, float[2][2] = 0x0);
-bool GetReplaceableArea(const float[2][2], const CMapObject &, float[2][2]);
+MapObject CreateMapObject(const CMapItemGroup *, int, int, int, int);
+void SetExtendedArea(MapObject &);
+bool GetVisibleArea(const float[2][2], const MapObject &, float[2][2] = 0x0);
+bool GetReplaceableArea(const float[2][2], const MapObject &, float[2][2]);
 
-void GetGameAreaDistance(const float[2][2][2], const CMapObject[2], const float[2][2][2], float[2]);
-void GetGameAreaDistance(const float[2][2][2], const CMapObject[2], const float[2][2], float[2]);
-void GetSignificantScreenPos(const CMapObject &, const float[2][2], const float[2][2], float[2]);
+void GetGameAreaDistance(const float[2][2][2], const MapObject[2], const float[2][2][2], float[2]);
+void GetGameAreaDistance(const float[2][2][2], const MapObject[2], const float[2][2], float[2]);
+void GetSignificantScreenPos(const MapObject &, const float[2][2], const float[2][2], float[2]);
 void ConvertToTiles(const float[2][2], int[2][2]);
 
 bool GetLineIntersection(const float[2], const float[2], float[2] = 0x0);
@@ -165,21 +165,16 @@ void SaveOutputMap(CDataFileReader &InputMap, CDataFileWriter &OutputMap)
 {
 	for(int i = 0; i < InputMap.NumItems(); i++)
 	{
-		int Id, Type;
-		CUuid Uuid;
-		void *pItem = InputMap.GetItem(i, &Type, &Id, &Uuid);
+		int ID, Type;
+		void *pItem = InputMap.GetItem(i, &Type, &ID);
 
-		// Filter ITEMTYPE_EX items, they will be automatically added again.
 		if(Type == ITEMTYPE_EX)
-		{
 			continue;
-		}
-
 		if(g_apNewItem[i])
 			pItem = g_apNewItem[i];
 
 		int Size = InputMap.GetItemSize(i);
-		OutputMap.AddItem(Type, Id, Size, pItem, &Uuid);
+		OutputMap.AddItem(Type, ID, Size, pItem);
 	}
 
 	for(int i = 0; i < InputMap.NumData(); i++)
@@ -236,9 +231,9 @@ void CompareGroups(const char aaMapNames[3][64], CDataFileReader aInputMaps[2])
 		for(int j = 0; j < 2; j++)
 			apItem[j] = (CMapItemGroup *)aInputMaps[j].GetItem(aStart[j] + i);
 
-		bool SameConfig = apItem[0]->m_ParallaxX == apItem[1]->m_ParallaxX && apItem[0]->m_ParallaxY == apItem[1]->m_ParallaxY && apItem[0]->m_OffsetX == apItem[1]->m_OffsetX && apItem[0]->m_OffsetY == apItem[1]->m_OffsetY && apItem[0]->m_UseClipping == apItem[1]->m_UseClipping && apItem[0]->m_ClipX == apItem[1]->m_ClipX && apItem[0]->m_ClipY == apItem[1]->m_ClipY && apItem[0]->m_ClipW == apItem[1]->m_ClipW && apItem[0]->m_ClipH == apItem[1]->m_ClipH;
+		bool bSameConfig = apItem[0]->m_ParallaxX == apItem[1]->m_ParallaxX && apItem[0]->m_ParallaxY == apItem[1]->m_ParallaxY && apItem[0]->m_OffsetX == apItem[1]->m_OffsetX && apItem[0]->m_OffsetY == apItem[1]->m_OffsetY && apItem[0]->m_UseClipping == apItem[1]->m_UseClipping && apItem[0]->m_ClipX == apItem[1]->m_ClipX && apItem[0]->m_ClipY == apItem[1]->m_ClipY && apItem[0]->m_ClipW == apItem[1]->m_ClipW && apItem[0]->m_ClipH == apItem[1]->m_ClipH;
 
-		if(!SameConfig)
+		if(!bSameConfig)
 			dbg_msg("map_replace_area", "WARNING: different configuration on layergroup #%d, this might lead to unexpected results", i);
 	}
 }
@@ -263,7 +258,7 @@ void ReplaceAreaTiles(CDataFileReader aInputMaps[2], const float aaaGameAreas[][
 	CMapItemLayerTilemap *apTilemap[2];
 	CTile *apTile[2];
 	float aaaVisibleAreas[2][2][2], aaaReplaceableAreas[2][2][2];
-	CMapObject aObs[2];
+	MapObject aObs[2];
 
 	for(int i = 0; i < 2; i++)
 	{
@@ -314,7 +309,7 @@ void ReplaceDestinationTiles(CMapItemLayerTilemap *apTilemap[2], CTile *apTile[2
 			apTile[1][x1 + (y1 * apTilemap[1]->m_Width)] = apTile[0][x0 + (y0 * apTilemap[0]->m_Width)];
 }
 
-bool AdaptVisibleAreas(const float aaaGameAreas[2][2][2], const CMapObject aObs[2], float aaaVisibleAreas[2][2][2])
+bool AdaptVisibleAreas(const float aaaGameAreas[2][2][2], const MapObject aObs[2], float aaaVisibleAreas[2][2][2])
 {
 	float aDistance[2];
 	GetGameAreaDistance(aaaGameAreas, aObs, aaaVisibleAreas, aDistance);
@@ -337,7 +332,7 @@ bool AdaptVisibleAreas(const float aaaGameAreas[2][2][2], const CMapObject aObs[
 	return true;
 }
 
-bool AdaptReplaceableAreas(const float aaaGameAreas[2][2][2], const float aaaVisibleAreas[2][2][2], const CMapObject aObs[2], float aaaReplaceableAreas[2][2][2])
+bool AdaptReplaceableAreas(const float aaaGameAreas[2][2][2], const float aaaVisibleAreas[2][2][2], const MapObject aObs[2], float aaaReplaceableAreas[2][2][2])
 {
 	float aDistance[2], aScreenPos[2];
 	GetGameAreaDistance(aaaGameAreas, aObs, aaaVisibleAreas, aDistance);
@@ -379,10 +374,10 @@ void ReplaceAreaQuads(CDataFileReader aInputMaps[2], const float aaaGameAreas[][
 	apQuads[2] = new CQuad[apQuadLayer[0]->m_NumQuads + apQuadLayer[1]->m_NumQuads];
 	int QuadsCounter = 0;
 
-	bool DataChanged = RemoveDestinationQuads(aaaGameAreas[1], apQuads[1], apQuadLayer[1]->m_NumQuads, apLayerGroups[1], apQuads[2], QuadsCounter);
-	DataChanged |= InsertDestinationQuads(aaaGameAreas, apQuads[0], apQuadLayer[0]->m_NumQuads, apLayerGroups, apQuads[2], QuadsCounter);
+	bool bDataChanged = RemoveDestinationQuads(aaaGameAreas[1], apQuads[1], apQuadLayer[1]->m_NumQuads, apLayerGroups[1], apQuads[2], QuadsCounter);
+	bDataChanged |= InsertDestinationQuads(aaaGameAreas, apQuads[0], apQuadLayer[0]->m_NumQuads, apLayerGroups, apQuads[2], QuadsCounter);
 
-	if(DataChanged)
+	if(bDataChanged)
 	{
 		g_apNewData[apQuadLayer[1]->m_Data] = apQuads[2];
 		g_aNewDataSize[apQuadLayer[1]->m_Data] = ((int)sizeof(CQuad)) * QuadsCounter;
@@ -395,15 +390,15 @@ void ReplaceAreaQuads(CDataFileReader aInputMaps[2], const float aaaGameAreas[][
 
 bool RemoveDestinationQuads(const float aaGameArea[2][2], const CQuad *pQuads, const int NumQuads, const CMapItemGroup *pLayerGroup, CQuad *pDestQuads, int &QuadsCounter)
 {
-	bool DataChanged = false;
+	bool bDataChanged = false;
 
 	for(int i = 0; i < NumQuads; i++)
 	{
-		CMapObject Ob = CreateMapObject(pLayerGroup, fx2f(pQuads[i].m_aPoints[4].x), fx2f(pQuads[i].m_aPoints[4].y), 0, 0);
+		MapObject Ob = CreateMapObject(pLayerGroup, fx2f(pQuads[i].m_aPoints[4].x), fx2f(pQuads[i].m_aPoints[4].y), 0, 0);
 
 		if(GetVisibleArea(aaGameArea, Ob))
 		{
-			DataChanged = true;
+			bDataChanged = true;
 			continue;
 		}
 
@@ -411,16 +406,16 @@ bool RemoveDestinationQuads(const float aaGameArea[2][2], const CQuad *pQuads, c
 		QuadsCounter++;
 	}
 
-	return DataChanged;
+	return bDataChanged;
 }
 
 bool InsertDestinationQuads(const float aaaGameAreas[2][2][2], const CQuad *pQuads, const int NumQuads, const CMapItemGroup *apLayerGroups[2], CQuad *pDestQuads, int &QuadsCounter)
 {
-	bool DataChanged = false;
+	bool bDataChanged = false;
 
 	for(int i = 0; i < NumQuads; i++)
 	{
-		CMapObject aObs[2];
+		MapObject aObs[2];
 		aObs[0] = CreateMapObject(apLayerGroups[0], fx2f(pQuads[i].m_aPoints[4].x), fx2f(pQuads[i].m_aPoints[4].y), 0, 0);
 		float aaVisibleArea[2][2];
 
@@ -440,14 +435,14 @@ bool InsertDestinationQuads(const float aaaGameAreas[2][2][2], const CQuad *pQua
 			}
 
 			QuadsCounter++;
-			DataChanged = true;
+			bDataChanged = true;
 		}
 	}
 
-	return DataChanged;
+	return bDataChanged;
 }
 
-bool AdaptVisiblePoint(const float aaaGameAreas[2][2][2], const float aaVisibleArea[2][2], const CMapObject aObs[2], float aPos[2])
+bool AdaptVisiblePoint(const float aaaGameAreas[2][2][2], const float aaVisibleArea[2][2], const MapObject aObs[2], float aPos[2])
 {
 	float aDistance[2], aScreenPos[2];
 	GetGameAreaDistance(aaaGameAreas, aObs, aaVisibleArea, aDistance);
@@ -456,7 +451,7 @@ bool AdaptVisiblePoint(const float aaaGameAreas[2][2][2], const float aaVisibleA
 	for(int i = 0; i < 2; i++)
 		aPos[i] = aaVisibleArea[i][0] + aDistance[i] + aObs[1].m_aLayerOffset[i] - (aScreenPos[i] + aDistance[i]) * aObs[1].m_aSpeed[i];
 
-	CMapObject FinalOb = aObs[1];
+	MapObject FinalOb = aObs[1];
 	for(int i = 0; i < 2; i++)
 		FinalOb.m_aaBaseArea[i][0] = FinalOb.m_aaBaseArea[i][1] += aPos[i];
 	SetExtendedArea(FinalOb);
@@ -464,9 +459,9 @@ bool AdaptVisiblePoint(const float aaaGameAreas[2][2][2], const float aaVisibleA
 	return GetVisibleArea(aaaGameAreas[1], FinalOb);
 }
 
-CMapObject CreateMapObject(const CMapItemGroup *pLayerGroup, const int PosX, const int PosY, const int Width, const int Height)
+MapObject CreateMapObject(const CMapItemGroup *pLayerGroup, const int PosX, const int PosY, const int Width, const int Height)
 {
-	CMapObject Ob;
+	MapObject Ob;
 
 	Ob.m_aaBaseArea[0][0] = PosX - pLayerGroup->m_OffsetX;
 	Ob.m_aaBaseArea[1][0] = PosY - pLayerGroup->m_OffsetY;
@@ -484,8 +479,8 @@ CMapObject CreateMapObject(const CMapItemGroup *pLayerGroup, const int PosX, con
 
 	for(int i = 0; i < 2; i++)
 	{
-		Ob.m_aaScreenOffset[i][0] = -CMapObject::ms_aStandardScreen[i];
-		Ob.m_aaScreenOffset[i][1] = CMapObject::ms_aStandardScreen[i];
+		Ob.m_aaScreenOffset[i][0] = -MapObject::ms_aStandardScreen[i];
+		Ob.m_aaScreenOffset[i][1] = MapObject::ms_aStandardScreen[i];
 		if(Ob.m_aSpeed[i] < 0)
 			std::swap(Ob.m_aaScreenOffset[i][0], Ob.m_aaScreenOffset[i][1]);
 	}
@@ -494,7 +489,7 @@ CMapObject CreateMapObject(const CMapItemGroup *pLayerGroup, const int PosX, con
 	return Ob;
 }
 
-void SetExtendedArea(CMapObject &Ob)
+void SetExtendedArea(MapObject &Ob)
 {
 	SetInexistent((float *)Ob.m_aaExtendedArea, 4);
 
@@ -516,7 +511,7 @@ void SetExtendedArea(CMapObject &Ob)
 	}
 }
 
-bool GetVisibleArea(const float aaGameArea[2][2], const CMapObject &Ob, float aaVisibleArea[2][2])
+bool GetVisibleArea(const float aaGameArea[2][2], const MapObject &Ob, float aaVisibleArea[2][2])
 {
 	if(IsInexistent((float *)Ob.m_aaExtendedArea, 4))
 		return false;
@@ -548,7 +543,7 @@ bool GetVisibleArea(const float aaGameArea[2][2], const CMapObject &Ob, float aa
 	return true;
 }
 
-bool GetReplaceableArea(const float aaVisibleArea[2][2], const CMapObject &Ob, float aaReplaceableArea[2][2])
+bool GetReplaceableArea(const float aaVisibleArea[2][2], const MapObject &Ob, float aaReplaceableArea[2][2])
 {
 	SetInexistent((float *)aaReplaceableArea, 4);
 	if(IsInexistent((float *)aaVisibleArea, 4))
@@ -581,7 +576,7 @@ bool GetReplaceableArea(const float aaVisibleArea[2][2], const CMapObject &Ob, f
 	return true;
 }
 
-void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const CMapObject aObs[2], const float aaaVisibleAreas[2][2][2], float aDistance[2])
+void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const MapObject aObs[2], const float aaaVisibleAreas[2][2][2], float aDistance[2])
 {
 	for(int i = 0; i < 2; i++)
 	{
@@ -596,7 +591,7 @@ void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const CMapObject aOb
 	}
 }
 
-void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const CMapObject aObs[2], const float aaVisibleArea[2][2], float aDistance[2])
+void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const MapObject aObs[2], const float aaVisibleArea[2][2], float aDistance[2])
 {
 	float aaaVisibleAreas[2][2][2];
 	mem_copy(aaaVisibleAreas[0], aaVisibleArea[0], sizeof(float[2][2]));
@@ -604,7 +599,7 @@ void GetGameAreaDistance(const float aaaGameAreas[2][2][2], const CMapObject aOb
 	GetGameAreaDistance(aaaGameAreas, aObs, aaaVisibleAreas, aDistance);
 }
 
-void GetSignificantScreenPos(const CMapObject &Ob, const float aaVisibleArea[2][2], const float aaReplaceableArea[2][2], float aScreen[2])
+void GetSignificantScreenPos(const MapObject &Ob, const float aaVisibleArea[2][2], const float aaReplaceableArea[2][2], float aScreen[2])
 {
 	for(int i = 0; i < 2; i++)
 	{
@@ -635,7 +630,7 @@ bool GetLineIntersection(const float aLine1[2], const float aLine2[2], float aIn
 		std::min(aLine1[1], aLine2[1])};
 
 	if(aIntersection)
-		SetInexistent(aIntersection, 2);
+		SetInexistent((float *)aIntersection, 2);
 
 	if(aBorders[0] - aBorders[1] > 0.01f)
 		return false;

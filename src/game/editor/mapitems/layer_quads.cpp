@@ -138,7 +138,7 @@ int CLayerQuads::BrushGrab(std::shared_ptr<CLayerGroup> pBrush, CUIRect Rect)
 	return pGrabbed->m_vQuads.empty() ? 0 : 1;
 }
 
-void CLayerQuads::BrushPlace(std::shared_ptr<CLayer> pBrush, vec2 WorldPos)
+void CLayerQuads::BrushPlace(std::shared_ptr<CLayer> pBrush, float wx, float wy)
 {
 	std::shared_ptr<CLayerQuads> pQuadLayer = std::static_pointer_cast<CLayerQuads>(pBrush);
 	std::vector<CQuad> vAddedQuads;
@@ -148,8 +148,8 @@ void CLayerQuads::BrushPlace(std::shared_ptr<CLayer> pBrush, vec2 WorldPos)
 
 		for(auto &Point : n.m_aPoints)
 		{
-			Point.x += f2fx(WorldPos.x);
-			Point.y += f2fx(WorldPos.y);
+			Point.x += f2fx(wx);
+			Point.y += f2fx(wy);
 		}
 
 		m_vQuads.push_back(n);
@@ -221,7 +221,7 @@ void CLayerQuads::GetSize(float *pWidth, float *pHeight)
 	}
 }
 
-CUi::EPopupMenuFunctionResult CLayerQuads::RenderProperties(CUIRect *pToolBox)
+CUI::EPopupMenuFunctionResult CLayerQuads::RenderProperties(CUIRect *pToolBox)
 {
 	CProperty aProps[] = {
 		{"Image", m_Image, PROPTYPE_IMAGE, -1, 0},
@@ -231,7 +231,7 @@ CUi::EPopupMenuFunctionResult CLayerQuads::RenderProperties(CUIRect *pToolBox)
 	static int s_aIds[(int)ELayerQuadsProp::NUM_PROPS] = {0};
 	int NewVal = 0;
 	auto [State, Prop] = m_pEditor->DoPropertiesWithState<ELayerQuadsProp>(pToolBox, aProps, s_aIds, &NewVal);
-	if(Prop != ELayerQuadsProp::PROP_NONE && (State == EEditState::END || State == EEditState::ONE_GO))
+	if(Prop != ELayerQuadsProp::PROP_NONE)
 	{
 		m_pEditor->m_Map.OnModify();
 	}
@@ -249,7 +249,7 @@ CUi::EPopupMenuFunctionResult CLayerQuads::RenderProperties(CUIRect *pToolBox)
 
 	s_Tracker.End(Prop, State);
 
-	return CUi::POPUP_KEEP_OPEN;
+	return CUI::POPUP_KEEP_OPEN;
 }
 
 void CLayerQuads::ModifyImageIndex(FIndexModifyFunction Func)

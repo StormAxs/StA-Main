@@ -44,6 +44,9 @@
 %s wins!
 == ¡%s gana!
 
+-Page %d-
+== -Página %d-
+
 Abort
 == Cancelar
 
@@ -95,8 +98,8 @@ Client
 Connecting to
 == Conectando con
 
-Connection Problems…
-== Problemas de conexión…
+Connection Problems...
+== Problemas de conexión...
 
 Console
 == Consola
@@ -299,6 +302,9 @@ Player
 Player country:
 == País del jugador
 
+Player options
+== Opciones de jugador
+
 Players
 == Jugadores
 
@@ -419,6 +425,9 @@ The audio device couldn't be initialised.
 The server is running a non-standard tuning on a pure game type.
 == El servidor está ejecutando una configuración no estándar en un tipo de juego puro.
 
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Tienes un mapa sin guardar en el editor, quizá quieras guardarlo antes de salir.
+
 Time limit
 == Tiempo límite
 
@@ -519,6 +528,12 @@ Your skin
 
 Reset to defaults
 == Resetear por defecto
+
+Quit anyway?
+== ¿Salir de todos modos?
+
+Round
+== Ronda
 
 Lht.
 == Lum.
@@ -623,13 +638,13 @@ Types
 == Tipos
 
 DDNet %s is out!
-== ¡DDNet %s ya está disponible!
+== ¡DDNet %s ya esta disponible!
 
 Downloading %s:
 == Descargando %s:
 
-Update failed! Check log…
-== ¡Actualización fallida! Comprueba el registro…
+Update failed! Check log...
+== ¡Actualización fallida! Comprueba el registro...
 
 DDNet Client updated!
 == ¡Cliente DDNet actualizado!
@@ -639,6 +654,9 @@ Update now
 
 Restart
 == Reiniciar
+
+Please use a different filename
+== 
 
 Remove chat
 == Eliminar chat
@@ -670,6 +688,9 @@ Connecting dummy
 Connect Dummy
 == Conectar Dummy
 
+Reload
+== Recargar
+
 Deactivate
 == Desactivar
 
@@ -699,6 +720,9 @@ Automatically create statboard csv
 
 Max CSVs
 == CSV máx
+
+Dummy settings
+== Config. del Dummy
 
 Vanilla skins only
 == Solo skins Vanilla
@@ -805,6 +829,9 @@ DDNet
 DDNet Client needs to be restarted to complete update!
 == ¡El Cliente DDNet debe reiniciarse para completar la actualización!
 
+Use DDRace Scoreboard
+== Utilizar el marcador DDRace
+
 Show score
 == Mostrar puntaje
 
@@ -895,8 +922,8 @@ Show tiles layers from BG map
 DDNet %s is available:
 == DDNet %s está disponible:
 
-Updating…
-== Actualizando…
+Updating...
+== Actualizando...
 
 No updates available
 == No hay actualizaciones disponibles
@@ -948,6 +975,9 @@ Grabs
 
 9+ new mentions
 == 9+ nuevas menciones
+
+Saving ddnet-settings.cfg failed
+== Error al guardar ddnet-settings.cfg
 
 Warning
 == Advertencia
@@ -1136,6 +1166,9 @@ https://ddnet.org/discord
 Are you sure that you want to disconnect and switch to a different server?
 == ¿Seguro que quieres desconectarte y cambiar de servidor?
 
+Kill Messages
+== Mensajes de Muerte
+
 Show local player's key presses
 == Mostrar las teclas presionadas por el jugador local
 
@@ -1181,6 +1214,9 @@ Tutorial
 Can't find a Tutorial server
 == No se pudo encontrar un servidor Tutorial
 
+Toggle to edit your dummy settings
+== Actívalo para editar la configuración de tu dummy
+
 Choose default eyes when joining a server
 == Escoge los ojos predeterminados al unirte a un servidor
 
@@ -1214,8 +1250,8 @@ Speed:
 Angle:
 == Ángulo:
 
-Trying to determine UDP connectivity…
-== Tratando de determinar la conexión UDP…
+Trying to determine UDP connectivity...
+== Tratando de determinar la conexión UDP...
 
 UDP seems to be filtered.
 == UDP parece estar filtrado.
@@ -1283,7 +1319,7 @@ Show player speed
 == Mostrar la velocidad del jugador
 
 Show player target angle
-== Mostrar el ángulo de la mira del jugador
+== Mostrar el ángulo del objetivo del jugador
 
 Adjust the opacity of entities belonging to other teams, such as tees and nameplates
 == Ajusta la opacidad de entidades pertenecientes a otros equipos, como los tees y los nombres.
@@ -1384,11 +1420,17 @@ Show health, shields and ammo
 DDRace HUD
 == HUD DDRace
 
+Show client IDs in scoreboard
+== Mostrar IDs de cliente en la tabla de puntuación
+
 Show DDRace HUD
 == Mostrar el HUD DDRace
 
 Show jumps indicator
 == Mostrar indicador de saltos
+
+Show hook strength indicator
+== Mostrar indicador de fuerza del gancho
 
 Hook collision line
 == Línea de colisión del gancho
@@ -1729,232 +1771,3 @@ Regular background color
 
 Entities background color
 == Color del fondo de entidades
-
-Saving settings to '%s' failed
-== No se pudo guardar la configuración en '%s'
-
-Searching
-== Buscando
-
-Enter Username
-== Ingresa tu usuario
-
-Enter Password
-== Ingresa tu contraseña
-
-NOT CONNECTED
-== SIN CONECTAR
-
-Match %d of %d
-== Coincidencia %d de %d
-
-No results
-== Sin resultados
-
-Lines %d - %d (%s)
-== Líneas %d - %d (%s)
-
-Locked
-== Bloqueado
-
-Following
-== Siguiendo
-
-Press a key…
-== Presiona una tecla…
-
-Are you sure that you want to restart?
-== ¿Estás seguro de que quieres reiniciar?
-
-There's an unsaved map in the editor, you might want to save it.
-== Hay un mapa sin guardar en el editor, quizás quieras guardarlo antes.
-
-Continue anyway?
-== ¿Continuar de todos modos?
-
-Communities
-== Comunidades
-
-Please use a different filename
-== Por favor, usa un nombre de archivo diferente.
-
-Info Messages
-== Mensajes de información
-
-Show local time always
-== Mostrar la hora local siempre
-
-Chat font size
-== Tamaño de la fuente del chat
-
-Chat width
-== Ancho del chat
-
-Authed name color in scoreboard
-== Color de usuario autorizado en la tabla de puntuación
-
-Same clan color in scoreboard
-== Color de tu clan en la tabla de puntuación
-
-Show finish messages
-== Mostrar mensajes de llegada de meta
-
-Failed saving the replay!
-== ¡No se pudo guardar la repetición!
-
-Error saving settings
-== Error al guardar los ajustes
-
-Loading commands…
-== Cargando comandos…
-
-Main menu
-== Menú principal
-
-Server filter
-== Filtro de servidor
-
-Friends
-== Amigos
-
-Loading…
-== Cargando…
-
-Loading demo file from storage
-== Cargando archivo de demo desde el almacenamiento
-
-No login required
-== No requiere login
-
-Player info change cooldown
-== Tiempo para cambiar la información del jugador
-
-Always show chat
-== Siempre mostrar chat
-
-Show friend mark (♥) in name plates
-== Mostrar marca de amigos (♥) en los nombres
-
-Show hook strength icon indicator
-== Mostrar indicador de fuerza del gancho
-
-Show hook strength number indicator
-== Mostrar número indicador de fuerza del gancho
-
-Show own player's hook collision line
-== Mostrar la línea de colisión del gancho del jugador local
-
-Always show own player's hook collision line
-== Siempre mostrar la línea de colisión del gancho del jugador local
-
-Always show other players' hook collision lines
-== Siempre mostrar la línea de colisión del gancho de otros jugadores
-
-%d/%d KiB (%.1f KiB/s)
-== %d/%d KiB (%.1f KiB/s)
-
-Tee
-== Tee
-
-Show only chat messages from team members
-== Mostrar solo los mensajes de miembros del equipo
-
-[Spectating]
-Following %s
-== Viendo a %s
-
-Example of usage
-== Ejemplo de uso
-
-Round %d/%d
-== Ronda %d/%d
-
-[Spectators]
-%d others…
-== otros %d
-
-[Team and size]
-%d\n(%d/%d)
-== %d\n(%d/%d)
-
-Team %d (%d/%d)
-== Equipo %d (%d/%d)
-
-https://wiki.ddnet.org/wiki/Mapping
-== https://wiki.ddnet.org/wiki/Mapping/es
-
-Could not resolve connect address '%s'. See local console for details.
-== No se pudo resolver la dirección de conexión '%s'. Ver la consola local para más detalles.
-
-Connect address error
-== Error de dirección de conexión
-
-Could not connect dummy
-== No se pudo conectar tu dummy
-
-Dummy is not allowed on this server
-== No se permiten dummys en este servidor
-
-Please wait…
-== Espera por favor…
-
-Show client IDs (scoreboard, chat, spectator)
-== Mostrar IDs de cliente (scoreboard, chat, espectador)
-
-Are you sure that you want to delete '%s'?
-== ¿Estás seguro de que quieres eliminar '%s'?
-
-Delete skin
-== Eliminar skin
-
-Basic
-== Básico
-
-Custom
-== Personalizado
-
-Unable to delete skin
-== No se pudo borrar la skin
-
-Save skin
-== Guardar skin
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== ¿Estás seguro de que quieres guardar tu skin? Si una skin con este nombre ya existe, esta será reemplazada.
-
-Unable to save the skin
-== No se pudo guardar la skin
-
-Unable to save the skin with a reserved name
-== No se pudo guardar la skin con un nombre reservado
-
-No local servers found (ports %d-%d)
-== No se encontraron servidores locales (puertos %d-%d)
-
-[Hertz]
-Hz
-== Hz
-
-[skins]
-Body
-== Cuerpo
-
-[skins]
-Marking
-== Marcas
-
-[skins]
-Decoration
-== Decoración
-
-[skins]
-Hands
-== Manos
-
-[skins]
-Feet
-== Pies
-
-[skins]
-Eyes
-== Ojos

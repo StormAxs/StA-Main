@@ -8,28 +8,37 @@
 
 void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
 {
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(pConfigName, IOFLAG_READ, IStorage::TYPE_ABSOLUTE)))
+	IOHANDLE File = pStorage->OpenFile(pConfigName, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ABSOLUTE);
+	if(!File)
 	{
 		dbg_msg("config_store", "config '%s' not found", pConfigName);
 		return;
 	}
 
-	std::vector<const char *> vpLines;
+	CLineReader LineReader;
+	LineReader.Init(File);
+
+	char *pLine;
 	int TotalLength = 0;
-	while(const char *pLine = LineReader.Get())
+	std::vector<char *> vLines;
+	while((pLine = LineReader.Get()))
 	{
-		vpLines.push_back(pLine);
-		TotalLength += str_length(pLine) + 1;
+		int Length = str_length(pLine) + 1;
+		char *pCopy = (char *)malloc(Length);
+		mem_copy(pCopy, pLine, Length);
+		vLines.push_back(pCopy);
+		TotalLength += Length;
 	}
+	io_close(File);
 
 	char *pSettings = (char *)malloc(maximum(1, TotalLength));
 	int Offset = 0;
-	for(const char *pLine : vpLines)
+	for(auto &Line : vLines)
 	{
-		int Length = str_length(pLine) + 1;
-		mem_copy(pSettings + Offset, pLine, Length);
+		int Length = str_length(Line) + 1;
+		mem_copy(pSettings + Offset, Line, Length);
 		Offset += Length;
+		free(Line);
 	}
 
 	CDataFileReader Reader;
@@ -41,11 +50,11 @@ void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
 	bool FoundInfo = false;
 	for(int i = 0; i < Reader.NumItems(); i++)
 	{
-		int Type, Id;
-		int *pItem = (int *)Reader.GetItem(i, &Type, &Id);
+		int Type, ID;
+		int *pItem = (int *)Reader.GetItem(i, &Type, &ID);
 		int Size = Reader.GetItemSize(i);
 		CMapItemInfoSettings MapInfo;
-		if(Type == MAPITEMTYPE_INFO && Id == 0)
+		if(Type == MAPITEMTYPE_INFO && ID == 0)
 		{
 			FoundInfo = true;
 			CMapItemInfoSettings *pInfo = (CMapItemInfoSettings *)pItem;
@@ -83,7 +92,7 @@ void Process(IStorage *pStorage, const char *pMapName, const char *pConfigName)
 				Size = sizeof(MapInfo);
 			}
 		}
-		Writer.AddItem(Type, Id, Size, pItem);
+		Writer.AddItem(Type, ID, Size, pItem);
 	}
 
 	if(!FoundInfo)

@@ -23,23 +23,23 @@ CAntibot::~CAntibot()
 	if(m_Initialized)
 		AntibotDestroy();
 }
-void CAntibot::Kick(int ClientId, const char *pMessage, void *pUser)
+void CAntibot::Kick(int ClientID, const char *pMessage, void *pUser)
 {
 	CAntibot *pAntibot = (CAntibot *)pUser;
-	pAntibot->Server()->Kick(ClientId, pMessage);
+	pAntibot->Server()->Kick(ClientID, pMessage);
 }
 void CAntibot::Log(const char *pMessage, void *pUser)
 {
 	CAntibot *pAntibot = (CAntibot *)pUser;
 	pAntibot->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "antibot", pMessage);
 }
-void CAntibot::Report(int ClientId, const char *pMessage, void *pUser)
+void CAntibot::Report(int ClientID, const char *pMessage, void *pUser)
 {
 	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "%d: %s", ClientId, pMessage);
+	str_format(aBuf, sizeof(aBuf), "%d: %s", ClientID, pMessage);
 	Log(aBuf, pUser);
 }
-void CAntibot::Send(int ClientId, const void *pData, int Size, int Flags, void *pUser)
+void CAntibot::Send(int ClientID, const void *pData, int Size, int Flags, void *pUser)
 {
 	CAntibot *pAntibot = (CAntibot *)pUser;
 
@@ -52,7 +52,7 @@ void CAntibot::Send(int ClientId, const void *pData, int Size, int Flags, void *
 	{
 		RealFlags |= MSGFLAG_FLUSH;
 	}
-	pAntibot->Server()->SendMsgRaw(ClientId, pData, Size, RealFlags);
+	pAntibot->Server()->SendMsgRaw(ClientID, pData, Size, RealFlags);
 }
 void CAntibot::Teehistorian(const void *pData, int Size, void *pUser)
 {
@@ -115,50 +115,50 @@ void CAntibot::Update()
 	}
 }
 
-void CAntibot::OnPlayerInit(int ClientId)
+void CAntibot::OnPlayerInit(int ClientID)
 {
 	Update();
-	AntibotOnPlayerInit(ClientId);
+	AntibotOnPlayerInit(ClientID);
 }
-void CAntibot::OnPlayerDestroy(int ClientId)
+void CAntibot::OnPlayerDestroy(int ClientID)
 {
 	Update();
-	AntibotOnPlayerDestroy(ClientId);
+	AntibotOnPlayerDestroy(ClientID);
 }
-void CAntibot::OnSpawn(int ClientId)
+void CAntibot::OnSpawn(int ClientID)
 {
 	Update();
-	AntibotOnSpawn(ClientId);
+	AntibotOnSpawn(ClientID);
 }
-void CAntibot::OnHammerFireReloading(int ClientId)
+void CAntibot::OnHammerFireReloading(int ClientID)
 {
 	Update();
-	AntibotOnHammerFireReloading(ClientId);
+	AntibotOnHammerFireReloading(ClientID);
 }
-void CAntibot::OnHammerFire(int ClientId)
+void CAntibot::OnHammerFire(int ClientID)
 {
 	Update();
-	AntibotOnHammerFire(ClientId);
+	AntibotOnHammerFire(ClientID);
 }
-void CAntibot::OnHammerHit(int ClientId, int TargetId)
+void CAntibot::OnHammerHit(int ClientID, int TargetID)
 {
 	Update();
-	AntibotOnHammerHit(ClientId, TargetId);
+	AntibotOnHammerHit(ClientID, TargetID);
 }
-void CAntibot::OnDirectInput(int ClientId)
+void CAntibot::OnDirectInput(int ClientID)
 {
 	Update();
-	AntibotOnDirectInput(ClientId);
+	AntibotOnDirectInput(ClientID);
 }
-void CAntibot::OnCharacterTick(int ClientId)
+void CAntibot::OnCharacterTick(int ClientID)
 {
 	Update();
-	AntibotOnCharacterTick(ClientId);
+	AntibotOnCharacterTick(ClientID);
 }
-void CAntibot::OnHookAttach(int ClientId, bool Player)
+void CAntibot::OnHookAttach(int ClientID, bool Player)
 {
 	Update();
-	AntibotOnHookAttach(ClientId, Player);
+	AntibotOnHookAttach(ClientID, Player);
 }
 
 void CAntibot::OnEngineTick()
@@ -166,27 +166,17 @@ void CAntibot::OnEngineTick()
 	Update();
 	AntibotOnEngineTick();
 }
-void CAntibot::OnEngineClientJoin(int ClientId, bool Sixup)
+void CAntibot::OnEngineClientJoin(int ClientID, bool Sixup)
 {
 	Update();
-	AntibotOnEngineClientJoin(ClientId, Sixup);
+	AntibotOnEngineClientJoin(ClientID, Sixup);
 }
-void CAntibot::OnEngineClientDrop(int ClientId, const char *pReason)
+void CAntibot::OnEngineClientDrop(int ClientID, const char *pReason)
 {
 	Update();
-	AntibotOnEngineClientDrop(ClientId, pReason);
+	AntibotOnEngineClientDrop(ClientID, pReason);
 }
-bool CAntibot::OnEngineClientMessage(int ClientId, const void *pData, int Size, int Flags)
-{
-	Update();
-	int AntibotFlags = 0;
-	if((Flags & MSGFLAG_VITAL) == 0)
-	{
-		AntibotFlags |= ANTIBOT_MSGFLAG_NONVITAL;
-	}
-	return AntibotOnEngineClientMessage(ClientId, pData, Size, AntibotFlags);
-}
-bool CAntibot::OnEngineServerMessage(int ClientId, const void *pData, int Size, int Flags)
+bool CAntibot::OnEngineClientMessage(int ClientID, const void *pData, int Size, int Flags)
 {
 	Update();
 	int AntibotFlags = 0;
@@ -194,12 +184,22 @@ bool CAntibot::OnEngineServerMessage(int ClientId, const void *pData, int Size, 
 	{
 		AntibotFlags |= ANTIBOT_MSGFLAG_NONVITAL;
 	}
-	return AntibotOnEngineServerMessage(ClientId, pData, Size, AntibotFlags);
+	return AntibotOnEngineClientMessage(ClientID, pData, Size, AntibotFlags);
 }
-bool CAntibot::OnEngineSimulateClientMessage(int *pClientId, void *pBuffer, int BufferSize, int *pOutSize, int *pFlags)
+bool CAntibot::OnEngineServerMessage(int ClientID, const void *pData, int Size, int Flags)
+{
+	Update();
+	int AntibotFlags = 0;
+	if((Flags & MSGFLAG_VITAL) == 0)
+	{
+		AntibotFlags |= ANTIBOT_MSGFLAG_NONVITAL;
+	}
+	return AntibotOnEngineServerMessage(ClientID, pData, Size, AntibotFlags);
+}
+bool CAntibot::OnEngineSimulateClientMessage(int *pClientID, void *pBuffer, int BufferSize, int *pOutSize, int *pFlags)
 {
 	int AntibotFlags = 0;
-	bool Result = AntibotOnEngineSimulateClientMessage(pClientId, pBuffer, BufferSize, pOutSize, &AntibotFlags);
+	bool Result = AntibotOnEngineSimulateClientMessage(pClientID, pBuffer, BufferSize, pOutSize, &AntibotFlags);
 	if(Result)
 	{
 		*pFlags = 0;
@@ -245,22 +245,22 @@ void CAntibot::Update()
 {
 }
 
-void CAntibot::OnPlayerInit(int ClientId) {}
-void CAntibot::OnPlayerDestroy(int ClientId) {}
-void CAntibot::OnSpawn(int ClientId) {}
-void CAntibot::OnHammerFireReloading(int ClientId) {}
-void CAntibot::OnHammerFire(int ClientId) {}
-void CAntibot::OnHammerHit(int ClientId, int TargetId) {}
-void CAntibot::OnDirectInput(int ClientId) {}
-void CAntibot::OnCharacterTick(int ClientId) {}
-void CAntibot::OnHookAttach(int ClientId, bool Player) {}
+void CAntibot::OnPlayerInit(int ClientID) {}
+void CAntibot::OnPlayerDestroy(int ClientID) {}
+void CAntibot::OnSpawn(int ClientID) {}
+void CAntibot::OnHammerFireReloading(int ClientID) {}
+void CAntibot::OnHammerFire(int ClientID) {}
+void CAntibot::OnHammerHit(int ClientID, int TargetID) {}
+void CAntibot::OnDirectInput(int ClientID) {}
+void CAntibot::OnCharacterTick(int ClientID) {}
+void CAntibot::OnHookAttach(int ClientID, bool Player) {}
 
 void CAntibot::OnEngineTick() {}
-void CAntibot::OnEngineClientJoin(int ClientId, bool Sixup) {}
-void CAntibot::OnEngineClientDrop(int ClientId, const char *pReason) {}
-bool CAntibot::OnEngineClientMessage(int ClientId, const void *pData, int Size, int Flags) { return false; }
-bool CAntibot::OnEngineServerMessage(int ClientId, const void *pData, int Size, int Flags) { return false; }
-bool CAntibot::OnEngineSimulateClientMessage(int *pClientId, void *pBuffer, int BufferSize, int *pOutSize, int *pFlags) { return false; }
+void CAntibot::OnEngineClientJoin(int ClientID, bool Sixup) {}
+void CAntibot::OnEngineClientDrop(int ClientID, const char *pReason) {}
+bool CAntibot::OnEngineClientMessage(int ClientID, const void *pData, int Size, int Flags) { return false; }
+bool CAntibot::OnEngineServerMessage(int ClientID, const void *pData, int Size, int Flags) { return false; }
+bool CAntibot::OnEngineSimulateClientMessage(int *pClientID, void *pBuffer, int BufferSize, int *pOutSize, int *pFlags) { return false; }
 #endif
 
 IEngineAntibot *CreateEngineAntibot()

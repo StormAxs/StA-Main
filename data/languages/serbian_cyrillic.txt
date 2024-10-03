@@ -25,6 +25,9 @@
 %s wins!
 == %s је победио!
 
+-Page %d-
+== -Страна %d-
+
 Abort
 == Одустани
 
@@ -76,7 +79,7 @@ Client
 Connecting to
 == Повезујем се на
 
-Connection Problems…
+Connection Problems...
 == Проблеми са интернетом
 
 Console
@@ -277,6 +280,9 @@ Player
 Player country:
 == Држава играча
 
+Player options
+== Подешавања играча
+
 Players
 == Играчи
 
@@ -396,6 +402,9 @@ The audio device couldn't be initialised.
 
 The server is running a non-standard tuning on a pure game type.
 == Сервер изводи нестандардно подешавање чистог типа игре.
+
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Мапа није сачувана, вероватно желите да је сачувате пре изласка из игре.
 
 Time limit
 == Временско ограничење
@@ -525,6 +534,12 @@ Your skin
 Reset to defaults
 == Ресетуј
 
+Quit anyway?
+== Излаз?
+
+Round
+== Рунда
+
 Lht.
 == Светл.
 
@@ -648,6 +663,9 @@ Countries
 Types
 == Типови
 
+Please use a different filename
+== 
+
 Remove chat
 == Уклони дописивање
 
@@ -681,6 +699,9 @@ Kill
 Pause
 == Пауза
 
+Reload
+== Освежи
+
 Deactivate
 == Деактивирај
 
@@ -713,6 +734,9 @@ Automatically create statboard csv
 
 Max CSVs
 == Највише csv-ова
+
+Dummy settings
+== Подешавања копије
 
 Download skins
 == Преузимај теме
@@ -822,6 +846,9 @@ Assets
 DDNet Client needs to be restarted to complete update!
 == Потребно је поново покренути DDNet клијент да бисте довршили ажурирање!
 
+Use DDRace Scoreboard
+== Користи DDRace табелу резултата
+
 Show score
 == Прикажи бодове
 
@@ -912,8 +939,8 @@ DDNet %s is available:
 Update now
 == Унапреди сада
 
-Updating…
-== Унапређујем…
+Updating...
+== Унапређујем...
 
 DDNet Client updated!
 == DDNet клијент је унапређен!
@@ -967,8 +994,8 @@ DDNet %s is out!
 Downloading %s:
 == Преузимање %s:
 
-Update failed! Check log…
-== Ажурирање није успело! Сачекајте log…
+Update failed! Check log...
+== Ажурирање није успело! Сачекајте log...
 
 Restart
 == Поново покрени
@@ -1027,6 +1054,9 @@ Auto
 Replay
 == Помнови
 
+Saving ddnet-settings.cfg failed
+== Чување ddnet-settings.cfg неуспело
+
 The width of texture %s is not divisible by %d, or the height is not divisible by %d, which might cause visual bugs.
 == Ширина текстуре %s није дељива са %d, или висина није дељива са %d, што ће проузроковати видљиве грешке.
 
@@ -1069,7 +1099,7 @@ Angle:
 Uploading map data to GPU
 == Слање података мапе Г.Ј.О.~у (GPU)
 
-Trying to determine UDP connectivity…
+Trying to determine UDP connectivity...
 == Покушавам да одредим К.Д.П.(UDP) повезаност
 
 UDP seems to be filtered.
@@ -1149,6 +1179,9 @@ Settings file
 
 Config directory
 == Директоријум конфигурацији
+
+Toggle to edit your dummy settings
+== Укључи да уређујеш подешавања лутке
 
 Download community skins
 == Преузми остале теме
@@ -1251,11 +1284,17 @@ Name Plate
 Hook Collisions
 == Додир куке
 
+Kill Messages
+== Поруке убистава
+
 Show health, shields and ammo
 == Прикажи животе, штитове и меткове
 
 DDRace HUD
 == DDRace Приказ
+
+Show client IDs in scoreboard
+== Прикажи идентитете на табли резултата
 
 Show DDRace HUD
 == Прикажи DDRace Приказ
@@ -1286,6 +1325,9 @@ Use old chat style
 
 Preview
 == Преглед
+
+Show hook strength indicator
+== Прикажи јачину куке индикатор
 
 Show local player's key presses
 == Прикажи своје акције
@@ -1413,31 +1455,10 @@ Could not initialize the given graphics backend, reverting to the default backen
 Could not initialize the given graphics backend, this is probably because you didn't install the driver of the integrated graphics card.
 == 
 
-Could not resolve connect address '%s'. See local console for details.
-== 
-
-Connect address error
-== 
-
 Could not save downloaded map. Try manually deleting this file: %s
 == 
 
-Could not connect dummy
-== 
-
 Error playing demo
-== 
-
-Failed saving the replay!
-== 
-
-Saving settings to '%s' failed
-== 
-
-Error saving settings
-== 
-
-Loading demo file from storage
 == 
 
 Initializing components
@@ -1449,41 +1470,7 @@ Quitting. Please wait…
 Restarting. Please wait…
 == 
 
-Searching
-== 
-
-Enter Username
-== 
-
-Enter Password
-== 
-
-NOT CONNECTED
-== 
-
-Match %d of %d
-== 
-
-No results
-== 
-
-Lines %d - %d (%s)
-== 
-
-Locked
-== 
-
-Following
-== 
-
-Loading commands…
-== 
-
 Multi-View
-== 
-
-[Spectating]
-Following %s
 == 
 
 Some map images could not be loaded. Check the local console for details.
@@ -1495,31 +1482,10 @@ Some map sounds could not be loaded. Check the local console for details.
 Loading menu themes
 == 
 
-Press a key…
-== 
-
-Main menu
-== 
-
 Rename folder
 == 
 
 Render complete
-== 
-
-Are you sure that you want to restart?
-== 
-
-Save skin
-== 
-
-Are you sure you want to save your skin? If a skin with this name already exists, it will be replaced.
-== 
-
-There's an unsaved map in the editor, you might want to save it.
-== 
-
-Continue anyway?
 == 
 
 A demo with this name already exists
@@ -1541,27 +1507,6 @@ Videos directory
 == 
 
 Video was saved to '%s'
-== 
-
-Unable to save the skin
-== 
-
-Unable to save the skin with a reserved name
-== 
-
-%d/%d KiB (%.1f KiB/s)
-== 
-
-No local servers found (ports %d-%d)
-== 
-
-Example of usage
-== 
-
-No login required
-== 
-
-Communities
 == 
 
 Copy info
@@ -1599,12 +1544,6 @@ Are you sure that you want to remove the clan '%s' from your friends list?
 == 
 
 Add Clan
-== 
-
-Server filter
-== 
-
-Friends
 == 
 
 Play the current demo
@@ -1678,9 +1617,6 @@ Cut length
 Render cut to video
 == 
 
-Please use a different filename
-== 
-
 All combined
 == 
 
@@ -1718,15 +1654,6 @@ Unable to delete the demo '%s'
 Unable to delete the folder '%s'. Make sure it's empty first.
 == 
 
-Dummy is not allowed on this server
-== 
-
-Please wait…
-== 
-
-Loading…
-== 
-
 Ghosts directory
 == 
 
@@ -1739,10 +1666,6 @@ Deactivate all
 Menu opened. Press Esc key again to close menu.
 == 
 
-[Hertz]
-Hz
-== 
-
 Save power by lowering refresh rate (higher input latency)
 == 
 
@@ -1753,9 +1676,6 @@ Open the directory that contains the configuration and user files
 == 
 
 Open the directory to add custom themes
-== 
-
-Player info change cooldown
 == 
 
 Create a random skin
@@ -1780,57 +1700,6 @@ Cancel
 == 
 
 Graphics card
-== 
-
-Tee
-== 
-
-Info Messages
-== 
-
-Show local time always
-== 
-
-Show client IDs (scoreboard, chat, spectator)
-== 
-
-Always show chat
-== 
-
-Show only chat messages from team members
-== 
-
-Chat font size
-== 
-
-Chat width
-== 
-
-Show friend mark (♥) in name plates
-== 
-
-Show hook strength icon indicator
-== 
-
-Show hook strength number indicator
-== 
-
-Authed name color in scoreboard
-== 
-
-Same clan color in scoreboard
-== 
-
-Show own player's hook collision line
-== 
-
-Always show own player's hook collision line
-== 
-
-Always show other players' hook collision lines
-== 
-
-Show finish messages
 == 
 
 Weapons
@@ -1878,64 +1747,8 @@ Entities background color
 Unregister protocol and file extensions
 == 
 
-Basic
-== 
-
-Custom
-== 
-
-Are you sure that you want to delete '%s'?
-== 
-
-Delete skin
-== 
-
-Unable to delete skin
-== 
-
 Open the directory to add custom assets
 == 
 
-Round %d/%d
-== 
-
-[Spectators]
-%d others…
-== 
-
-[Team and size]
-%d\n(%d/%d)
-== 
-
-Team %d (%d/%d)
-== 
-
-[skins]
-Body
-== 
-
-[skins]
-Marking
-== 
-
-[skins]
-Decoration
-== 
-
-[skins]
-Hands
-== 
-
-[skins]
-Feet
-== 
-
-[skins]
-Eyes
-== 
-
 Moved ingame
-== 
-
-https://wiki.ddnet.org/wiki/Mapping
 == 

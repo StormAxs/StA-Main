@@ -137,16 +137,6 @@ public:
 		return col;
 	}
 
-	DerivedT Multiply(const DerivedT &Other) const
-	{
-		DerivedT Color(static_cast<const DerivedT &>(*this));
-		Color.x *= Other.x;
-		Color.y *= Other.y;
-		Color.z *= Other.z;
-		Color.a *= Other.a;
-		return Color;
-	}
-
 	template<typename UnpackT>
 	static UnpackT UnpackAlphaLast(unsigned Color, bool Alpha = true)
 	{
@@ -176,9 +166,8 @@ public:
 	ColorHSLA(){};
 
 	constexpr static const float DARKEST_LGT = 0.5f;
-	constexpr static const float DARKEST_LGT7 = 61.0f / 255.0f;
 
-	ColorHSLA UnclampLighting(float Darkest) const
+	ColorHSLA UnclampLighting(float Darkest = DARKEST_LGT) const
 	{
 		ColorHSLA col = *this;
 		col.l = Darkest + col.l * (1.0f - Darkest);

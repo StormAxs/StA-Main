@@ -21,11 +21,11 @@ private:
 protected:
 	CGameWorld *m_pGameWorld;
 	bool m_MarkedForDestroy;
-	int m_Id;
+	int m_ID;
 	int m_ObjType;
 
 public:
-	int GetId() const { return m_Id; }
+	int GetID() const { return m_ID; }
 
 	CEntity(CGameWorld *pGameWorld, int Objtype, vec2 Pos = vec2(0, 0), int ProximityRadius = 0);
 	virtual ~CEntity();
@@ -66,7 +66,7 @@ public:
 
 	CEntity()
 	{
-		m_Id = -1;
+		m_ID = -1;
 		m_pGameWorld = 0;
 	}
 };

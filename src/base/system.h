@@ -219,42 +219,13 @@ bool mem_has_null(const void *block, size_t size);
  */
 enum
 {
-	/**
-	 * Open file for reading.
-	 *
-	 * @see io_open
-	 */
 	IOFLAG_READ = 1,
-	/**
-	 * Open file for writing.
-	 *
-	 * @see io_open
-	 */
 	IOFLAG_WRITE = 2,
-	/**
-	 * Open file for appending at the end.
-	 *
-	 * @see io_open
-	 */
 	IOFLAG_APPEND = 4,
+	IOFLAG_SKIP_BOM = 8,
 
-	/**
-	 * Start seeking from the beginning of the file.
-	 *
-	 * @see io_seek
-	 */
 	IOSEEK_START = 0,
-	/**
-	 * Start seeking from the current position.
-	 *
-	 * @see io_seek
-	 */
 	IOSEEK_CUR = 1,
-	/**
-	 * Start seeking from the end of the file.
-	 *
-	 * @see io_seek
-	 */
 	IOSEEK_END = 2,
 };
 
@@ -266,9 +237,10 @@ enum
  * @param File to open.
  * @param flags A set of IOFLAG flags.
  *
- * @see IOFLAG_READ, IOFLAG_WRITE, IOFLAG_APPEND.
+ * @sa IOFLAG_READ, IOFLAG_WRITE, IOFLAG_APPEND, IOFLAG_SKIP_BOM.
  *
- * @return A handle to the file on success, or `nullptr` on failure.
+ * @return A handle to the file on success and 0 on failure.
+ *
  */
 IOHANDLE io_open(const char *filename, int flags);
 
@@ -282,6 +254,7 @@ IOHANDLE io_open(const char *filename, int flags);
  * @param size Number of bytes to read from the file.
  *
  * @return Number of bytes read.
+ *
  */
 unsigned io_read(IOHANDLE io, void *buffer, unsigned size);
 
@@ -307,7 +280,7 @@ void io_read_all(IOHANDLE io, void **result, unsigned *result_len);
  *
  * @param io Handle to the file to read data from.
  *
- * @return The file's remaining contents, or `nullptr` on failure.
+ * @return The file's remaining contents or null on failure.
  *
  * @remark Guarantees that there are no internal null bytes.
  * @remark Guarantees that result will contain zero-termination.
@@ -328,42 +301,7 @@ char *io_read_all_str(IOHANDLE io);
 int io_skip(IOHANDLE io, int size);
 
 /**
- * Seeks to a specified offset in the file.
- *
- * @ingroup File-IO
- *
- * @param io Handle to the file.
- * @param offset Offset from position to search.
- * @param origin Position to start searching from.
- *
- * @return `0` on success.
- */
-int io_seek(IOHANDLE io, int offset, int origin);
-
-/**
- * Gets the current position in the file.
- *
- * @ingroup File-IO
- *
- * @param io Handle to the file.
- *
- * @return The current position, or `-1` on failure.
- */
-long int io_tell(IOHANDLE io);
-
-/**
- * Gets the total length of the file. Resets cursor to the beginning.
- *
- * @ingroup File-IO
- *
- * @param io Handle to the file.
- *
- * @return The total size, or `-1` on failure.
- */
-long int io_length(IOHANDLE io);
-
-/**
- * Writes data from a buffer to a file.
+ * Writes data from a buffer to file.
  *
  * @ingroup File-IO
  *
@@ -376,15 +314,50 @@ long int io_length(IOHANDLE io);
 unsigned io_write(IOHANDLE io, const void *buffer, unsigned size);
 
 /**
- * Writes a platform dependent newline to a file.
+ * Writes a platform dependent newline to file.
  *
  * @ingroup File-IO
  *
  * @param io Handle to the file.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  */
 bool io_write_newline(IOHANDLE io);
+
+/**
+ * Seeks to a specified offset in the file.
+ *
+ * @ingroup File-IO
+ *
+ * @param io Handle to the file.
+ * @param offset Offset from pos to stop.
+ * @param origin Position to start searching from.
+ *
+ * @return 0 on success.
+ */
+int io_seek(IOHANDLE io, int offset, int origin);
+
+/**
+ * Gets the current position in the file.
+ *
+ * @ingroup File-IO
+ *
+ * @param io Handle to the file.
+ *
+ * @return The current position. @c -1L if an error occurred.
+ */
+long int io_tell(IOHANDLE io);
+
+/**
+ * Gets the total length of the file. Resetting cursor to the beginning
+ *
+ * @ingroup File-IO
+ *
+ * @param io Handle to the file.
+ *
+ * @return The total size. @c -1L if an error occurred.
+ */
+long int io_length(IOHANDLE io);
 
 /**
  * Closes a file.
@@ -393,7 +366,7 @@ bool io_write_newline(IOHANDLE io);
  *
  * @param io Handle to the file.
  *
- * @return `0` on success.
+ * @return 0 on success.
  */
 int io_close(IOHANDLE io);
 
@@ -404,7 +377,7 @@ int io_close(IOHANDLE io);
  *
  * @param io Handle to the file.
  *
- * @return `0` on success.
+ * @return 0 on success.
  */
 int io_flush(IOHANDLE io);
 
@@ -415,7 +388,7 @@ int io_flush(IOHANDLE io);
  *
  * @param io Handle to the file.
  *
- * @return `0` on success.
+ * @return 0 on success.
  */
 int io_sync(IOHANDLE io);
 
@@ -426,57 +399,34 @@ int io_sync(IOHANDLE io);
  *
  * @param io Handle to the file.
  *
- * @return `0` on success, or non-`0` on error.
+ * @return nonzero on error, 0 otherwise.
  */
 int io_error(IOHANDLE io);
 
 /**
  * @ingroup File-IO
- *
- * Returns a handle for the standard input.
- *
- * @return An @link IOHANDLE @endlink for the standard input.
- *
- * @remark The handle must not be closed.
+ * @return An <IOHANDLE> to the standard input.
  */
 IOHANDLE io_stdin();
 
 /**
  * @ingroup File-IO
- *
- * Returns a handle for the standard output.
- *
- * @return An @link IOHANDLE @endlink for the standard output.
- *
- * @remark The handle must not be closed.
+ * @return An <IOHANDLE> to the standard output.
  */
 IOHANDLE io_stdout();
 
 /**
  * @ingroup File-IO
- *
- * Returns a handle for the standard error.
- *
- * @return An @link IOHANDLE @endlink for the standard error.
- *
- * @remark The handle must not be closed.
+ * @return An <IOHANDLE> to the standard error.
  */
 IOHANDLE io_stderr();
 
 /**
  * @ingroup File-IO
- *
- * Returns a handle for the current executable.
- *
- * @return An @link IOHANDLE @endlink for the current executable.
+ * @return An <IOHANDLE> to the current executable.
  */
 IOHANDLE io_current_exe();
 
-/**
- * Wrapper for asynchronously writing to an @link IOHANDLE @endlink.
- *
- * @ingroup File-IO
- */
 typedef struct ASYNCIO ASYNCIO;
 
 /**
@@ -487,11 +437,12 @@ typedef struct ASYNCIO ASYNCIO;
  * @param io Handle to the file.
  *
  * @return The handle for asynchronous writing.
+ *
  */
 ASYNCIO *aio_new(IOHANDLE io);
 
 /**
- * Locks the `ASYNCIO` structure so it can't be written into by
+ * Locks the ASYNCIO structure so it can't be written into by
  * other threads.
  *
  * @ingroup File-IO
@@ -501,7 +452,7 @@ ASYNCIO *aio_new(IOHANDLE io);
 void aio_lock(ASYNCIO *aio);
 
 /**
- * Unlocks the `ASYNCIO` structure after finishing the contiguous
+ * Unlocks the ASYNCIO structure after finishing the contiguous
  * write.
  *
  * @ingroup File-IO
@@ -527,11 +478,12 @@ void aio_write(ASYNCIO *aio, const void *buffer, unsigned size);
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
+ *
  */
 void aio_write_newline(ASYNCIO *aio);
 
 /**
- * Queues a chunk of data for writing. The `ASYNCIO` struct must be
+ * Queues a chunk of data for writing. The ASYNCIO struct must be
  * locked using @link aio_lock @endlink first.
  *
  * @ingroup File-IO
@@ -539,16 +491,18 @@ void aio_write_newline(ASYNCIO *aio);
  * @param aio Handle to the file.
  * @param buffer Pointer to the data that should be written.
  * @param size Number of bytes to write.
+ *
  */
 void aio_write_unlocked(ASYNCIO *aio, const void *buffer, unsigned size);
 
 /**
- * Queues a newline for writing. The `ASYNCIO` struct must be locked
+ * Queues a newline for writing. The ASYNCIO struct must be locked
  * using @link aio_lock @endlink first.
  *
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
+ *
  */
 void aio_write_newline_unlocked(ASYNCIO *aio);
 
@@ -556,15 +510,16 @@ void aio_write_newline_unlocked(ASYNCIO *aio);
  * Checks whether errors have occurred during the asynchronous
  * writing.
  *
- * Call this function regularly to see if there are errors. Call this
- * function after @link aio_wait @endlink to see if the process of writing
+ * Call this function regularly to see if there are errors. Call
+ * this function after <aio_wait> to see if the process of writing
  * to the file succeeded.
  *
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
  *
- * @return `0` on success, or non-`0` on error.
+ * @eturn 0 if no error occurred, and nonzero on error.
+ *
  */
 int aio_error(ASYNCIO *aio);
 
@@ -574,6 +529,7 @@ int aio_error(ASYNCIO *aio);
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
+ *
  */
 void aio_close(ASYNCIO *aio);
 
@@ -583,15 +539,17 @@ void aio_close(ASYNCIO *aio);
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
+ *
  */
 void aio_wait(ASYNCIO *aio);
 
 /**
- * Frees the resources associated with the asynchronous file handle.
+ * Frees the resources associated to the asynchronous file handle.
  *
  * @ingroup File-IO
  *
  * @param aio Handle to the file.
+ *
  */
 void aio_free(ASYNCIO *aio);
 
@@ -600,7 +558,6 @@ void aio_free(ASYNCIO *aio);
  * Threading related functions.
  *
  * @see Locks
- * @see Semaphore
  */
 
 /**
@@ -610,9 +567,7 @@ void aio_free(ASYNCIO *aio);
  *
  * @param threadfunc Entry point for the new thread.
  * @param user Pointer to pass to the thread.
- * @param name Name describing the use of the thread.
- *
- * @return Handle for the new thread.
+ * @param name name describing the use of the thread
  */
 void *thread_init(void (*threadfunc)(void *), void *user, const char *name);
 
@@ -626,33 +581,35 @@ void *thread_init(void (*threadfunc)(void *), void *user, const char *name);
 void thread_wait(void *thread);
 
 /**
- * Yield the current thread's execution slice.
+ * Yield the current threads execution slice.
  *
  * @ingroup Threads
  */
 void thread_yield();
 
 /**
- * Puts the thread in the detached state, guaranteeing that
+ * Puts the thread in the detached thread, guaranteeing that
  * resources of the thread will be freed immediately when the
  * thread terminates.
  *
  * @ingroup Threads
  *
- * @param thread Thread to detach.
+ * @param thread Thread to detach
  */
 void thread_detach(void *thread);
 
 /**
- * Creates a new thread and detaches it.
+ * Creates a new thread and if it succeeded detaches it.
  *
  * @ingroup Threads
  *
  * @param threadfunc Entry point for the new thread.
  * @param user Pointer to pass to the thread.
- * @param name Name describing the use of the thread.
+ * @param name Name describing the use of the thread
+ *
+ * @return true on success, false on failure.
  */
-void thread_init_and_detach(void (*threadfunc)(void *), void *user, const char *name);
+bool thread_init_and_detach(void (*threadfunc)(void *), void *user, const char *name);
 
 /**
  * @defgroup Semaphore
@@ -740,7 +697,7 @@ int64_t time_freq();
  *
  * @return The time as a UNIX timestamp
  */
-int64_t time_timestamp();
+int time_timestamp();
 
 /**
  * Retrieves the hours since midnight (0..23)
@@ -855,11 +812,9 @@ int net_addr_comp_noport(const NETADDR *a, const NETADDR *b);
  * @param max_length Maximum size of the string.
  * @param add_port add port to string or not
  *
- * @return true on success
- *
  * @remark The string will always be zero terminated
  */
-bool net_addr_str(const NETADDR *addr, char *string, int max_length, int add_port);
+void net_addr_str(const NETADDR *addr, char *string, int max_length, int add_port);
 
 /**
  * Turns url string into a network address struct.
@@ -1273,32 +1228,6 @@ int str_format_v(char *buffer, int buffer_size, const char *format, va_list args
 int str_format(char *buffer, int buffer_size, const char *format, ...)
 	GNUC_ATTRIBUTE((format(printf, 3, 4)));
 
-#if !defined(CONF_DEBUG)
-int str_format_int(char *buffer, size_t buffer_size, int value);
-
-template<typename... Args>
-int str_format_opt(char *buffer, int buffer_size, const char *format, Args... args)
-{
-	static_assert(sizeof...(args) > 0, "Use str_copy instead of str_format without format arguments");
-	return str_format(buffer, buffer_size, format, args...);
-}
-
-template<>
-inline int str_format_opt(char *buffer, int buffer_size, const char *format, int val)
-{
-	if(strcmp(format, "%d") == 0)
-	{
-		return str_format_int(buffer, buffer_size, val);
-	}
-	else
-	{
-		return str_format(buffer, buffer_size, format, val);
-	}
-}
-
-#define str_format str_format_opt
-#endif
-
 /**
  * Trims specific number of words at the start of a string.
  *
@@ -1652,22 +1581,6 @@ const char *str_find_nocase(const char *haystack, const char *needle);
 const char *str_find(const char *haystack, const char *needle);
 
 /**
- * @ingroup Strings
- *
- * @param haystack String to search in
- * @param delim String to search for
- * @param offset Number of characters into the haystack
- * @param start Will be set to the first delimiter on the left side of the offset (or haystack start)
- * @param end Will be set to the first delimiter on the right side of the offset (or haystack end)
- *
- * @return `true` if both delimiters were found
- * @return 'false' if a delimiter is missing (it uses haystack start and end as fallback)
- *
- * @remark The strings are treated as zero-terminated strings.
- */
-bool str_delimiters_around_offset(const char *haystay, const char *delim, int offset, int *start, int *end);
-
-/**
  * Finds the last occurrence of a character
  *
  * @ingroup Strings
@@ -1798,21 +1711,6 @@ void str_timestamp_format(char *buffer, int buffer_size, const char *format)
 void str_timestamp_ex(time_t time, char *buffer, int buffer_size, const char *format)
 	GNUC_ATTRIBUTE((format(strftime, 4, 0)));
 
-/**
- * Parses a string into a timestamp following a specified format.
- *
- * @ingroup Timestamp
- *
- * @param string Pointer to the string to parse
- * @param format The time format to use (for example FORMAT_NOSPACE below)
- * @param timestamp Pointer to the timestamp result
- *
- * @return true on success, false if the string could not be parsed with the specified format
- *
- */
-bool timestamp_from_str(const char *string, const char *format, time_t *timestamp)
-	GNUC_ATTRIBUTE((format(strftime, 2, 0)));
-
 #define FORMAT_TIME "%H:%M:%S"
 #define FORMAT_SPACE "%Y-%m-%d %H:%M:%S"
 #define FORMAT_NOSPACE "%Y-%m-%d_%H-%M-%S"
@@ -1925,11 +1823,11 @@ int fs_makedir(const char *path);
 int fs_removedir(const char *path);
 
 /**
- * Recursively creates parent directories for a file or directory.
+ * Recursively create directories for a file.
  *
  * @ingroup Filesystem
  *
- * @param path File or directory for which to create parent directories.
+ * @param path - File for which to create directories.
  *
  * @return 0 on success. Negative value on failure.
  *
@@ -2155,6 +2053,36 @@ int net_would_block();
 
 int net_socket_read_wait(NETSOCKET sock, int time);
 
+/*
+	Function: open_link
+		Opens a link in the browser.
+
+	Parameters:
+		link - The link to open in a browser.
+
+	Returns:
+		Returns 1 on success, 0 on failure.
+
+	Remarks:
+		This may not be called with untrusted input or it'll result in arbitrary code execution, especially on Windows.
+*/
+int open_link(const char *link);
+
+/*
+	Function: open_file
+		Opens a file or directory with default program.
+
+	Parameters:
+		path - The path to open.
+
+	Returns:
+		Returns 1 on success, 0 on failure.
+
+	Remarks:
+		This may not be called with untrusted input or it'll result in arbitrary code execution, especially on Windows.
+*/
+int open_file(const char *path);
+
 /**
  * Swaps the endianness of data. Each element is swapped individually by reversing its bytes.
  *
@@ -2177,12 +2105,18 @@ typedef struct
 void net_stats(NETSTATS *stats);
 
 int str_toint(const char *str);
-bool str_toint(const char *str, int *out);
 int str_toint_base(const char *str, int base);
 unsigned long str_toulong_base(const char *str, int base);
 int64_t str_toint64_base(const char *str, int base = 10);
 float str_tofloat(const char *str);
-bool str_tofloat(const char *str, float *out);
+
+void str_from_int(int value, char *buffer, size_t buffer_size);
+
+template<size_t N>
+void str_from_int(int value, char (&dst)[N])
+{
+	str_from_int(value, dst, N);
+}
 
 /**
  * Determines whether a character is whitespace.
@@ -2198,8 +2132,6 @@ bool str_tofloat(const char *str, float *out);
 int str_isspace(char c);
 
 char str_uppercase(char c);
-
-bool str_isnum(char c);
 
 int str_isallnum(const char *str);
 
@@ -2423,22 +2355,6 @@ int str_utf8_encode(char *ptr, int chr);
 int str_utf8_check(const char *str);
 
 /*
-	Function: str_utf8_copy_num
-		Copies a number of utf8 characters from one string to another.
-
-	Parameters:
-		dst - Pointer to a buffer that shall receive the string.
-		src - String to be copied.
-		dst_size - Size of the buffer dst.
-		num - maximum number of utf8 characters to be copied.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-		- Garantees that dst string will contain zero-termination.
-*/
-void str_utf8_copy_num(char *dst, const char *src, int dst_size, int num);
-
-/*
 	Function: str_utf8_stats
 		Determines the byte size and utf8 character count of a utf8 string.
 
@@ -2541,247 +2457,162 @@ unsigned bytes_be_to_uint(const unsigned char *bytes);
  */
 void uint_to_bytes_be(unsigned char *bytes, unsigned value);
 
-/**
- * @defgroup Shell
- * Shell, process management, OS specific functionality.
- */
+/*
+	Function: pid
+		Returns the pid of the current process.
 
-/**
- * Returns the ID of the current process.
- *
- * @ingroup Shell
- *
- * @return PID of the current process.
- */
+	Returns:
+		pid of the current process
+*/
 int pid();
 
-/**
- * Fixes the command line arguments to be encoded in UTF-8 on all systems.
- *
- * @ingroup Shell
- *
- * @param argc A pointer to the argc parameter that was passed to the main function.
- * @param argv A pointer to the argv parameter that was passed to the main function.
- *
- * @remark You need to call @link cmdline_free @endlink once you're no longer using the results.
- */
+/*
+	Function: cmdline_fix
+		Fixes the command line arguments to be encoded in UTF-8 on all
+		systems.
+
+	Parameters:
+		argc - A pointer to the argc parameter that was passed to the main function.
+		argv - A pointer to the argv parameter that was passed to the main function.
+
+	Remarks:
+		- You need to call cmdline_free once you're no longer using the
+		results.
+*/
 void cmdline_fix(int *argc, const char ***argv);
 
-/**
- * Frees memory that was allocated by @link cmdline_fix @endlink.
- *
- * @ingroup Shell
- *
- * @param argc The argc obtained from `cmdline_fix`.
- * @param argv The argv obtained from `cmdline_fix`.
- */
+/*
+	Function: cmdline_free
+		Frees memory that was allocated by cmdline_fix.
+
+	Parameters:
+		argc - The argc obtained from cmdline_fix.
+		argv - The argv obtained from cmdline_fix.
+
+*/
 void cmdline_free(int argc, const char **argv);
 
 #if defined(CONF_FAMILY_WINDOWS)
-/**
- * A handle for a process.
- *
- * @ingroup Shell
- */
 typedef void *PROCESS;
-/**
- * A handle that denotes an invalid process.
- *
- * @ingroup Shell
- */
 constexpr PROCESS INVALID_PROCESS = nullptr;
 #else
-/**
- * A handle for a process.
- *
- * @ingroup Shell
- */
 typedef pid_t PROCESS;
-/**
- * A handle that denotes an invalid process.
- *
- * @ingroup Shell
- */
 constexpr PROCESS INVALID_PROCESS = 0;
 #endif
-#if !defined(CONF_PLATFORM_ANDROID)
-/**
- * Determines the initial window state when using @link shell_execute @endlink
- * to execute a process.
- *
- * @ingroup Shell
- *
- * @remark Currently only supported on Windows.
- */
-enum class EShellExecuteWindowState
-{
-	/**
-	 * The process window is opened in the foreground and activated.
-	 */
-	FOREGROUND,
 
-	/**
-	 * The process window is opened in the background without focus.
-	 */
-	BACKGROUND,
-};
+/*
+	Function: shell_execute
+		Executes a given file.
 
-/**
- * Executes a given file.
- *
- * @ingroup Shell
- *
- * @param file The file to execute.
- * @param window_state The window state how the process window should be shown.
- *
- * @return Handle of the new process, or @link INVALID_PROCESS @endlink on error.
- */
-PROCESS shell_execute(const char *file, EShellExecuteWindowState window_state);
+	Returns:
+		handle/pid of the new process
+*/
+PROCESS shell_execute(const char *file);
 
-/**
- * Sends kill signal to a process.
- *
- * @ingroup Shell
- *
- * @param process Handle of the process to kill.
- *
- * @return `1` on success, `0` on error.
- */
+/*
+	Function: kill_process
+		Sends kill signal to a process.
+
+	Parameters:
+		process - handle/pid of the process
+
+	Returns:
+		0 - Error
+		1 - Success
+*/
 int kill_process(PROCESS process);
 
 /**
  * Checks if a process is alive.
- *
- * @ingroup Shell
- *
+ * 
  * @param process Handle/PID of the process.
- *
- * @return `true` if the process is currently running,
- * `false` if the process is not running (dead).
+ * 
+ * @return bool Returns true if the process is currently running, false if the process is not running (dead).
  */
 bool is_process_alive(PROCESS process);
 
-/**
- * Opens a link in the browser.
- *
- * @ingroup Shell
- *
- * @param link The link to open in a browser.
- *
- * @return `1` on success, `0` on failure.
- *
- * @remark The strings are treated as zero-terminated strings.
- * @remark This may not be called with untrusted input or it'll result in arbitrary code execution, especially on Windows.
- */
-int open_link(const char *link);
+/*
+	Function: generate_password
+		Generates a null-terminated password of length `2 *
+		random_length`.
 
-/**
- * Opens a file or directory with the default program.
- *
- * @ingroup Shell
- *
- * @param path The file or folder to open with the default program.
- *
- * @return `1` on success, `0` on failure.
- *
- * @remark The strings are treated as zero-terminated strings.
- * @remark This may not be called with untrusted input or it'll result in arbitrary code execution, especially on Windows.
- */
-int open_file(const char *path);
-#endif // !defined(CONF_PLATFORM_ANDROID)
-
-/**
- * @defgroup Secure-Random
- * Secure random number generation.
- */
-
-/**
- * Generates a null-terminated password of length `2 * random_length`.
- *
- * @ingroup Secure-Random
- *
- * @param buffer Pointer to the start of the output buffer.
- * @param length Length of the buffer.
- * @param random Pointer to a randomly-initialized array of shorts.
- * @param random_length Length of the short array.
- */
+	Parameters:
+		buffer - Pointer to the start of the output buffer.
+		length - Length of the buffer.
+		random - Pointer to a randomly-initialized array of shorts.
+		random_length - Length of the short array.
+*/
 void generate_password(char *buffer, unsigned length, const unsigned short *random, unsigned random_length);
 
-/**
- * Initializes the secure random module.
- * You *MUST* check the return value of this function.
- *
- * @ingroup Secure-Random
- *
- * @return `0` on success.
- */
-[[nodiscard]] int secure_random_init();
+/*
+	Function: secure_random_init
+		Initializes the secure random module.
+		You *MUST* check the return value of this function.
 
-/**
- * Uninitializes the secure random module.
- *
- * @ingroup Secure-Random
- *
- * @return `0` on success.
- */
+	Returns:
+		0 - Initialization succeeded.
+		1 - Initialization failed.
+*/
+int secure_random_init();
+
+/*
+	Function: secure_random_uninit
+		Uninitializes the secure random module.
+
+	Returns:
+		0 - Uninitialization succeeded.
+		1 - Uninitialization failed.
+*/
 int secure_random_uninit();
 
-/**
- * Fills the buffer with the specified amount of random password characters.
- *
- * @ingroup Secure-Random
- *
- * @param buffer Pointer to the start of the buffer.
- * @param length Length of the buffer.
- * @param pw_length Length of the desired password.
- *
- * @remark The desired password length must be greater or equal to 6,
- * even and smaller or equal to 128.
- */
+/*
+	Function: secure_random_password
+		Fills the buffer with the specified amount of random password
+		characters.
+
+		The desired password length must be greater or equal to 6, even
+		and smaller or equal to 128.
+
+	Parameters:
+		buffer - Pointer to the start of the buffer.
+		length - Length of the buffer.
+		pw_length - Length of the desired password.
+*/
 void secure_random_password(char *buffer, unsigned length, unsigned pw_length);
 
-/**
- * Fills the buffer with the specified amount of random bytes.
- *
- * @ingroup Secure-Random
- *
- * @param buffer Pointer to the start of the buffer.
- * @param length Length of the buffer.
- */
+/*
+	Function: secure_random_fill
+		Fills the buffer with the specified amount of random bytes.
+
+	Parameters:
+		buffer - Pointer to the start of the buffer.
+		length - Length of the buffer.
+*/
 void secure_random_fill(void *bytes, unsigned length);
 
-/**
- * Returns random `int`.
- *
- * @ingroup Secure-Random
- *
- * @return Random int.
- *
- * @remark Can be used as a replacement for the `rand` function.
- */
+/*
+	Function: secure_rand
+		Returns random int (replacement for rand()).
+*/
 int secure_rand();
 
-/**
- * Returns a random nonnegative integer below the given number,
- * with a uniform distribution.
- *
- * @ingroup Secure-Random
- *
- * @param below Upper limit (exclusive) of integers to return.
- *
- * @return Random nonnegative below the given number.
- */
+/*
+	Function: secure_rand_below
+		Returns a random nonnegative integer below the given number,
+		with a uniform distribution.
+
+	Parameters:
+		below - Upper limit (exclusive) of integers to return.
+*/
 int secure_rand_below(int below);
 
 /**
  * Returns a human-readable version string of the operating system.
  *
- * @ingroup Shell
- *
  * @param version Buffer to use for the output.
  * @param length Length of the output buffer.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  */
 bool os_version_str(char *version, size_t length);
 
@@ -2792,8 +2623,6 @@ bool os_version_str(char *version, size_t length);
  * If the preferred locale could not be determined this function
  * falls back to the locale `"en-US"`.
  *
- * @ingroup Shell
- *
  * @param locale Buffer to use for the output.
  * @param length Length of the output buffer.
  *
@@ -2802,25 +2631,7 @@ bool os_version_str(char *version, size_t length);
 void os_locale_str(char *locale, size_t length);
 
 #if defined(CONF_EXCEPTION_HANDLING)
-/**
- * @defgroup Exception-Handling
- * Exception handling (crash logging).
- */
-
-/**
- * Initializes the exception handling module.
- *
- * @ingroup Exception-Handling
- */
 void init_exception_handler();
-
-/**
- * Sets the filename for writing the crash log.
- *
- * @ingroup Exception-Handling
- *
- * @param log_file_path Absolute path to which crash log file should be written.
- */
 void set_exception_handler_log_file(const char *log_file_path);
 #endif
 
@@ -2837,9 +2648,7 @@ int net_socket_read_wait(NETSOCKET sock, std::chrono::nanoseconds nanoseconds);
 
 /**
  * Fixes the command line arguments to be encoded in UTF-8 on all systems.
- * This is a RAII wrapper for @link cmdline_fix @endlink and @link cmdline_free @endlink.
- *
- * @ingroup Shell
+ * This is a RAII wrapper for cmdline_fix and cmdline_free.
  */
 class CCmdlineFix
 {
@@ -2861,29 +2670,25 @@ public:
 
 #if defined(CONF_FAMILY_WINDOWS)
 /**
- * Converts a UTF-8 encoded string to a wide character string
+ * Converts a utf8 encoded string to a wide character string
  * for use with the Windows API.
  *
- * @ingroup Shell
- *
- * @param str The UTF-8 encoded string to convert.
+ * @param str The utf8 encoded string to convert.
  *
  * @return The argument as a wide character string.
  *
  * @remark The argument string must be zero-terminated.
- * @remark Fails with assertion error if passed UTF-8 is invalid.
+ * @remark Fails with assertion error if passed utf8 is invalid.
  */
 std::wstring windows_utf8_to_wide(const char *str);
 
 /**
  * Converts a wide character string obtained from the Windows API
- * to a UTF-8 encoded string.
- *
- * @ingroup Shell
+ * to a utf8 encoded string.
  *
  * @param wide_str The wide character string to convert.
  *
- * @return The argument as a UTF-8 encoded string, wrapped in an optional.
+ * @return The argument as a utf8 encoded string, wrapped in an optional.
  * The optional is empty, if the wide string contains invalid codepoints.
  *
  * @remark The argument string must be zero-terminated.
@@ -2892,13 +2697,10 @@ std::optional<std::string> windows_wide_to_utf8(const wchar_t *wide_str);
 
 /**
  * This is a RAII wrapper to initialize/uninitialize the Windows COM library,
- * which may be necessary for using the @link open_file @endlink and
- * @link open_link @endlink functions.
+ * which may be necessary for using the open_file and open_link functions.
  * Must be used on every thread. It's automatically used on threads created
- * with @link thread_init @endlink. Pass `true` to the constructor on threads
- * that own a window (i.e. pump a message queue).
- *
- * @ingroup Shell
+ * with thread_init. Pass true to the constructor on threads that own a
+ * window (i.e. pump a message queue).
  */
 class CWindowsComLifecycle
 {
@@ -2914,11 +2716,11 @@ public:
  *
  * @param protocol_name The name of the protocol.
  * @param executable The absolute path of the executable that will be associated with the protocol.
- * @param updated Pointer to a variable that will be set to `true`, iff the shell needs to be updated.
+ * @param updated Pointer to a variable that will be set to true, iff the shell needs to be updated.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  *
- * @remark The caller must later call @link shell_update @endlink, iff the shell needs to be updated.
+ * @remark The caller must later call shell_update, iff the shell needs to be updated.
  */
 bool shell_register_protocol(const char *protocol_name, const char *executable, bool *updated);
 
@@ -2931,11 +2733,11 @@ bool shell_register_protocol(const char *protocol_name, const char *executable, 
  * @param description A readable description for the file extension.
  * @param executable_name A unique name that will used to describe the application.
  * @param executable The absolute path of the executable that will be associated with the file extension.
- * @param updated Pointer to a variable that will be set to `true`, iff the shell needs to be updated.
+ * @param updated Pointer to a variable that will be set to true, iff the shell needs to be updated.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  *
- * @remark The caller must later call @link shell_update @endlink, iff the shell needs to be updated.
+ * @remark The caller must later call shell_update, iff the shell needs to be updated.
  */
 bool shell_register_extension(const char *extension, const char *description, const char *executable_name, const char *executable, bool *updated);
 
@@ -2946,11 +2748,11 @@ bool shell_register_extension(const char *extension, const char *description, co
  *
  * @param name Readable name of the application.
  * @param executable The absolute path of the executable being registered.
- * @param updated Pointer to a variable that will be set to `true`, iff the shell needs to be updated.
+ * @param updated Pointer to a variable that will be set to true, iff the shell needs to be updated.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  *
- * @remark The caller must later call @link shell_update @endlink, iff the shell needs to be updated.
+ * @remark The caller must later call shell_update, iff the shell needs to be updated.
  */
 bool shell_register_application(const char *name, const char *executable, bool *updated);
 
@@ -2962,11 +2764,11 @@ bool shell_register_application(const char *name, const char *executable, bool *
  * @param shell_class The shell class to delete.
  * For protocols this is the name of the protocol.
  * For file extensions this is the program ID associated with the file extension.
- * @param updated Pointer to a variable that will be set to `true`, iff the shell needs to be updated.
+ * @param updated Pointer to a variable that will be set to true, iff the shell needs to be updated.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  *
- * @remark The caller must later call @link shell_update @endlink, iff the shell needs to be updated.
+ * @remark The caller must later call shell_update, iff the shell needs to be updated.
  */
 bool shell_unregister_class(const char *shell_class, bool *updated);
 
@@ -2976,11 +2778,11 @@ bool shell_unregister_class(const char *shell_class, bool *updated);
  * @ingroup Shell
  *
  * @param executable The absolute path of the executable being unregistered.
- * @param updated Pointer to a variable that will be set to `true`, iff the shell needs to be updated.
+ * @param updated Pointer to a variable that will be set to true, iff the shell needs to be updated.
  *
- * @return `true` on success, `false` on failure.
+ * @return true on success, false on failure.
  *
- * @remark The caller must later call @link shell_update @endlink, iff the shell needs to be updated.
+ * @remark The caller must later call shell_update, iff the shell needs to be updated.
  */
 bool shell_unregister_application(const char *executable, bool *updated);
 

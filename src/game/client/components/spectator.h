@@ -3,10 +3,8 @@
 #ifndef GAME_CLIENT_COMPONENTS_SPECTATOR_H
 #define GAME_CLIENT_COMPONENTS_SPECTATOR_H
 #include <base/vmath.h>
-#include <engine/console.h>
 
 #include <game/client/component.h>
-#include <game/client/ui.h>
 
 class CSpectator : public CComponent
 {
@@ -18,11 +16,13 @@ class CSpectator : public CComponent
 
 	bool m_Active;
 	bool m_WasActive;
+	bool m_Clicked;
 
-	int m_SelectedSpectatorId;
+	int m_SelectedSpectatorID;
 	vec2 m_SelectorMouse;
 
-	CUi::CTouchState m_TouchState;
+	float m_OldMouseX;
+	float m_OldMouseY;
 
 	float m_MultiViewActivateDelay;
 
@@ -42,15 +42,13 @@ public:
 
 	virtual void OnConsoleInit() override;
 	virtual bool OnCursorMove(float x, float y, IInput::ECursorType CursorType) override;
-	virtual bool OnInput(const IInput::CEvent &Event) override;
 	virtual void OnRender() override;
 	virtual void OnRelease() override;
 	virtual void OnReset() override;
+	virtual bool OnInput(const IInput::CEvent &Event) override;
 
-	void Spectate(int SpectatorId);
+	void Spectate(int SpectatorID);
 	void SpectateClosest();
-
-	bool IsActive() const { return m_Active; }
 };
 
 #endif

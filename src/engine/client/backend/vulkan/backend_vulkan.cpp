@@ -15,23 +15,26 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <algorithm>
 #include <array>
-#include <condition_variable>
+#include <map>
+#include <set>
+#include <vector>
+
+#include <algorithm>
+
 #include <cstddef>
-#include <cstdlib>
 #include <functional>
 #include <limits>
-#include <map>
 #include <memory>
-#include <mutex>
-#include <optional>
-#include <set>
 #include <string>
+
+#include <condition_variable>
+#include <mutex>
 #include <thread>
+
+#include <cstdlib>
+
 #include <unordered_map>
-#include <utility>
-#include <vector>
 
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
@@ -113,10 +116,10 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 	* STRUCT DEFINITIONS
 	************************/
 
-	static constexpr size_t s_StagingBufferCacheId = 0;
-	static constexpr size_t s_StagingBufferImageCacheId = 1;
-	static constexpr size_t s_VertexBufferCacheId = 2;
-	static constexpr size_t s_ImageBufferCacheId = 3;
+	static constexpr size_t s_StagingBufferCacheID = 0;
+	static constexpr size_t s_StagingBufferImageCacheID = 1;
+	static constexpr size_t s_VertexBufferCacheID = 2;
+	static constexpr size_t s_ImageBufferCacheID = 3;
 
 	struct SDeviceMemoryBlock
 	{
@@ -161,20 +164,6 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 			size_t m_OffsetToAlign;
 			SMemoryHeapElement *m_pElementInHeap;
 			[[nodiscard]] bool operator>(const SMemoryHeapQueueElement &Other) const { return m_AllocationSize > Other.m_AllocationSize; }
-			struct SMemoryHeapQueueElementFind
-			{
-				// respects alignment requirements
-				constexpr bool operator()(const SMemoryHeapQueueElement &Val, const std::pair<size_t, size_t> &Other) const
-				{
-					auto AllocSize = Other.first;
-					auto AllocAlignment = Other.second;
-					size_t ExtraSizeAlign = Val.m_OffsetInHeap % AllocAlignment;
-					if(ExtraSizeAlign != 0)
-						ExtraSizeAlign = AllocAlignment - ExtraSizeAlign;
-					size_t RealAllocSize = AllocSize + ExtraSizeAlign;
-					return Val.m_AllocationSize < RealAllocSize;
-				}
-			};
 		};
 
 		typedef std::multiset<SMemoryHeapQueueElement, std::greater<>> TMemoryHeapQueue;
@@ -217,31 +206,23 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 			}
 			else
 			{
+				// calculate the alignment
+				size_t ExtraSizeAlign = m_Elements.begin()->m_OffsetInHeap % AllocAlignment;
+				if(ExtraSizeAlign != 0)
+					ExtraSizeAlign = AllocAlignment - ExtraSizeAlign;
+				size_t RealAllocSize = AllocSize + ExtraSizeAlign;
+
 				// check if there is enough space in this instance
-				if(SMemoryHeapQueueElement::SMemoryHeapQueueElementFind{}(*m_Elements.begin(), std::make_pair(AllocSize, AllocAlignment)))
+				if(m_Elements.begin()->m_AllocationSize < RealAllocSize)
 				{
 					return false;
 				}
 				else
 				{
-					// see SMemoryHeapQueueElement::operator>
-					SMemoryHeapQueueElement FindAllocSize;
-					FindAllocSize.m_AllocationSize = AllocSize;
-					// find upper bound for a allocation size
-					auto Upper = m_Elements.upper_bound(FindAllocSize);
-					// then find the first entry that respects alignment, this is a linear search!
-					auto FoundEl = std::lower_bound(std::make_reverse_iterator(Upper), m_Elements.rend(), std::make_pair(AllocSize, AllocAlignment), SMemoryHeapQueueElement::SMemoryHeapQueueElementFind{});
-
-					auto TopEl = *FoundEl;
+					auto TopEl = *m_Elements.begin();
 					m_Elements.erase(TopEl.m_pElementInHeap->m_InQueue);
 
 					TopEl.m_pElementInHeap->m_InUse = true;
-
-					// calculate the real alloc size + alignment offset
-					size_t ExtraSizeAlign = TopEl.m_OffsetInHeap % AllocAlignment;
-					if(ExtraSizeAlign != 0)
-						ExtraSizeAlign = AllocAlignment - ExtraSizeAlign;
-					size_t RealAllocSize = AllocSize + ExtraSizeAlign;
 
 					// the heap element gets children
 					TopEl.m_pElementInHeap->m_pLeft = std::make_unique<SMemoryHeapElement>();
@@ -325,7 +306,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 		}
 	};
 
-	template<size_t Id>
+	template<size_t ID>
 	struct SMemoryBlock
 	{
 		SMemoryHeap::SMemoryHeapQueueElement m_HeapData;
@@ -342,13 +323,13 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 		SMemoryHeap *m_pHeap;
 	};
 
-	template<size_t Id>
-	struct SMemoryImageBlock : public SMemoryBlock<Id>
+	template<size_t ID>
+	struct SMemoryImageBlock : public SMemoryBlock<ID>
 	{
 		uint32_t m_ImageMemoryBits;
 	};
 
-	template<size_t Id>
+	template<size_t ID>
 	struct SMemoryBlockCache
 	{
 		struct SMemoryCacheType
@@ -364,7 +345,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 			std::vector<SMemoryCacheHeap *> m_vpMemoryHeaps;
 		};
 		SMemoryCacheType m_MemoryCaches;
-		std::vector<std::vector<SMemoryBlock<Id>>> m_vvFrameDelayedCachedBufferCleanup;
+		std::vector<std::vector<SMemoryBlock<ID>>> m_vvFrameDelayedCachedBufferCleanup;
 
 		bool m_CanShrink = false;
 
@@ -411,7 +392,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 			m_vvFrameDelayedCachedBufferCleanup[ImgIndex].clear();
 		}
 
-		void FreeMemBlock(SMemoryBlock<Id> &Block, size_t ImgIndex)
+		void FreeMemBlock(SMemoryBlock<ID> &Block, size_t ImgIndex)
 		{
 			m_vvFrameDelayedCachedBufferCleanup[ImgIndex].push_back(Block);
 		}
@@ -455,12 +436,12 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 	struct CTexture
 	{
 		VkImage m_Img = VK_NULL_HANDLE;
-		SMemoryImageBlock<s_ImageBufferCacheId> m_ImgMem;
+		SMemoryImageBlock<s_ImageBufferCacheID> m_ImgMem;
 		VkImageView m_ImgView = VK_NULL_HANDLE;
 		VkSampler m_aSamplers[2] = {VK_NULL_HANDLE, VK_NULL_HANDLE};
 
 		VkImage m_Img3D = VK_NULL_HANDLE;
-		SMemoryImageBlock<s_ImageBufferCacheId> m_Img3DMem;
+		SMemoryImageBlock<s_ImageBufferCacheID> m_Img3DMem;
 		VkImageView m_Img3DView = VK_NULL_HANDLE;
 		VkSampler m_Sampler3D = VK_NULL_HANDLE;
 
@@ -477,7 +458,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 
 	struct SBufferObject
 	{
-		SMemoryBlock<s_VertexBufferCacheId> m_Mem;
+		SMemoryBlock<s_VertexBufferCacheID> m_Mem;
 	};
 
 	struct SBufferObjectFrame
@@ -502,9 +483,9 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 		size_t m_OffsetInBuffer = 0;
 		size_t m_Size;
 		size_t m_UsedSize;
-		uint8_t *m_pMappedBufferData;
+		void *m_pMappedBufferData;
 
-		SFrameBuffers(VkBuffer Buffer, SDeviceMemoryBlock BufferMem, size_t OffsetInBuffer, size_t Size, size_t UsedSize, uint8_t *pMappedBufferData) :
+		SFrameBuffers(VkBuffer Buffer, SDeviceMemoryBlock BufferMem, size_t OffsetInBuffer, size_t Size, size_t UsedSize, void *pMappedBufferData) :
 			m_Buffer(Buffer), m_BufferMem(BufferMem), m_OffsetInBuffer(OffsetInBuffer), m_Size(Size), m_UsedSize(UsedSize), m_pMappedBufferData(pMappedBufferData)
 		{
 		}
@@ -514,7 +495,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 	{
 		std::array<SDeviceDescriptorSet, 2> m_aUniformSets;
 
-		SFrameUniformBuffers(VkBuffer Buffer, SDeviceMemoryBlock BufferMem, size_t OffsetInBuffer, size_t Size, size_t UsedSize, uint8_t *pMappedBufferData) :
+		SFrameUniformBuffers(VkBuffer Buffer, SDeviceMemoryBlock BufferMem, size_t OffsetInBuffer, size_t Size, size_t UsedSize, void *pMappedBufferData) :
 			SFrameBuffers(Buffer, BufferMem, OffsetInBuffer, Size, UsedSize, pMappedBufferData) {}
 	};
 
@@ -865,7 +846,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 	struct SSwapChainMultiSampleImage
 	{
 		VkImage m_Image = VK_NULL_HANDLE;
-		SMemoryImageBlock<s_ImageBufferCacheId> m_ImgMem;
+		SMemoryImageBlock<s_ImageBufferCacheID> m_ImgMem;
 		VkImageView m_ImgView = VK_NULL_HANDLE;
 	};
 
@@ -875,10 +856,10 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 
 	std::unordered_map<std::string, SShaderFileCache> m_ShaderFiles;
 
-	SMemoryBlockCache<s_StagingBufferCacheId> m_StagingBufferCache;
-	SMemoryBlockCache<s_StagingBufferImageCacheId> m_StagingBufferCacheImage;
-	SMemoryBlockCache<s_VertexBufferCacheId> m_VertexBufferCache;
-	std::map<uint32_t, SMemoryBlockCache<s_ImageBufferCacheId>> m_ImageBufferCaches;
+	SMemoryBlockCache<s_StagingBufferCacheID> m_StagingBufferCache;
+	SMemoryBlockCache<s_StagingBufferImageCacheID> m_StagingBufferCacheImage;
+	SMemoryBlockCache<s_VertexBufferCacheID> m_VertexBufferCache;
+	std::map<uint32_t, SMemoryBlockCache<s_ImageBufferCacheID>> m_ImageBufferCaches;
 
 	std::vector<VkMappedMemoryRange> m_vNonFlushedStagingBufferRange;
 
@@ -889,7 +870,7 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 	std::atomic<uint64_t> *m_pStreamMemoryUsage;
 	std::atomic<uint64_t> *m_pStagingMemoryUsage;
 
-	TTwGraphicsGpuList *m_pGpuList;
+	TTWGraphicsGPUList *m_pGPUList;
 
 	int m_GlobalTextureLodBIAS;
 	uint32_t m_MultiSamplingCount = 1;
@@ -923,7 +904,6 @@ class CCommandProcessorFragment_Vulkan : public CCommandProcessorFragment_GLBase
 
 	uint32_t m_MinUniformAlign;
 
-	std::vector<uint8_t> m_vReadPixelHelper;
 	std::vector<uint8_t> m_vScreenshotHelper;
 
 	SDeviceMemoryBlock m_GetPresentedImgDataHelperMem;
@@ -985,6 +965,8 @@ private:
 	// swapped by use case
 	std::vector<VkSemaphore> m_vWaitSemaphores;
 	std::vector<VkSemaphore> m_vSigSemaphores;
+
+	std::vector<VkSemaphore> m_vMemorySemaphores;
 
 	std::vector<VkFence> m_vFrameFences;
 	std::vector<VkFence> m_vImagesFences;
@@ -1051,7 +1033,7 @@ private:
 	std::vector<SStreamMemory<SFrameBuffers>> m_vStreamedVertexBuffers;
 	std::vector<SStreamMemory<SFrameUniformBuffers>> m_vStreamedUniformBuffers;
 
-	uint32_t m_CurFrameSyncObject = 0;
+	uint32_t m_CurFrames = 0;
 	uint32_t m_CurImageIndex = 0;
 
 	uint32_t m_CanvasWidth;
@@ -1263,6 +1245,7 @@ protected:
 	{
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXTURE_CREATE)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_Texture_Create(static_cast<const CCommandBuffer::SCommand_Texture_Create *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXTURE_DESTROY)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_Texture_Destroy(static_cast<const CCommandBuffer::SCommand_Texture_Destroy *>(pBaseCommand)); }};
+		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXTURE_UPDATE)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_Texture_Update(static_cast<const CCommandBuffer::SCommand_Texture_Update *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXT_TEXTURES_CREATE)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_TextTextures_Create(static_cast<const CCommandBuffer::SCommand_TextTextures_Create *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXT_TEXTURES_DESTROY)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_TextTextures_Destroy(static_cast<const CCommandBuffer::SCommand_TextTextures_Destroy *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TEXT_TEXTURE_UPDATE)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_TextTexture_Update(static_cast<const CCommandBuffer::SCommand_TextTexture_Update *>(pBaseCommand)); }};
@@ -1295,7 +1278,6 @@ protected:
 
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_VSYNC)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_VSync(static_cast<const CCommandBuffer::SCommand_VSync *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_MULTISAMPLING)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_MultiSampling(static_cast<const CCommandBuffer::SCommand_MultiSampling *>(pBaseCommand)); }};
-		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TRY_SWAP_AND_READ_PIXEL)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_ReadPixel(static_cast<const CCommandBuffer::SCommand_TrySwapAndReadPixel *>(pBaseCommand)); }};
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_TRY_SWAP_AND_SCREENSHOT)] = {false, [](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) {}, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_Screenshot(static_cast<const CCommandBuffer::SCommand_TrySwapAndScreenshot *>(pBaseCommand)); }};
 
 		m_aCommandCallbacks[CommandBufferCMDOff(CCommandBuffer::CMD_UPDATE_VIEWPORT)] = {false, [this](SRenderCommandExecuteBuffer &ExecBuffer, const CCommandBuffer::SCommand *pBaseCommand) { Cmd_Update_Viewport_FillExecuteBuffer(ExecBuffer, static_cast<const CCommandBuffer::SCommand_Update_Viewport *>(pBaseCommand)); }, [this](const CCommandBuffer::SCommand *pBaseCommand, SRenderCommandExecuteBuffer &ExecBuffer) { return Cmd_Update_Viewport(static_cast<const CCommandBuffer::SCommand_Update_Viewport *>(pBaseCommand)); }};
@@ -1396,29 +1378,15 @@ protected:
 		}
 	}
 
-	[[nodiscard]] bool GetPresentedImageDataImpl(uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData, bool ResetAlpha, std::optional<ivec2> PixelOffset)
+	[[nodiscard]] bool GetPresentedImageDataImpl(uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData, bool FlipImgData, bool ResetAlpha)
 	{
 		bool IsB8G8R8A8 = m_VKSurfFormat.format == VK_FORMAT_B8G8R8A8_UNORM;
 		bool UsesRGBALikeFormat = m_VKSurfFormat.format == VK_FORMAT_R8G8B8A8_UNORM || IsB8G8R8A8;
 		if(UsesRGBALikeFormat && m_LastPresentedSwapChainImageIndex != std::numeric_limits<decltype(m_LastPresentedSwapChainImageIndex)>::max())
 		{
 			auto Viewport = m_VKSwapImgAndViewportExtent.GetPresentedImageViewport();
-			VkOffset3D SrcOffset;
-			if(PixelOffset.has_value())
-			{
-				SrcOffset.x = PixelOffset.value().x;
-				SrcOffset.y = PixelOffset.value().y;
-				Width = 1;
-				Height = 1;
-			}
-			else
-			{
-				SrcOffset.x = 0;
-				SrcOffset.y = 0;
-				Width = Viewport.width;
-				Height = Viewport.height;
-			}
-			SrcOffset.z = 0;
+			Width = Viewport.width;
+			Height = Viewport.height;
 			Format = CImageInfo::FORMAT_RGBA;
 
 			const size_t ImageTotalSize = (size_t)Width * Height * CImageInfo::PixelSize(Format);
@@ -1431,6 +1399,17 @@ protected:
 			if(!GetMemoryCommandBuffer(pCommandBuffer))
 				return false;
 			VkCommandBuffer &CommandBuffer = *pCommandBuffer;
+
+			VkBufferImageCopy Region{};
+			Region.bufferOffset = 0;
+			Region.bufferRowLength = 0;
+			Region.bufferImageHeight = 0;
+			Region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			Region.imageSubresource.mipLevel = 0;
+			Region.imageSubresource.baseArrayLayer = 0;
+			Region.imageSubresource.layerCount = 1;
+			Region.imageOffset = {0, 0, 0};
+			Region.imageExtent = {Viewport.width, Viewport.height, 1};
 
 			auto &SwapImg = m_vSwapChainImages[m_LastPresentedSwapChainImageIndex];
 
@@ -1446,12 +1425,10 @@ protected:
 				BlitSize.x = Width;
 				BlitSize.y = Height;
 				BlitSize.z = 1;
-
 				VkImageBlit ImageBlitRegion{};
 				ImageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				ImageBlitRegion.srcSubresource.layerCount = 1;
-				ImageBlitRegion.srcOffsets[0] = SrcOffset;
-				ImageBlitRegion.srcOffsets[1] = {SrcOffset.x + BlitSize.x, SrcOffset.y + BlitSize.y, SrcOffset.z + BlitSize.z};
+				ImageBlitRegion.srcOffsets[1] = BlitSize;
 				ImageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				ImageBlitRegion.dstSubresource.layerCount = 1;
 				ImageBlitRegion.dstOffsets[1] = BlitSize;
@@ -1470,7 +1447,6 @@ protected:
 				VkImageCopy ImageCopyRegion{};
 				ImageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				ImageCopyRegion.srcSubresource.layerCount = 1;
-				ImageCopyRegion.srcOffset = SrcOffset;
 				ImageCopyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				ImageCopyRegion.dstSubresource.layerCount = 1;
 				ImageCopyRegion.extent.width = Width;
@@ -1493,6 +1469,7 @@ protected:
 
 			VkSubmitInfo SubmitInfo{};
 			SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
 			SubmitInfo.commandBufferCount = 1;
 			SubmitInfo.pCommandBuffers = &CommandBuffer;
 
@@ -1508,9 +1485,8 @@ protected:
 			vkInvalidateMappedMemoryRanges(m_VKDevice, 1, &MemRange);
 
 			size_t RealFullImageSize = maximum(ImageTotalSize, (size_t)(Height * m_GetPresentedImgDataHelperMappedLayoutPitch));
-			size_t ExtraRowSize = Width * 4;
-			if(vDstData.size() < RealFullImageSize + ExtraRowSize)
-				vDstData.resize(RealFullImageSize + ExtraRowSize);
+			if(vDstData.size() < RealFullImageSize + (Width * 4))
+				vDstData.resize(RealFullImageSize + (Width * 4)); // extra space for flipping
 
 			mem_copy(vDstData.data(), pResImageData, RealFullImageSize);
 
@@ -1521,8 +1497,7 @@ protected:
 				{
 					size_t OffsetImagePacked = (Y * Width * 4);
 					size_t OffsetImageUnpacked = (Y * m_GetPresentedImgDataHelperMappedLayoutPitch);
-					mem_copy(vDstData.data() + RealFullImageSize, vDstData.data() + OffsetImageUnpacked, Width * 4);
-					mem_copy(vDstData.data() + OffsetImagePacked, vDstData.data() + RealFullImageSize, Width * 4);
+					mem_copy(vDstData.data() + OffsetImagePacked, vDstData.data() + OffsetImageUnpacked, Width * 4);
 				}
 			}
 
@@ -1540,6 +1515,17 @@ protected:
 						}
 						vDstData[ImgOff + 3] = 255;
 					}
+				}
+			}
+
+			if(FlipImgData)
+			{
+				uint8_t *pTempRow = vDstData.data() + Width * Height * 4;
+				for(uint32_t Y = 0; Y < Height / 2; ++Y)
+				{
+					mem_copy(pTempRow, vDstData.data() + Y * Width * 4, Width * 4);
+					mem_copy(vDstData.data() + Y * Width * 4, vDstData.data() + ((Height - Y) - 1) * Width * 4, Width * 4);
+					mem_copy(vDstData.data() + ((Height - Y) - 1) * Width * 4, pTempRow, Width * 4);
 				}
 			}
 
@@ -1561,7 +1547,7 @@ protected:
 
 	[[nodiscard]] bool GetPresentedImageData(uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData) override
 	{
-		return GetPresentedImageDataImpl(Width, Height, Format, vDstData, false, {});
+		return GetPresentedImageDataImpl(Width, Height, Format, vDstData, false, false);
 	}
 
 	/************************
@@ -1599,10 +1585,10 @@ protected:
 		return CreateBuffer(RequiredSize, MemUsage, BufferUsage, BufferProperties, Buffer, BufferMemory);
 	}
 
-	template<size_t Id,
+	template<size_t ID,
 		int64_t MemoryBlockSize, size_t BlockCount,
 		bool RequiresMapping>
-	[[nodiscard]] bool GetBufferBlockImpl(SMemoryBlock<Id> &RetBlock, SMemoryBlockCache<Id> &MemoryCache, VkBufferUsageFlags BufferUsage, VkMemoryPropertyFlags BufferProperties, const void *pBufferData, VkDeviceSize RequiredSize, VkDeviceSize TargetAlignment)
+	[[nodiscard]] bool GetBufferBlockImpl(SMemoryBlock<ID> &RetBlock, SMemoryBlockCache<ID> &MemoryCache, VkBufferUsageFlags BufferUsage, VkMemoryPropertyFlags BufferProperties, const void *pBufferData, VkDeviceSize RequiredSize, VkDeviceSize TargetAlignment)
 	{
 		bool Res = true;
 
@@ -1610,7 +1596,7 @@ protected:
 			bool FoundAllocation = false;
 			SMemoryHeap::SMemoryHeapQueueElement AllocatedMem;
 			SDeviceMemoryBlock TmpBufferMemory;
-			typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap *pCacheHeap = nullptr;
+			typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap *pCacheHeap = nullptr;
 			auto &Heaps = MemoryCache.m_MemoryCaches.m_vpMemoryHeaps;
 			for(size_t i = 0; i < Heaps.size(); ++i)
 			{
@@ -1625,7 +1611,7 @@ protected:
 			}
 			if(!FoundAllocation)
 			{
-				typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap *pNewHeap = new typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap();
+				typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap *pNewHeap = new typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap();
 
 				VkBuffer TmpBuffer;
 				if(!GetBufferImpl(MemoryBlockSize * BlockCount, RequiresMapping ? MEMORY_BLOCK_USAGE_STAGING : MEMORY_BLOCK_USAGE_BUFFER, TmpBuffer, TmpBufferMemory, BufferUsage, BufferProperties))
@@ -1711,18 +1697,18 @@ protected:
 		return Res;
 	}
 
-	[[nodiscard]] bool GetStagingBuffer(SMemoryBlock<s_StagingBufferCacheId> &ResBlock, const void *pBufferData, VkDeviceSize RequiredSize)
+	[[nodiscard]] bool GetStagingBuffer(SMemoryBlock<s_StagingBufferCacheID> &ResBlock, const void *pBufferData, VkDeviceSize RequiredSize)
 	{
-		return GetBufferBlockImpl<s_StagingBufferCacheId, 8 * 1024 * 1024, 3, true>(ResBlock, m_StagingBufferCache, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, pBufferData, RequiredSize, maximum<VkDeviceSize>(m_NonCoherentMemAlignment, 16));
+		return GetBufferBlockImpl<s_StagingBufferCacheID, 8 * 1024 * 1024, 3, true>(ResBlock, m_StagingBufferCache, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, pBufferData, RequiredSize, maximum<VkDeviceSize>(m_NonCoherentMemAlignment, 16));
 	}
 
-	[[nodiscard]] bool GetStagingBufferImage(SMemoryBlock<s_StagingBufferImageCacheId> &ResBlock, const void *pBufferData, VkDeviceSize RequiredSize)
+	[[nodiscard]] bool GetStagingBufferImage(SMemoryBlock<s_StagingBufferImageCacheID> &ResBlock, const void *pBufferData, VkDeviceSize RequiredSize)
 	{
-		return GetBufferBlockImpl<s_StagingBufferImageCacheId, 8 * 1024 * 1024, 3, true>(ResBlock, m_StagingBufferCacheImage, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, pBufferData, RequiredSize, maximum<VkDeviceSize>(m_OptimalImageCopyMemAlignment, maximum<VkDeviceSize>(m_NonCoherentMemAlignment, 16)));
+		return GetBufferBlockImpl<s_StagingBufferImageCacheID, 8 * 1024 * 1024, 3, true>(ResBlock, m_StagingBufferCacheImage, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, pBufferData, RequiredSize, maximum<VkDeviceSize>(m_OptimalImageCopyMemAlignment, maximum<VkDeviceSize>(m_NonCoherentMemAlignment, 16)));
 	}
 
-	template<size_t Id>
-	void PrepareStagingMemRange(SMemoryBlock<Id> &Block)
+	template<size_t ID>
+	void PrepareStagingMemRange(SMemoryBlock<ID> &Block)
 	{
 		VkMappedMemoryRange UploadRange{};
 		UploadRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -1741,7 +1727,7 @@ protected:
 		m_vNonFlushedStagingBufferRange.push_back(UploadRange);
 	}
 
-	void UploadAndFreeStagingMemBlock(SMemoryBlock<s_StagingBufferCacheId> &Block)
+	void UploadAndFreeStagingMemBlock(SMemoryBlock<s_StagingBufferCacheID> &Block)
 	{
 		PrepareStagingMemRange(Block);
 		if(!Block.m_IsCached)
@@ -1754,7 +1740,7 @@ protected:
 		}
 	}
 
-	void UploadAndFreeStagingImageMemBlock(SMemoryBlock<s_StagingBufferImageCacheId> &Block)
+	void UploadAndFreeStagingImageMemBlock(SMemoryBlock<s_StagingBufferImageCacheID> &Block)
 	{
 		PrepareStagingMemRange(Block);
 		if(!Block.m_IsCached)
@@ -1767,12 +1753,12 @@ protected:
 		}
 	}
 
-	[[nodiscard]] bool GetVertexBuffer(SMemoryBlock<s_VertexBufferCacheId> &ResBlock, VkDeviceSize RequiredSize)
+	[[nodiscard]] bool GetVertexBuffer(SMemoryBlock<s_VertexBufferCacheID> &ResBlock, VkDeviceSize RequiredSize)
 	{
-		return GetBufferBlockImpl<s_VertexBufferCacheId, 8 * 1024 * 1024, 3, false>(ResBlock, m_VertexBufferCache, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, nullptr, RequiredSize, 16);
+		return GetBufferBlockImpl<s_VertexBufferCacheID, 8 * 1024 * 1024, 3, false>(ResBlock, m_VertexBufferCache, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, nullptr, RequiredSize, 16);
 	}
 
-	void FreeVertexMemBlock(SMemoryBlock<s_VertexBufferCacheId> &Block)
+	void FreeVertexMemBlock(SMemoryBlock<s_VertexBufferCacheID> &Block)
 	{
 		if(!Block.m_IsCached)
 		{
@@ -1824,15 +1810,15 @@ protected:
 		return true;
 	}
 
-	template<size_t Id,
+	template<size_t ID,
 		int64_t MemoryBlockSize, size_t BlockCount>
-	[[nodiscard]] bool GetImageMemoryBlockImpl(SMemoryImageBlock<Id> &RetBlock, SMemoryBlockCache<Id> &MemoryCache, VkMemoryPropertyFlags BufferProperties, VkDeviceSize RequiredSize, VkDeviceSize RequiredAlignment, uint32_t RequiredMemoryTypeBits)
+	[[nodiscard]] bool GetImageMemoryBlockImpl(SMemoryImageBlock<ID> &RetBlock, SMemoryBlockCache<ID> &MemoryCache, VkMemoryPropertyFlags BufferProperties, VkDeviceSize RequiredSize, VkDeviceSize RequiredAlignment, uint32_t RequiredMemoryTypeBits)
 	{
 		auto &&CreateCacheBlock = [&]() -> bool {
 			bool FoundAllocation = false;
 			SMemoryHeap::SMemoryHeapQueueElement AllocatedMem;
 			SDeviceMemoryBlock TmpBufferMemory;
-			typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap *pCacheHeap = nullptr;
+			typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap *pCacheHeap = nullptr;
 			for(size_t i = 0; i < MemoryCache.m_MemoryCaches.m_vpMemoryHeaps.size(); ++i)
 			{
 				auto *pHeap = MemoryCache.m_MemoryCaches.m_vpMemoryHeaps[i];
@@ -1846,7 +1832,7 @@ protected:
 			}
 			if(!FoundAllocation)
 			{
-				typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap *pNewHeap = new typename SMemoryBlockCache<Id>::SMemoryCacheType::SMemoryCacheHeap();
+				typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap *pNewHeap = new typename SMemoryBlockCache<ID>::SMemoryCacheType::SMemoryCacheHeap();
 
 				if(!GetImageMemoryImpl(MemoryBlockSize * BlockCount, RequiredMemoryTypeBits, TmpBufferMemory, BufferProperties))
 				{
@@ -1906,7 +1892,7 @@ protected:
 		return true;
 	}
 
-	[[nodiscard]] bool GetImageMemory(SMemoryImageBlock<s_ImageBufferCacheId> &RetBlock, VkDeviceSize RequiredSize, VkDeviceSize RequiredAlignment, uint32_t RequiredMemoryTypeBits)
+	[[nodiscard]] bool GetImageMemory(SMemoryImageBlock<s_ImageBufferCacheID> &RetBlock, VkDeviceSize RequiredSize, VkDeviceSize RequiredAlignment, uint32_t RequiredMemoryTypeBits)
 	{
 		auto it = m_ImageBufferCaches.find(RequiredMemoryTypeBits);
 		if(it == m_ImageBufferCaches.end())
@@ -1915,10 +1901,10 @@ protected:
 
 			it->second.Init(m_SwapChainImageCount);
 		}
-		return GetImageMemoryBlockImpl<s_ImageBufferCacheId, s_1024x1024ImgSize, 2>(RetBlock, it->second, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, RequiredSize, RequiredAlignment, RequiredMemoryTypeBits);
+		return GetImageMemoryBlockImpl<s_ImageBufferCacheID, s_1024x1024ImgSize, 2>(RetBlock, it->second, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, RequiredSize, RequiredAlignment, RequiredMemoryTypeBits);
 	}
 
-	void FreeImageMemBlock(SMemoryImageBlock<s_ImageBufferCacheId> &Block)
+	void FreeImageMemBlock(SMemoryImageBlock<s_ImageBufferCacheID> &Block)
 	{
 		if(!Block.m_IsCached)
 		{
@@ -1985,7 +1971,7 @@ protected:
 
 			if(IsVerbose())
 			{
-				VerboseDeallocatedMemory(BufferMem.m_Size, ImageIndex, BufferMem.m_UsageType);
+				VerboseDeallocatedMemory(BufferMem.m_Size, (size_t)ImageIndex, BufferMem.m_UsageType);
 			}
 
 			BufferMem.m_Mem = VK_NULL_HANDLE;
@@ -2082,7 +2068,7 @@ protected:
 			m_pStagingMemoryUsage->store(m_pStagingMemoryUsage->load(std::memory_order_relaxed) - FreeedMemory, std::memory_order_relaxed);
 			if(IsVerbose())
 			{
-				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (staging buffer)", FreeedMemory);
+				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (staging buffer)", (size_t)FreeedMemory);
 			}
 		}
 		FreeedMemory = 0;
@@ -2092,7 +2078,7 @@ protected:
 			m_pBufferMemoryUsage->store(m_pBufferMemoryUsage->load(std::memory_order_relaxed) - FreeedMemory, std::memory_order_relaxed);
 			if(IsVerbose())
 			{
-				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (buffer)", FreeedMemory);
+				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (buffer)", (size_t)FreeedMemory);
 			}
 		}
 		FreeedMemory = 0;
@@ -2103,7 +2089,7 @@ protected:
 			m_pTextureMemoryUsage->store(m_pTextureMemoryUsage->load(std::memory_order_relaxed) - FreeedMemory, std::memory_order_relaxed);
 			if(IsVerbose())
 			{
-				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (texture)", FreeedMemory);
+				dbg_msg("vulkan", "deallocated chunks of memory with size: %" PRIzu " from all frames (texture)", (size_t)FreeedMemory);
 			}
 		}
 	}
@@ -2274,7 +2260,7 @@ protected:
 			return false;
 		}
 
-		VkSemaphore WaitSemaphore = m_vWaitSemaphores[m_CurFrameSyncObject];
+		VkSemaphore WaitSemaphore = m_vWaitSemaphores[m_CurFrames];
 
 		VkSubmitInfo SubmitInfo{};
 		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -2303,13 +2289,13 @@ protected:
 		SubmitInfo.pWaitSemaphores = aWaitSemaphores.data();
 		SubmitInfo.pWaitDstStageMask = aWaitStages.data();
 
-		std::array<VkSemaphore, 1> aSignalSemaphores = {m_vSigSemaphores[m_CurFrameSyncObject]};
+		std::array<VkSemaphore, 1> aSignalSemaphores = {m_vSigSemaphores[m_CurFrames]};
 		SubmitInfo.signalSemaphoreCount = aSignalSemaphores.size();
 		SubmitInfo.pSignalSemaphores = aSignalSemaphores.data();
 
-		vkResetFences(m_VKDevice, 1, &m_vFrameFences[m_CurFrameSyncObject]);
+		vkResetFences(m_VKDevice, 1, &m_vFrameFences[m_CurFrames]);
 
-		VkResult QueueSubmitRes = vkQueueSubmit(m_VKGraphicsQueue, 1, &SubmitInfo, m_vFrameFences[m_CurFrameSyncObject]);
+		VkResult QueueSubmitRes = vkQueueSubmit(m_VKGraphicsQueue, 1, &SubmitInfo, m_vFrameFences[m_CurFrames]);
 		if(QueueSubmitRes != VK_SUCCESS)
 		{
 			const char *pCritErrorMsg = CheckVulkanCriticalError(QueueSubmitRes);
@@ -2320,7 +2306,7 @@ protected:
 			}
 		}
 
-		std::swap(m_vWaitSemaphores[m_CurFrameSyncObject], m_vSigSemaphores[m_CurFrameSyncObject]);
+		std::swap(m_vWaitSemaphores[m_CurFrames], m_vSigSemaphores[m_CurFrames]);
 
 		VkPresentInfoKHR PresentInfo{};
 		PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -2347,7 +2333,7 @@ protected:
 			}
 		}
 
-		m_CurFrameSyncObject = (m_CurFrameSyncObject + 1) % m_vWaitSemaphores.size();
+		m_CurFrames = (m_CurFrames + 1) % m_SwapChainImageCount;
 		return true;
 	}
 
@@ -2363,7 +2349,7 @@ protected:
 			RecreateSwapChain();
 		}
 
-		auto AcqResult = vkAcquireNextImageKHR(m_VKDevice, m_VKSwapChain, std::numeric_limits<uint64_t>::max(), m_vSigSemaphores[m_CurFrameSyncObject], VK_NULL_HANDLE, &m_CurImageIndex);
+		auto AcqResult = vkAcquireNextImageKHR(m_VKDevice, m_VKSwapChain, std::numeric_limits<uint64_t>::max(), m_vSigSemaphores[m_CurFrames], VK_NULL_HANDLE, &m_CurImageIndex);
 		if(AcqResult != VK_SUCCESS)
 		{
 			if(AcqResult == VK_ERROR_OUT_OF_DATE_KHR || m_RecreateSwapChain)
@@ -2394,13 +2380,13 @@ protected:
 				}
 			}
 		}
-		std::swap(m_vWaitSemaphores[m_CurFrameSyncObject], m_vSigSemaphores[m_CurFrameSyncObject]);
+		std::swap(m_vWaitSemaphores[m_CurFrames], m_vSigSemaphores[m_CurFrames]);
 
 		if(m_vImagesFences[m_CurImageIndex] != VK_NULL_HANDLE)
 		{
 			vkWaitForFences(m_VKDevice, 1, &m_vImagesFences[m_CurImageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
 		}
-		m_vImagesFences[m_CurImageIndex] = m_vFrameFences[m_CurFrameSyncObject];
+		m_vImagesFences[m_CurImageIndex] = m_vFrameFences[m_CurFrames];
 
 		// next frame
 		m_CurFrame++;
@@ -2527,10 +2513,10 @@ protected:
 		return 4;
 	}
 
-	[[nodiscard]] bool UpdateTexture(size_t TextureSlot, VkFormat Format, uint8_t *&pData, int64_t XOff, int64_t YOff, size_t Width, size_t Height)
+	[[nodiscard]] bool UpdateTexture(size_t TextureSlot, VkFormat Format, void *&pData, int64_t XOff, int64_t YOff, size_t Width, size_t Height)
 	{
 		const size_t ImageSize = Width * Height * VulkanFormatToPixelSize(Format);
-		SMemoryBlock<s_StagingBufferImageCacheId> StagingBuffer;
+		SMemoryBlock<s_StagingBufferImageCacheID> StagingBuffer;
 		if(!GetStagingBufferImage(StagingBuffer, pData, ImageSize))
 			return false;
 
@@ -2547,7 +2533,7 @@ protected:
 				YOff /= 2;
 			}
 
-			uint8_t *pTmpData = ResizeImage(pData, Width, Height, Width, Height, VulkanFormatToPixelSize(Format));
+			void *pTmpData = Resize((const uint8_t *)pData, Width, Height, Width, Height, VulkanFormatToPixelSize(Format));
 			free(pData);
 			pData = pTmpData;
 		}
@@ -2580,7 +2566,7 @@ protected:
 		VkFormat Format,
 		VkFormat StoreFormat,
 		int Flags,
-		uint8_t *&pData)
+		void *&pData)
 	{
 		size_t ImageIndex = (size_t)Slot;
 		const size_t PixelSize = VulkanFormatToPixelSize(Format);
@@ -2601,7 +2587,7 @@ protected:
 				++RescaleCount;
 			} while((size_t)Width > m_MaxTextureSize || (size_t)Height > m_MaxTextureSize);
 
-			uint8_t *pTmpData = ResizeImage(pData, Width, Height, Width, Height, PixelSize);
+			void *pTmpData = Resize((const uint8_t *)(pData), Width, Height, Width, Height, PixelSize);
 			free(pData);
 			pData = pTmpData;
 		}
@@ -2656,7 +2642,7 @@ protected:
 				dbg_msg("vulkan", "3D/2D array texture was resized");
 				int NewWidth = maximum<int>(HighestBit(ConvertWidth), 16);
 				int NewHeight = maximum<int>(HighestBit(ConvertHeight), 16);
-				uint8_t *pNewTexData = ResizeImage(pData, ConvertWidth, ConvertHeight, NewWidth, NewHeight, PixelSize);
+				uint8_t *pNewTexData = (uint8_t *)Resize((const uint8_t *)pData, ConvertWidth, ConvertHeight, NewWidth, NewHeight, PixelSize);
 
 				ConvertWidth = NewWidth;
 				ConvertHeight = NewHeight;
@@ -2666,7 +2652,7 @@ protected:
 			}
 
 			bool Needs3DTexDel = false;
-			uint8_t *p3DTexData = static_cast<uint8_t *>(malloc((size_t)PixelSize * ConvertWidth * ConvertHeight));
+			void *p3DTexData = malloc((size_t)PixelSize * ConvertWidth * ConvertHeight);
 			if(!Texture2DTo3D(pData, ConvertWidth, ConvertHeight, PixelSize, 16, 16, p3DTexData, Image3DWidth, Image3DHeight))
 			{
 				free(p3DTexData);
@@ -2701,6 +2687,13 @@ protected:
 			}
 		}
 		return true;
+	}
+
+	VkFormat TextureFormatToVulkanFormat(int TexFormat)
+	{
+		if(TexFormat == CCommandBuffer::TEXFORMAT_RGBA)
+			return VK_FORMAT_R8G8B8A8_UNORM;
+		return VK_FORMAT_R8G8B8A8_UNORM;
 	}
 
 	[[nodiscard]] bool BuildMipmaps(VkImage Image, VkFormat ImageFormat, size_t Width, size_t Height, size_t Depth, size_t MipMapLevelCount)
@@ -2785,11 +2778,11 @@ protected:
 		return true;
 	}
 
-	[[nodiscard]] bool CreateTextureImage(size_t ImageIndex, VkImage &NewImage, SMemoryImageBlock<s_ImageBufferCacheId> &NewImgMem, const uint8_t *pData, VkFormat Format, size_t Width, size_t Height, size_t Depth, size_t PixelSize, size_t MipMapLevelCount)
+	[[nodiscard]] bool CreateTextureImage(size_t ImageIndex, VkImage &NewImage, SMemoryImageBlock<s_ImageBufferCacheID> &NewImgMem, const void *pData, VkFormat Format, size_t Width, size_t Height, size_t Depth, size_t PixelSize, size_t MipMapLevelCount)
 	{
-		VkDeviceSize ImageSize = Width * Height * Depth * PixelSize;
+		int ImageSize = Width * Height * Depth * PixelSize;
 
-		SMemoryBlock<s_StagingBufferImageCacheId> StagingBuffer;
+		SMemoryBlock<s_StagingBufferImageCacheID> StagingBuffer;
 		if(!GetStagingBufferImage(StagingBuffer, pData, ImageSize))
 			return false;
 
@@ -2895,7 +2888,7 @@ protected:
 		return ImageView;
 	}
 
-	[[nodiscard]] bool CreateImage(uint32_t Width, uint32_t Height, uint32_t Depth, size_t MipMapLevelCount, VkFormat Format, VkImageTiling Tiling, VkImage &Image, SMemoryImageBlock<s_ImageBufferCacheId> &ImageMemory, VkImageUsageFlags ImageUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
+	[[nodiscard]] bool CreateImage(uint32_t Width, uint32_t Height, uint32_t Depth, size_t MipMapLevelCount, VkFormat Format, VkImageTiling Tiling, VkImage &Image, SMemoryImageBlock<s_ImageBufferCacheID> &ImageMemory, VkImageUsageFlags ImageUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
 	{
 		VkImageCreateInfo ImageInfo{};
 		ImageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -3080,11 +3073,11 @@ protected:
 		size_t BufferOffset = 0;
 		if(!IsOneFrameBuffer)
 		{
-			SMemoryBlock<s_StagingBufferCacheId> StagingBuffer;
+			SMemoryBlock<s_StagingBufferCacheID> StagingBuffer;
 			if(!GetStagingBuffer(StagingBuffer, pUploadData, BufferDataSize))
 				return false;
 
-			SMemoryBlock<s_VertexBufferCacheId> Mem;
+			SMemoryBlock<s_VertexBufferCacheID> Mem;
 			if(!GetVertexBuffer(Mem, BufferDataSize))
 				return false;
 
@@ -3286,7 +3279,7 @@ protected:
 			else
 			{
 				Scissor.offset = {0, 0};
-				Scissor.extent = {ScissorViewport.width, ScissorViewport.height};
+				Scissor.extent = {(uint32_t)ScissorViewport.width, (uint32_t)ScissorViewport.height};
 			}
 
 			// if there is a dynamic viewport make sure the scissor data is scaled down to that
@@ -3402,7 +3395,7 @@ protected:
 		vkCmdPushConstants(CommandBuffer, PipeLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, VertexPushConstantSize, &VertexPushConstants);
 		vkCmdPushConstants(CommandBuffer, PipeLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(SUniformTileGPosBorder) + sizeof(SUniformTileGVertColorAlign), FragPushConstantSize, &FragPushConstants);
 
-		size_t DrawCount = IndicesDrawNum;
+		size_t DrawCount = (size_t)IndicesDrawNum;
 		vkCmdBindIndexBuffer(CommandBuffer, ExecBuffer.m_IndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 		for(size_t i = 0; i < DrawCount; ++i)
 		{
@@ -3574,22 +3567,6 @@ public:
 		return true;
 	}
 
-	bool IsGpuDenied(uint32_t Vendor, uint32_t DriverVersion, uint32_t ApiMajor, uint32_t ApiMinor, uint32_t ApiPatch)
-	{
-#ifdef CONF_FAMILY_WINDOWS
-		// AMD
-		if(0x1002 == Vendor)
-		{
-			auto Major = (DriverVersion >> 22);
-			auto Minor = (DriverVersion >> 12) & 0x3ff;
-			auto Patch = DriverVersion & 0xfff;
-
-			return Major == 2 && Minor == 0 && Patch > 116 && Patch < 220 && ((ApiMajor <= 1 && ApiMinor < 3) || (ApiMajor <= 1 && ApiMinor == 3 && ApiPatch < 206));
-		}
-#endif
-		return false;
-	}
-
 	[[nodiscard]] bool CreateVulkanInstance(const std::vector<std::string> &vVKLayers, const std::vector<std::string> &vVKExtensions, bool TryDebugExtensions)
 	{
 		std::vector<const char *> vLayersCStr;
@@ -3661,25 +3638,25 @@ public:
 		return true;
 	}
 
-	STWGraphicGpu::ETWGraphicsGpuType VKGPUTypeToGraphicsGpuType(VkPhysicalDeviceType VKGPUType)
+	STWGraphicGPU::ETWGraphicsGPUType VKGPUTypeToGraphicsGPUType(VkPhysicalDeviceType VKGPUType)
 	{
 		if(VKGPUType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-			return STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_DISCRETE;
+			return STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_DISCRETE;
 		else if(VKGPUType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
-			return STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_INTEGRATED;
+			return STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_INTEGRATED;
 		else if(VKGPUType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU)
-			return STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_VIRTUAL;
+			return STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_VIRTUAL;
 		else if(VKGPUType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_CPU)
-			return STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_CPU;
+			return STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_CPU;
 
-		return STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_CPU;
+		return STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_CPU;
 	}
 
 	// from: https://github.com/SaschaWillems/vulkan.gpuinfo.org/blob/5c3986798afc39d736b825bf8a5fbf92b8d9ed49/includes/functions.php#L364
-	const char *GetDriverVerson(char (&aBuff)[256], uint32_t DriverVersion, uint32_t VendorId)
+	const char *GetDriverVerson(char (&aBuff)[256], uint32_t DriverVersion, uint32_t VendorID)
 	{
 		// NVIDIA
-		if(VendorId == 4318)
+		if(VendorID == 4318)
 		{
 			str_format(aBuff, std::size(aBuff), "%d.%d.%d.%d",
 				(DriverVersion >> 22) & 0x3ff,
@@ -3689,7 +3666,7 @@ public:
 		}
 #ifdef CONF_FAMILY_WINDOWS
 		// windows only
-		else if(VendorId == 0x8086)
+		else if(VendorID == 0x8086)
 		{
 			str_format(aBuff, std::size(aBuff),
 				"%d.%d",
@@ -3710,7 +3687,7 @@ public:
 		return aBuff;
 	}
 
-	[[nodiscard]] bool SelectGpu(char *pRendererName, char *pVendorName, char *pVersionName)
+	[[nodiscard]] bool SelectGPU(char *pRendererName, char *pVendorName, char *pVersionName)
 	{
 		uint32_t DevicesCount = 0;
 		auto Res = vkEnumeratePhysicalDevices(m_VKInstance, &DevicesCount, nullptr);
@@ -3744,72 +3721,59 @@ public:
 
 		size_t Index = 0;
 		std::vector<VkPhysicalDeviceProperties> vDevicePropList(vDeviceList.size());
-		m_pGpuList->m_vGpus.reserve(vDeviceList.size());
+		m_pGPUList->m_vGPUs.reserve(vDeviceList.size());
 
 		size_t FoundDeviceIndex = 0;
+		size_t FoundGPUType = STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_INVALID;
 
-		STWGraphicGpu::ETWGraphicsGpuType AutoGpuType = STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_INVALID;
+		STWGraphicGPU::ETWGraphicsGPUType AutoGPUType = STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_INVALID;
 
-		bool IsAutoGpu = str_comp(g_Config.m_GfxGpuName, "auto") == 0;
+		bool IsAutoGPU = str_comp(g_Config.m_GfxGPUName, "auto") == 0;
 
-		bool UserSelectedGpuChosen = false;
 		for(auto &CurDevice : vDeviceList)
 		{
 			vkGetPhysicalDeviceProperties(CurDevice, &(vDevicePropList[Index]));
 
 			auto &DeviceProp = vDevicePropList[Index];
 
-			STWGraphicGpu::ETWGraphicsGpuType GPUType = VKGPUTypeToGraphicsGpuType(DeviceProp.deviceType);
+			STWGraphicGPU::ETWGraphicsGPUType GPUType = VKGPUTypeToGraphicsGPUType(DeviceProp.deviceType);
 
-			int DevApiMajor = (int)VK_API_VERSION_MAJOR(DeviceProp.apiVersion);
-			int DevApiMinor = (int)VK_API_VERSION_MINOR(DeviceProp.apiVersion);
-			int DevApiPatch = (int)VK_API_VERSION_PATCH(DeviceProp.apiVersion);
+			STWGraphicGPU::STWGraphicGPUItem NewGPU;
+			str_copy(NewGPU.m_aName, DeviceProp.deviceName);
+			NewGPU.m_GPUType = GPUType;
+			m_pGPUList->m_vGPUs.push_back(NewGPU);
 
-			auto IsDenied = CCommandProcessorFragment_Vulkan::IsGpuDenied(DeviceProp.vendorID, DeviceProp.driverVersion, DevApiMajor, DevApiMinor, DevApiPatch);
-			if((DevApiMajor > gs_BackendVulkanMajor || (DevApiMajor == gs_BackendVulkanMajor && DevApiMinor >= gs_BackendVulkanMinor)) && !IsDenied)
-			{
-				STWGraphicGpu::STWGraphicGpuItem NewGpu;
-				str_copy(NewGpu.m_aName, DeviceProp.deviceName);
-				NewGpu.m_GpuType = GPUType;
-				m_pGpuList->m_vGpus.push_back(NewGpu);
-
-				// We always decide what the 'auto' GPU would be, even if user is forcing a GPU by name in config
-				// Reminder: A worse GPU enumeration has a higher value than a better GPU enumeration, thus the '>'
-				if(AutoGpuType > STWGraphicGpu::ETWGraphicsGpuType::GRAPHICS_GPU_TYPE_INTEGRATED)
-				{
-					str_copy(m_pGpuList->m_AutoGpu.m_aName, DeviceProp.deviceName);
-					m_pGpuList->m_AutoGpu.m_GpuType = GPUType;
-
-					AutoGpuType = GPUType;
-
-					if(IsAutoGpu)
-						FoundDeviceIndex = Index;
-				}
-				// We only select the first GPU that matches, because it comes first in the enumeration array, it's preferred by the system
-				// Reminder: We can't break the cycle here if the name matches because we need to choose the best GPU for 'auto' mode
-				if(!IsAutoGpu && !UserSelectedGpuChosen && str_comp(DeviceProp.deviceName, g_Config.m_GfxGpuName) == 0)
-				{
-					FoundDeviceIndex = Index;
-					UserSelectedGpuChosen = true;
-				}
-			}
 			Index++;
+
+			int DevAPIMajor = (int)VK_API_VERSION_MAJOR(DeviceProp.apiVersion);
+			int DevAPIMinor = (int)VK_API_VERSION_MINOR(DeviceProp.apiVersion);
+
+			if(GPUType < AutoGPUType && (DevAPIMajor > gs_BackendVulkanMajor || (DevAPIMajor == gs_BackendVulkanMajor && DevAPIMinor >= gs_BackendVulkanMinor)))
+			{
+				str_copy(m_pGPUList->m_AutoGPU.m_aName, DeviceProp.deviceName);
+				m_pGPUList->m_AutoGPU.m_GPUType = GPUType;
+
+				AutoGPUType = GPUType;
+			}
+
+			if(((IsAutoGPU && (FoundGPUType > STWGraphicGPU::ETWGraphicsGPUType::GRAPHICS_GPU_TYPE_INTEGRATED && GPUType < FoundGPUType)) || str_comp(DeviceProp.deviceName, g_Config.m_GfxGPUName) == 0) && (DevAPIMajor > gs_BackendVulkanMajor || (DevAPIMajor == gs_BackendVulkanMajor && DevAPIMinor >= gs_BackendVulkanMinor)))
+			{
+				FoundDeviceIndex = Index;
+				FoundGPUType = GPUType;
+			}
 		}
 
-		if(m_pGpuList->m_vGpus.empty())
-		{
-			dbg_msg("vulkan", "no devices with required vulkan version found.");
-			return false;
-		}
+		if(FoundDeviceIndex == 0)
+			FoundDeviceIndex = 1;
 
 		{
-			auto &DeviceProp = vDevicePropList[FoundDeviceIndex];
+			auto &DeviceProp = vDevicePropList[FoundDeviceIndex - 1];
 
-			int DevApiMajor = (int)VK_API_VERSION_MAJOR(DeviceProp.apiVersion);
-			int DevApiMinor = (int)VK_API_VERSION_MINOR(DeviceProp.apiVersion);
-			int DevApiPatch = (int)VK_API_VERSION_PATCH(DeviceProp.apiVersion);
+			int DevAPIMajor = (int)VK_API_VERSION_MAJOR(DeviceProp.apiVersion);
+			int DevAPIMinor = (int)VK_API_VERSION_MINOR(DeviceProp.apiVersion);
+			int DevAPIPatch = (int)VK_API_VERSION_PATCH(DeviceProp.apiVersion);
 
-			str_copy(pRendererName, DeviceProp.deviceName, gs_GpuInfoStringSize);
+			str_copy(pRendererName, DeviceProp.deviceName, gs_GPUInfoStringSize);
 			const char *pVendorNameStr = NULL;
 			switch(DeviceProp.vendorID)
 			{
@@ -3844,8 +3808,8 @@ public:
 			}
 
 			char aBuff[256];
-			str_copy(pVendorName, pVendorNameStr, gs_GpuInfoStringSize);
-			str_format(pVersionName, gs_GpuInfoStringSize, "Vulkan %d.%d.%d (driver: %s)", DevApiMajor, DevApiMinor, DevApiPatch, GetDriverVerson(aBuff, DeviceProp.driverVersion, DeviceProp.vendorID));
+			str_copy(pVendorName, pVendorNameStr, gs_GPUInfoStringSize);
+			str_format(pVersionName, gs_GPUInfoStringSize, "Vulkan %d.%d.%d (driver: %s)", DevAPIMajor, DevAPIMinor, DevAPIPatch, GetDriverVerson(aBuff, DeviceProp.driverVersion, DeviceProp.vendorID));
 
 			// get important device limits
 			m_NonCoherentMemAlignment = DeviceProp.limits.nonCoherentAtomSize;
@@ -3863,7 +3827,7 @@ public:
 			}
 		}
 
-		VkPhysicalDevice CurDevice = vDeviceList[FoundDeviceIndex];
+		VkPhysicalDevice CurDevice = vDeviceList[FoundDeviceIndex - 1];
 
 		uint32_t FamQueueCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(CurDevice, &FamQueueCount, nullptr);
@@ -5354,12 +5318,12 @@ public:
 
 	[[nodiscard]] bool CreateSyncObjects()
 	{
-		// Create one more sync object than there are frames in flight
-		auto SyncObjectCount = m_SwapChainImageCount + 1;
-		m_vWaitSemaphores.resize(SyncObjectCount);
-		m_vSigSemaphores.resize(SyncObjectCount);
+		m_vWaitSemaphores.resize(m_SwapChainImageCount);
+		m_vSigSemaphores.resize(m_SwapChainImageCount);
 
-		m_vFrameFences.resize(SyncObjectCount);
+		m_vMemorySemaphores.resize(m_SwapChainImageCount);
+
+		m_vFrameFences.resize(m_SwapChainImageCount);
 		m_vImagesFences.resize(m_SwapChainImageCount, VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo CreateSemaphoreInfo{};
@@ -5369,10 +5333,11 @@ public:
 		FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for(size_t i = 0; i < SyncObjectCount; i++)
+		for(size_t i = 0; i < m_SwapChainImageCount; i++)
 		{
 			if(vkCreateSemaphore(m_VKDevice, &CreateSemaphoreInfo, nullptr, &m_vWaitSemaphores[i]) != VK_SUCCESS ||
 				vkCreateSemaphore(m_VKDevice, &CreateSemaphoreInfo, nullptr, &m_vSigSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(m_VKDevice, &CreateSemaphoreInfo, nullptr, &m_vMemorySemaphores[i]) != VK_SUCCESS ||
 				vkCreateFence(m_VKDevice, &FenceInfo, nullptr, &m_vFrameFences[i]) != VK_SUCCESS)
 			{
 				SetError(EGfxErrorType::GFX_ERROR_TYPE_INIT, "Creating swap chain sync objects(fences, semaphores) failed.");
@@ -5385,20 +5350,21 @@ public:
 
 	void DestroySyncObjects()
 	{
-		for(size_t i = 0; i < m_vWaitSemaphores.size(); i++)
+		for(size_t i = 0; i < m_SwapChainImageCount; i++)
 		{
 			vkDestroySemaphore(m_VKDevice, m_vWaitSemaphores[i], nullptr);
 			vkDestroySemaphore(m_VKDevice, m_vSigSemaphores[i], nullptr);
+			vkDestroySemaphore(m_VKDevice, m_vMemorySemaphores[i], nullptr);
 			vkDestroyFence(m_VKDevice, m_vFrameFences[i], nullptr);
 		}
 
 		m_vWaitSemaphores.clear();
 		m_vSigSemaphores.clear();
 
+		m_vMemorySemaphores.clear();
+
 		m_vFrameFences.clear();
 		m_vImagesFences.clear();
-
-		m_CurFrameSyncObject = 0;
 	}
 
 	void DestroyBufferOfFrame(size_t ImageIndex, SFrameBuffers &Buffer)
@@ -5452,7 +5418,7 @@ public:
 	}
 
 	template<bool IsLastCleanup>
-	void CleanupVulkan(size_t SwapchainCount)
+	void CleanupVulkan()
 	{
 		if(IsLastCleanup)
 		{
@@ -5490,7 +5456,7 @@ public:
 		m_vStreamedVertexBuffers.clear();
 		m_vStreamedUniformBuffers.clear();
 
-		for(size_t i = 0; i < SwapchainCount; ++i)
+		for(size_t i = 0; i < m_SwapChainImageCount; ++i)
 		{
 			ClearFrameData(i);
 		}
@@ -5499,11 +5465,11 @@ public:
 		m_vvFrameDelayedTextureCleanup.clear();
 		m_vvFrameDelayedTextTexturesCleanup.clear();
 
-		m_StagingBufferCache.DestroyFrameData(SwapchainCount);
-		m_StagingBufferCacheImage.DestroyFrameData(SwapchainCount);
-		m_VertexBufferCache.DestroyFrameData(SwapchainCount);
+		m_StagingBufferCache.DestroyFrameData(m_SwapChainImageCount);
+		m_StagingBufferCacheImage.DestroyFrameData(m_SwapChainImageCount);
+		m_VertexBufferCache.DestroyFrameData(m_SwapChainImageCount);
 		for(auto &ImageBufferCache : m_ImageBufferCaches)
-			ImageBufferCache.second.DestroyFrameData(SwapchainCount);
+			ImageBufferCache.second.DestroyFrameData(m_SwapChainImageCount);
 
 		if(IsLastCleanup)
 		{
@@ -5581,7 +5547,7 @@ public:
 
 		if(OldSwapChainImageCount != m_SwapChainImageCount)
 		{
-			CleanupVulkan<false>(OldSwapChainImageCount);
+			CleanupVulkan<false>();
 			InitVulkan<false>();
 		}
 
@@ -5625,7 +5591,7 @@ public:
 			}
 		}
 
-		if(!SelectGpu(pRendererString, pVendorString, pVersionString))
+		if(!SelectGPU(pRendererString, pVendorString, pVersionString))
 			return -1;
 
 		if(!CreateLogicalDevice(vVKLayers))
@@ -6135,20 +6101,20 @@ public:
 	template<bool IsFirstInitialization>
 	int InitVulkan()
 	{
+		if(!CreateDescriptorSetLayouts())
+			return -1;
+
+		if(!CreateTextDescriptorSetLayout())
+			return -1;
+
+		if(!CreateSpriteMultiUniformDescriptorSetLayout())
+			return -1;
+
+		if(!CreateQuadUniformDescriptorSetLayout())
+			return -1;
+
 		if(IsFirstInitialization)
 		{
-			if(!CreateDescriptorSetLayouts())
-				return -1;
-
-			if(!CreateTextDescriptorSetLayout())
-				return -1;
-
-			if(!CreateSpriteMultiUniformDescriptorSetLayout())
-				return -1;
-
-			if(!CreateQuadUniformDescriptorSetLayout())
-				return -1;
-
 			VkSwapchainKHR OldSwapChain = VK_NULL_HANDLE;
 			if(InitVulkanSwapChain(OldSwapChain) != 0)
 				return -1;
@@ -6322,7 +6288,7 @@ public:
 				BufferMem = BufferOfFrame.m_BufferMem;
 				Offset = BufferOfFrame.m_UsedSize;
 				BufferOfFrame.m_UsedSize += DataSize;
-				pMem = BufferOfFrame.m_pMappedBufferData;
+				pMem = (uint8_t *)BufferOfFrame.m_pMappedBufferData;
 				pBufferMem = &BufferOfFrame;
 				break;
 			}
@@ -6355,7 +6321,7 @@ public:
 			BufferMem = StreamBufferMemory;
 
 			pBufferMem = &NewStreamBuffer;
-			pMem = NewStreamBuffer.m_pMappedBufferData;
+			pMem = (uint8_t *)NewStreamBuffer.m_pMappedBufferData;
 			Offset = NewStreamBuffer.m_OffsetInBuffer;
 			NewStreamBuffer.m_UsedSize += DataSize;
 
@@ -6363,7 +6329,7 @@ public:
 		}
 
 		{
-			mem_copy(pMem + Offset, pData, DataSize);
+			mem_copy(pMem + Offset, pData, (size_t)DataSize);
 		}
 
 		NewBuffer = Buffer;
@@ -6412,7 +6378,7 @@ public:
 	{
 		VkDeviceSize BufferDataSize = DataSize;
 
-		SMemoryBlock<s_StagingBufferCacheId> StagingBuffer;
+		SMemoryBlock<s_StagingBufferCacheID> StagingBuffer;
 		if(!GetStagingBuffer(StagingBuffer, pData, DataSize))
 			return false;
 
@@ -6579,9 +6545,8 @@ public:
 
 		m_MultiSamplingCount = (g_Config.m_GfxFsaaSamples & 0xFFFFFFFE); // ignore the uneven bit, only even multi sampling works
 
-		*pCommand->m_pReadPresentedImageDataFunc = [this](uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData) {
-			return GetPresentedImageData(Width, Height, Format, vDstData);
-		};
+		TGLBackendReadPresentedImageData &ReadPresentedImgDataFunc = *pCommand->m_pReadPresentedImageDataFunc;
+		ReadPresentedImgDataFunc = [this](uint32_t &Width, uint32_t &Height, CImageInfo::EImageFormat &Format, std::vector<uint8_t> &vDstData) { return GetPresentedImageData(Width, Height, Format, vDstData); };
 
 		m_pWindow = pCommand->m_pWindow;
 
@@ -6645,7 +6610,21 @@ public:
 		DestroyIndexBuffer(m_IndexBuffer, m_IndexBufferMemory);
 		DestroyIndexBuffer(m_RenderIndexBuffer, m_RenderIndexBufferMemory);
 
-		CleanupVulkan<true>(m_SwapChainImageCount);
+		CleanupVulkan<true>();
+
+		return true;
+	}
+
+	[[nodiscard]] bool Cmd_Texture_Update(const CCommandBuffer::SCommand_Texture_Update *pCommand)
+	{
+		size_t IndexTex = pCommand->m_Slot;
+
+		void *pData = pCommand->m_pData;
+
+		if(!UpdateTexture(IndexTex, VK_FORMAT_B8G8R8A8_UNORM, pData, pCommand->m_X, pCommand->m_Y, pCommand->m_Width, pCommand->m_Height))
+			return false;
+
+		free(pData);
 
 		return true;
 	}
@@ -6667,10 +6646,12 @@ public:
 		int Slot = pCommand->m_Slot;
 		int Width = pCommand->m_Width;
 		int Height = pCommand->m_Height;
+		int Format = pCommand->m_Format;
+		int StoreFormat = pCommand->m_StoreFormat;
 		int Flags = pCommand->m_Flags;
-		uint8_t *pData = pCommand->m_pData;
+		void *pData = pCommand->m_pData;
 
-		if(!CreateTextureCMD(Slot, Width, Height, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, Flags, pData))
+		if(!CreateTextureCMD(Slot, Width, Height, TextureFormatToVulkanFormat(Format), TextureFormatToVulkanFormat(StoreFormat), Flags, pData))
 			return false;
 
 		free(pData);
@@ -6685,8 +6666,8 @@ public:
 		int Width = pCommand->m_Width;
 		int Height = pCommand->m_Height;
 
-		uint8_t *pTmpData = pCommand->m_pTextData;
-		uint8_t *pTmpData2 = pCommand->m_pTextOutlineData;
+		void *pTmpData = pCommand->m_pTextData;
+		void *pTmpData2 = pCommand->m_pTextOutlineData;
 
 		if(!CreateTextureCMD(Slot, Width, Height, VK_FORMAT_R8_UNORM, VK_FORMAT_R8_UNORM, CCommandBuffer::TEXFLAG_NOMIPMAPS, pTmpData))
 			return false;
@@ -6720,7 +6701,8 @@ public:
 	[[nodiscard]] bool Cmd_TextTexture_Update(const CCommandBuffer::SCommand_TextTexture_Update *pCommand)
 	{
 		size_t IndexTex = pCommand->m_Slot;
-		uint8_t *pData = pCommand->m_pData;
+
+		void *pData = pCommand->m_pData;
 
 		if(!UpdateTexture(IndexTex, VK_FORMAT_R8_UNORM, pData, pCommand->m_X, pCommand->m_Y, pCommand->m_Width, pCommand->m_Height))
 			return false;
@@ -6788,40 +6770,19 @@ public:
 		return RenderStandard<CCommandBuffer::SVertex, false>(ExecBuffer, pCommand->m_State, pCommand->m_PrimType, pCommand->m_pVertices, pCommand->m_PrimCount);
 	}
 
-	[[nodiscard]] bool Cmd_ReadPixel(const CCommandBuffer::SCommand_TrySwapAndReadPixel *pCommand)
-	{
-		if(!*pCommand->m_pSwapped && !NextFrame())
-			return false;
-		*pCommand->m_pSwapped = true;
-
-		uint32_t Width;
-		uint32_t Height;
-		CImageInfo::EImageFormat Format;
-		if(GetPresentedImageDataImpl(Width, Height, Format, m_vReadPixelHelper, false, pCommand->m_Position))
-		{
-			*pCommand->m_pColor = ColorRGBA(m_vReadPixelHelper[0] / 255.0f, m_vReadPixelHelper[1] / 255.0f, m_vReadPixelHelper[2] / 255.0f, 1.0f);
-		}
-		else
-		{
-			*pCommand->m_pColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-
-		return true;
-	}
-
 	[[nodiscard]] bool Cmd_Screenshot(const CCommandBuffer::SCommand_TrySwapAndScreenshot *pCommand)
 	{
-		if(!*pCommand->m_pSwapped && !NextFrame())
+		if(!NextFrame())
 			return false;
 		*pCommand->m_pSwapped = true;
 
 		uint32_t Width;
 		uint32_t Height;
 		CImageInfo::EImageFormat Format;
-		if(GetPresentedImageDataImpl(Width, Height, Format, m_vScreenshotHelper, true, {}))
+		if(GetPresentedImageDataImpl(Width, Height, Format, m_vScreenshotHelper, false, true))
 		{
-			const size_t ImgSize = (size_t)Width * (size_t)Height * CImageInfo::PixelSize(Format);
-			pCommand->m_pImage->m_pData = static_cast<uint8_t *>(malloc(ImgSize));
+			size_t ImgSize = (size_t)Width * (size_t)Height * (size_t)4;
+			pCommand->m_pImage->m_pData = malloc(ImgSize);
 			mem_copy(pCommand->m_pImage->m_pData, m_vScreenshotHelper.data(), ImgSize);
 		}
 		else
@@ -6947,7 +6908,7 @@ public:
 		void *pUploadData = pCommand->m_pUploadData;
 		VkDeviceSize DataSize = (VkDeviceSize)pCommand->m_DataSize;
 
-		SMemoryBlock<s_StagingBufferCacheId> StagingBuffer;
+		SMemoryBlock<s_StagingBufferCacheID> StagingBuffer;
 		if(!GetStagingBuffer(StagingBuffer, pUploadData, DataSize))
 			return false;
 
@@ -7492,7 +7453,7 @@ public:
 	[[nodiscard]] bool Cmd_WindowCreateNtf(const CCommandBuffer::SCommand_WindowCreateNtf *pCommand)
 	{
 		log_debug("vulkan", "creating new surface.");
-		m_pWindow = SDL_GetWindowFromID(pCommand->m_WindowId);
+		m_pWindow = SDL_GetWindowFromID(pCommand->m_WindowID);
 		if(m_RenderingPaused)
 		{
 #ifdef CONF_PLATFORM_ANDROID
@@ -7529,7 +7490,7 @@ public:
 
 	[[nodiscard]] bool Cmd_PreInit(const CCommandProcessorFragment_GLBase::SCommand_PreInit *pCommand)
 	{
-		m_pGpuList = pCommand->m_pGpuList;
+		m_pGPUList = pCommand->m_pGPUList;
 		if(InitVulkanSDL(pCommand->m_pWindow, pCommand->m_Width, pCommand->m_Height, pCommand->m_pRendererString, pCommand->m_pVendorString, pCommand->m_pVersionString) != 0)
 		{
 			m_VKInstance = VK_NULL_HANDLE;

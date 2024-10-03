@@ -10,17 +10,16 @@
 #include <game/mapitems.h>
 
 #include <game/server/gamecontext.h>
-#include <game/server/save.h>
 
 CDraggerBeam::CDraggerBeam(CGameWorld *pGameWorld, CDragger *pDragger, vec2 Pos, float Strength, bool IgnoreWalls,
-	int ForClientId, int Layer, int Number) :
+	int ForClientID, int Layer, int Number) :
 	CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
 	m_pDragger = pDragger;
 	m_Pos = Pos;
 	m_Strength = Strength;
 	m_IgnoreWalls = IgnoreWalls;
-	m_ForClientId = ForClientId;
+	m_ForClientID = ForClientID;
 	m_Active = true;
 	m_Layer = Layer;
 	m_Number = Number;
@@ -37,7 +36,7 @@ void CDraggerBeam::Tick()
 	}
 
 	// Drag only if the player is reachable and alive
-	CCharacter *pTarget = GameServer()->GetPlayerChar(m_ForClientId);
+	CCharacter *pTarget = GameServer()->GetPlayerChar(m_ForClientID);
 	if(!pTarget)
 	{
 		Reset();
@@ -72,7 +71,8 @@ void CDraggerBeam::Tick()
 	// In the center of the dragger a tee does not experience speed-up
 	else if(distance(pTarget->m_Pos, m_Pos) > 28)
 	{
-		pTarget->AddVelocity(normalize(m_Pos - pTarget->m_Pos) * m_Strength);
+		vec2 Temp = pTarget->Core()->m_Vel + (normalize(m_Pos - pTarget->m_Pos) * m_Strength);
+		pTarget->Core()->m_Vel = ClampVel(pTarget->m_MoveRestrictions, Temp);
 	}
 }
 
@@ -86,7 +86,7 @@ void CDraggerBeam::Reset()
 	m_MarkedForDestroy = true;
 	m_Active = false;
 
-	m_pDragger->RemoveDraggerBeam(m_ForClientId);
+	m_pDragger->RemoveDraggerBeam(m_ForClientID);
 }
 
 void CDraggerBeam::Snap(int SnappingClient)
@@ -97,7 +97,7 @@ void CDraggerBeam::Snap(int SnappingClient)
 	}
 
 	// Only players who can see the player attached to the dragger can see the dragger beam
-	CCharacter *pTarget = GameServer()->GetPlayerChar(m_ForClientId);
+	CCharacter *pTarget = GameServer()->GetPlayerChar(m_ForClientID);
 	if(!pTarget || !pTarget->CanSnapCharacter(SnappingClient))
 	{
 		return;
@@ -127,22 +127,17 @@ void CDraggerBeam::Snap(int SnappingClient)
 		StartTick = -1;
 	}
 
-	int SnapObjId = GetId();
-	if(m_pDragger->WillDraggerBeamUseDraggerId(m_ForClientId, SnappingClient))
+	int SnapObjID = GetID();
+	if(m_pDragger->WillDraggerBeamUseDraggerID(m_ForClientID, SnappingClient))
 	{
-		SnapObjId = m_pDragger->GetId();
+		SnapObjID = m_pDragger->GetID();
 	}
 
-	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), SnapObjId,
-		TargetPos, m_Pos, StartTick, m_ForClientId, LASERTYPE_DRAGGER, Subtype, m_Number);
+	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), SnapObjID,
+		TargetPos, m_Pos, StartTick, m_ForClientID, LASERTYPE_DRAGGER, Subtype, m_Number);
 }
 
 void CDraggerBeam::SwapClients(int Client1, int Client2)
 {
-	m_ForClientId = m_ForClientId == Client1 ? Client2 : m_ForClientId == Client2 ? Client1 : m_ForClientId;
-}
-
-ESaveResult CDraggerBeam::BlocksSave(int ClientId)
-{
-	return m_ForClientId == ClientId ? ESaveResult::DRAGGER_ACTIVE : ESaveResult::SUCCESS;
+	m_ForClientID = m_ForClientID == Client1 ? Client2 : m_ForClientID == Client2 ? Client1 : m_ForClientID;
 }

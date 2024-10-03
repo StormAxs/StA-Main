@@ -8,10 +8,10 @@
 #include <base/hash.h>
 #include <base/types.h>
 
-#include "uuid_manager.h"
-
 #include <array>
 #include <vector>
+
+#include <zlib.h>
 
 enum
 {
@@ -25,7 +25,7 @@ class CDataFileReader
 	void *GetDataImpl(int Index, bool Swap);
 	int GetFileDataSize(int Index) const;
 
-	int GetExternalItemType(int InternalType, CUuid *pUuid);
+	int GetExternalItemType(int InternalType);
 	int GetInternalItemType(int ExternalType);
 
 public:
@@ -54,10 +54,10 @@ public:
 	int NumData() const;
 
 	int GetItemSize(int Index) const;
-	void *GetItem(int Index, int *pType = nullptr, int *pId = nullptr, CUuid *pUuid = nullptr);
+	void *GetItem(int Index, int *pType = nullptr, int *pID = nullptr);
 	void GetType(int Type, int *pStart, int *pNum);
-	int FindItemIndex(int Type, int Id);
-	void *FindItem(int Type, int Id);
+	int FindItemIndex(int Type, int ID);
+	void *FindItem(int Type, int ID);
 	int NumItems() const;
 
 	SHA256_DIGEST Sha256() const;
@@ -68,27 +68,19 @@ public:
 // write access
 class CDataFileWriter
 {
-public:
-	enum ECompressionLevel
-	{
-		COMPRESSION_DEFAULT,
-		COMPRESSION_BEST,
-	};
-
-private:
 	struct CDataInfo
 	{
 		void *m_pUncompressedData;
 		int m_UncompressedSize;
 		void *m_pCompressedData;
 		int m_CompressedSize;
-		ECompressionLevel m_CompressionLevel;
+		int m_CompressionLevel;
 	};
 
 	struct CItemInfo
 	{
 		int m_Type;
-		int m_Id;
+		int m_ID;
 		int m_Size;
 		int m_Next;
 		int m_Prev;
@@ -102,12 +94,6 @@ private:
 		int m_Last;
 	};
 
-	struct CExtendedItemType
-	{
-		int m_Type;
-		CUuid m_Uuid;
-	};
-
 	enum
 	{
 		MAX_ITEM_TYPES = 0x10000,
@@ -117,10 +103,10 @@ private:
 	std::array<CItemTypeInfo, MAX_ITEM_TYPES> m_aItemTypes;
 	std::vector<CItemInfo> m_vItems;
 	std::vector<CDataInfo> m_vDatas;
-	std::vector<CExtendedItemType> m_vExtendedItemTypes;
+	std::vector<int> m_vExtendedItemTypes;
 
 	int GetTypeFromIndex(int Index) const;
-	int GetExtendedItemTypeIndex(int Type, const CUuid *pUuid);
+	int GetExtendedItemTypeIndex(int Type);
 
 public:
 	CDataFileWriter();
@@ -136,8 +122,8 @@ public:
 	~CDataFileWriter();
 
 	bool Open(class IStorage *pStorage, const char *pFilename, int StorageType = IStorage::TYPE_SAVE);
-	int AddItem(int Type, int Id, size_t Size, const void *pData, const CUuid *pUuid = nullptr);
-	int AddData(size_t Size, const void *pData, ECompressionLevel CompressionLevel = COMPRESSION_DEFAULT);
+	int AddItem(int Type, int ID, size_t Size, const void *pData);
+	int AddData(size_t Size, const void *pData, int CompressionLevel = Z_DEFAULT_COMPRESSION);
 	int AddDataSwapped(size_t Size, const void *pData);
 	int AddDataString(const char *pStr);
 	void Finish();

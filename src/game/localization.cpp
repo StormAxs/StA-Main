@@ -3,8 +3,6 @@
 
 #include "localization.h"
 
-#include <base/log.h>
-
 #include <engine/console.h>
 #include <engine/shared/linereader.h>
 #include <engine/storage.h>
@@ -23,14 +21,20 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 	m_vLanguages.emplace_back("English", "", 826, vEnglishLanguageCodes);
 
 	const char *pFilename = "languages/index.txt";
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL)))
+	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	if(!File)
 	{
-		log_error("localization", "Couldn't open index file '%s'", pFilename);
+		char aBuf[64 + IO_MAX_PATH_LENGTH];
+		str_format(aBuf, sizeof(aBuf), "Couldn't open index file '%s'", pFilename);
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 		return;
 	}
 
-	while(const char *pLine = LineReader.Get())
+	CLineReader LineReader;
+	LineReader.Init(File);
+
+	const char *pLine;
+	while((pLine = LineReader.Get()))
 	{
 		if(!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
 			continue;
@@ -41,12 +45,16 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 		pLine = LineReader.Get();
 		if(!pLine)
 		{
-			log_error("localization", "Unexpected end of index file after language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Unexpected end of index file after language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			break;
 		}
 		if(!str_startswith(pLine, "== "))
 		{
-			log_error("localization", "Missing native name for language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Missing native name for language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			(void)LineReader.Get();
 			(void)LineReader.Get();
 			continue;
@@ -57,12 +65,16 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 		pLine = LineReader.Get();
 		if(!pLine)
 		{
-			log_error("localization", "Unexpected end of index file after language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Unexpected end of index file after language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			break;
 		}
 		if(!str_startswith(pLine, "== "))
 		{
-			log_error("localization", "Missing country code for language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Missing country code for language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			(void)LineReader.Get();
 			continue;
 		}
@@ -72,12 +84,16 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 		pLine = LineReader.Get();
 		if(!pLine)
 		{
-			log_error("localization", "Unexpected end of index file after language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Unexpected end of index file after language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			break;
 		}
 		if(!str_startswith(pLine, "== "))
 		{
-			log_error("localization", "Missing language codes for language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "Missing language codes for language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			continue;
 		}
 		const char *pLanguageCodes = pLine + 3;
@@ -92,7 +108,9 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 		}
 		if(vLanguageCodes.empty())
 		{
-			log_error("localization", "At least one language code required for language '%s'", aEnglishName);
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "At least one language code required for language '%s'", aEnglishName);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			continue;
 		}
 
@@ -100,6 +118,8 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, IConsole *pConsole
 		str_format(aFileName, sizeof(aFileName), "languages/%s.txt", aEnglishName);
 		m_vLanguages.emplace_back(aNativeName, aFileName, str_toint(aCountryCode), vLanguageCodes);
 	}
+
+	io_close(File);
 
 	std::sort(m_vLanguages.begin(), m_vLanguages.end());
 }
@@ -117,7 +137,9 @@ void CLocalizationDatabase::SelectDefaultLanguage(IConsole *pConsole, char *pFil
 	char aLocaleStr[128];
 	os_locale_str(aLocaleStr, sizeof(aLocaleStr));
 
-	log_info("localization", "Choosing default language based on user locale '%s'", aLocaleStr);
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "Choosing default language based on user locale '%s'", aLocaleStr);
+	pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 
 	while(true)
 	{
@@ -173,18 +195,23 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 		return true;
 	}
 
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL)))
+	IOHANDLE IoHandle = pStorage->OpenFile(pFilename, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
+	if(!IoHandle)
 		return false;
 
-	log_info("localization", "loaded '%s'", pFilename);
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "loaded '%s'", pFilename);
+	pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 	m_vStrings.clear();
 	m_StringsHeap.Reset();
 
 	char aContext[512];
 	char aOrigin[512];
+	CLineReader LineReader;
+	LineReader.Init(IoHandle);
+	char *pLine;
 	int Line = 0;
-	while(const char *pLine = LineReader.Get())
+	while((pLine = LineReader.Get()))
 	{
 		Line++;
 		if(!str_length(pLine))
@@ -198,41 +225,38 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 			size_t Len = str_length(pLine);
 			if(Len < 1 || pLine[Len - 1] != ']')
 			{
-				log_error("localization", "malformed context '%s' on line %d", pLine, Line);
+				str_format(aBuf, sizeof(aBuf), "malformed context line (%d): %s", Line, pLine);
+				pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 				continue;
 			}
-			str_truncate(aContext, sizeof(aContext), pLine + 1, Len - 2);
+			str_copy(aContext, pLine + 1, Len - 1);
 			pLine = LineReader.Get();
-			if(!pLine)
-			{
-				log_error("localization", "unexpected end of file after context line '%s' on line %d", aContext, Line);
-				break;
-			}
-			Line++;
 		}
 		else
 		{
 			aContext[0] = '\0';
 		}
 
-		str_copy(aOrigin, pLine);
-		const char *pReplacement = LineReader.Get();
+		str_copy(aOrigin, pLine, sizeof(aOrigin));
+		char *pReplacement = LineReader.Get();
+		Line++;
 		if(!pReplacement)
 		{
-			log_error("localization", "unexpected end of file after original '%s' on line %d", aOrigin, Line);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", "unexpected end of file");
 			break;
 		}
-		Line++;
 
 		if(pReplacement[0] != '=' || pReplacement[1] != '=' || pReplacement[2] != ' ')
 		{
-			log_error("localization", "malformed replacement '%s' for original '%s' on line %d", pReplacement, aOrigin, Line);
+			str_format(aBuf, sizeof(aBuf), "malformed replacement line (%d) for '%s'", Line, aOrigin);
+			pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 			continue;
 		}
 
 		pReplacement += 3;
 		AddString(aOrigin, pReplacement, aContext);
 	}
+	io_close(IoHandle);
 	std::sort(m_vStrings.begin(), m_vStrings.end());
 	return true;
 }

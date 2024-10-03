@@ -61,7 +61,7 @@ class CConsole : public IConsole
 	static void ConCommandAccess(IResult *pResult, void *pUser);
 	static void ConCommandStatus(IConsole::IResult *pResult, void *pUser);
 
-	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientId = -1, bool InterpretSemicolons = true) override;
+	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) override;
 
 	FTeeHistorianCommandCallback m_pfnTeeHistorianCommandCallback;
 	void *m_pTeeHistorianCommandUserdata;
@@ -115,7 +115,7 @@ class CConsole : public IConsole
 		const char *GetString(unsigned Index) const override;
 		int GetInteger(unsigned Index) const override;
 		float GetFloat(unsigned Index) const override;
-		std::optional<ColorHSLA> GetColor(unsigned Index, float DarkestLighting) const override;
+		ColorHSLA GetColor(unsigned Index, bool Light) const override;
 
 		void RemoveArgument(unsigned Index) override
 		{
@@ -144,16 +144,7 @@ class CConsole : public IConsole
 	};
 
 	int ParseStart(CResult *pResult, const char *pString, int Length);
-
-	enum
-	{
-		PARSEARGS_OK = 0,
-		PARSEARGS_MISSING_VALUE,
-		PARSEARGS_INVALID_INTEGER,
-		PARSEARGS_INVALID_FLOAT,
-	};
-
-	int ParseArgs(CResult *pResult, const char *pFormat, bool IsColor = false);
+	int ParseArgs(CResult *pResult, const char *pFormat);
 
 	/*
 	this function will set pFormat to the next parameter (i,s,r,v,?) it contains and
@@ -216,9 +207,9 @@ public:
 	void StoreCommands(bool Store) override;
 
 	bool LineIsValid(const char *pStr) override;
-	void ExecuteLine(const char *pStr, int ClientId = -1, bool InterpretSemicolons = true) override;
-	void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientId = -1, bool InterpretSemicolons = true) override;
-	bool ExecuteFile(const char *pFilename, int ClientId = -1, bool LogFailure = false, int StorageType = IStorage::TYPE_ALL) override;
+	void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) override;
+	void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true) override;
+	bool ExecuteFile(const char *pFilename, int ClientID = -1, bool LogFailure = false, int StorageType = IStorage::TYPE_ALL) override;
 
 	char *Format(char *pBuf, int Size, const char *pFrom, const char *pStr) override;
 	void Print(int Level, const char *pFrom, const char *pStr, ColorRGBA PrintColor = gs_ConsoleDefaultColor) const override;

@@ -8,9 +8,9 @@
 
 #include "editor.h"
 
-void CMapView::OnInit(CEditor *pEditor)
+void CMapView::Init(CEditor *pEditor)
 {
-	CEditorComponent::OnInit(pEditor);
+	CEditorComponent::Init(pEditor);
 	RegisterSubComponent(m_MapGrid);
 	RegisterSubComponent(m_ProofMode);
 	InitSubComponents();
@@ -19,7 +19,7 @@ void CMapView::OnInit(CEditor *pEditor)
 void CMapView::OnReset()
 {
 	m_Zoom = CSmoothValue(200.0f, 10.0f, 2000.0f);
-	m_Zoom.OnInit(Editor());
+	m_Zoom.Init(Editor());
 	m_WorldZoom = 1.0f;
 
 	SetWorldOffset({0, 0});
@@ -152,8 +152,8 @@ void CMapView::ZoomMouseTarget(float ZoomFactor)
 	float WorldWidth = aPoints[2] - aPoints[0];
 	float WorldHeight = aPoints[3] - aPoints[1];
 
-	float Mwx = aPoints[0] + WorldWidth * (Ui()->MouseX() / Ui()->Screen()->w);
-	float Mwy = aPoints[1] + WorldHeight * (Ui()->MouseY() / Ui()->Screen()->h);
+	float Mwx = aPoints[0] + WorldWidth * (UI()->MouseX() / UI()->Screen()->w);
+	float Mwy = aPoints[1] + WorldHeight * (UI()->MouseY() / UI()->Screen()->h);
 
 	// adjust camera
 	OffsetWorld((vec2(Mwx, Mwy) - GetWorldOffset()) * (1.0f - ZoomFactor));

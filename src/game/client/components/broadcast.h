@@ -4,7 +4,6 @@
 #define GAME_CLIENT_COMPONENTS_BROADCAST_H
 
 #include <engine/textrender.h>
-#include <game/generated/protocol.h>
 
 #include <game/client/component.h>
 
@@ -25,8 +24,6 @@ public:
 	virtual void OnWindowResize() override;
 	virtual void OnRender() override;
 	virtual void OnMessage(int MsgType, void *pRawMsg) override;
-
-	void DoBroadcast(const char *pText);
 };
 
 #endif

@@ -4,12 +4,12 @@
 
 CEditorSound::CEditorSound(CEditor *pEditor)
 {
-	OnInit(pEditor);
+	Init(pEditor);
 }
 
 CEditorSound::~CEditorSound()
 {
-	Sound()->UnloadSample(m_SoundId);
+	Sound()->UnloadSample(m_SoundID);
 	free(m_pData);
 	m_pData = nullptr;
 }

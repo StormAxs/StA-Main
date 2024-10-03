@@ -56,19 +56,13 @@ int CNetClient::Connect(const NETADDR *pAddr, int NumAddrs)
 	return 0;
 }
 
-int CNetClient::Connect7(const NETADDR *pAddr, int NumAddrs)
-{
-	m_Connection.Connect7(pAddr, NumAddrs);
-	return 0;
-}
-
 int CNetClient::ResetErrorString()
 {
 	m_Connection.ResetErrorString();
 	return 0;
 }
 
-int CNetClient::Recv(CNetChunk *pChunk, SECURITY_TOKEN *pResponseToken, bool Sixup)
+int CNetClient::Recv(CNetChunk *pChunk)
 {
 	while(true)
 	{
@@ -89,17 +83,14 @@ int CNetClient::Recv(CNetChunk *pChunk, SECURITY_TOKEN *pResponseToken, bool Six
 		{
 			continue;
 		}
-		if(Sixup)
-			Addr.type |= NETTYPE_TW7;
 
-		SECURITY_TOKEN Token;
-		*pResponseToken = NET_SECURITY_TOKEN_UNKNOWN;
-		if(CNetBase::UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, Sixup, &Token, pResponseToken) == 0)
+		bool Sixup = false;
+		if(CNetBase::UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, Sixup) == 0)
 		{
 			if(m_RecvUnpacker.m_Data.m_Flags & NET_PACKETFLAG_CONNLESS)
 			{
 				pChunk->m_Flags = NETSENDFLAG_CONNLESS;
-				pChunk->m_ClientId = -1;
+				pChunk->m_ClientID = -1;
 				pChunk->m_Address = Addr;
 				pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
 				pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
@@ -112,7 +103,7 @@ int CNetClient::Recv(CNetChunk *pChunk, SECURITY_TOKEN *pResponseToken, bool Six
 			}
 			else
 			{
-				if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr, Token, *pResponseToken))
+				if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 					m_RecvUnpacker.Start(&Addr, &m_Connection, 0);
 			}
 		}
@@ -137,7 +128,7 @@ int CNetClient::Send(CNetChunk *pChunk)
 	else
 	{
 		int Flags = 0;
-		dbg_assert(pChunk->m_ClientId == 0, "erroneous client id");
+		dbg_assert(pChunk->m_ClientID == 0, "erroneous client id");
 
 		if(pChunk->m_Flags & NETSENDFLAG_VITAL)
 			Flags = NET_CHUNKFLAG_VITAL;

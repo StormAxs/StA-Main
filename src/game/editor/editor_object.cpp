@@ -2,14 +2,15 @@
 
 #include "editor.h"
 
-void CEditorObject::OnInit(CEditor *pEditor)
+void CEditorObject::Init(CEditor *pEditor)
 {
 	m_pEditor = pEditor;
 	OnReset();
 }
 
-void CEditorObject::OnUpdate()
+void CEditorObject::OnUpdate(CUIRect View)
 {
+	OnRender(View);
 	if(IsActive())
 		OnActive();
 	else if(IsHot())
@@ -28,37 +29,37 @@ void CEditorObject::OnMapLoad() {}
 
 bool CEditorObject::IsHot()
 {
-	return Ui()->HotItem() == this;
+	return UI()->HotItem() == this;
 }
 
 void CEditorObject::SetHot()
 {
-	Ui()->SetHotItem(this);
+	UI()->SetHotItem(this);
 }
 
 void CEditorObject::UnsetHot()
 {
 	if(IsHot())
-		Ui()->SetHotItem(nullptr);
+		UI()->SetHotItem(nullptr);
 }
 
 void CEditorObject::OnHot() {}
 
 bool CEditorObject::IsActive()
 {
-	return Ui()->CheckActiveItem(this);
+	return UI()->CheckActiveItem(this);
 }
 
 void CEditorObject::SetActive()
 {
 	SetHot();
-	Ui()->SetActiveItem(this);
+	UI()->SetActiveItem(this);
 }
 
 void CEditorObject::SetInactive()
 {
 	if(IsActive())
-		Ui()->SetActiveItem(nullptr);
+		UI()->SetActiveItem(nullptr);
 }
 
 void CEditorObject::OnActive() {}
@@ -74,5 +75,5 @@ IGraphics *CEditorObject::Graphics() { return m_pEditor->Graphics(); }
 ISound *CEditorObject::Sound() { return m_pEditor->Sound(); }
 ITextRender *CEditorObject::TextRender() { return m_pEditor->TextRender(); }
 IStorage *CEditorObject::Storage() { return m_pEditor->Storage(); }
-CUi *CEditorObject::Ui() { return m_pEditor->Ui(); }
+CUI *CEditorObject::UI() { return m_pEditor->UI(); }
 CRenderTools *CEditorObject::RenderTools() { return m_pEditor->RenderTools(); }

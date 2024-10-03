@@ -35,8 +35,6 @@ class CMapLayers : public CComponent
 	int m_LastLocalTick;
 	bool m_EnvelopeUpdate;
 
-	bool m_OnlineOnly;
-
 	struct STileLayerVisuals
 	{
 		STileLayerVisuals() :
@@ -152,14 +150,15 @@ public:
 	virtual void OnRender() override;
 	virtual void OnMapLoad() override;
 
-	void RenderTileLayer(int LayerIndex, const ColorRGBA &Color, CMapItemLayerTilemap *pTileLayer, CMapItemGroup *pGroup);
+	void RenderTileLayer(int LayerIndex, ColorRGBA &Color, CMapItemLayerTilemap *pTileLayer, CMapItemGroup *pGroup);
 	void RenderTileBorder(int LayerIndex, const ColorRGBA &Color, CMapItemLayerTilemap *pTileLayer, CMapItemGroup *pGroup, int BorderX0, int BorderY0, int BorderX1, int BorderY1);
 	void RenderKillTileBorder(int LayerIndex, const ColorRGBA &Color, CMapItemLayerTilemap *pTileLayer, CMapItemGroup *pGroup);
 	void RenderQuadLayer(int LayerIndex, CMapItemLayerQuads *pQuadLayer, CMapItemGroup *pGroup, bool ForceRender = false);
 
 	void EnvelopeUpdate();
 
-	static void EnvelopeEval(int TimeOffsetMillis, int Env, ColorRGBA &Result, size_t Channels, void *pUser);
+	static void EnvelopeEval(int TimeOffsetMillis, int Env, ColorRGBA &Channels, void *pUser);
+	bool m_OnlineOnly;
 };
 
 #endif

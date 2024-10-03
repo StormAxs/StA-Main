@@ -8,13 +8,15 @@
 
 class CDamageInd : public CComponent
 {
+	int64_t m_Lastupdate;
 	struct CItem
 	{
 		vec2 m_Pos;
 		vec2 m_Dir;
-		float m_RemainingLife;
+		float m_StartTime;
 		float m_StartAngle;
 		ColorRGBA m_Color;
+		float m_StartAlpha;
 	};
 
 	enum
@@ -25,6 +27,9 @@ class CDamageInd : public CComponent
 	CItem m_aItems[MAX_ITEMS];
 	int m_NumItems;
 
+	CItem *CreateI();
+	void DestroyI(CItem *pItem);
+
 	int m_DmgIndQuadContainerIndex;
 
 public:
@@ -33,7 +38,7 @@ public:
 
 	void CreateDamageInd(vec2 Pos, float Angle, float Alpha, int Amount);
 	void Create(vec2 Pos, vec2 Dir, float Alpha);
-	virtual void OnReset() override;
+	void Reset();
 	virtual void OnRender() override;
 	virtual void OnInit() override;
 };

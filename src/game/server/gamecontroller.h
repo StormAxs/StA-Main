@@ -8,6 +8,9 @@
 #include <engine/shared/protocol.h>
 #include <game/server/teams.h>
 
+#include <map>
+#include <vector>
+
 struct CScoreLoadBestTimeResult;
 
 /*
@@ -95,7 +98,6 @@ public:
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
 
 	virtual void HandleCharacterTiles(class CCharacter *pChr, int MapIndex);
-	virtual void SetArmorProgress(CCharacter *pCharacer, int Progress){};
 
 	/*
 		Function: OnEntity
@@ -128,7 +130,7 @@ public:
 	/*
 
 	*/
-	virtual bool CanBeMovedOnBalance(int ClientId);
+	virtual bool CanBeMovedOnBalance(int ClientID);
 
 	virtual void Tick();
 
@@ -142,16 +144,18 @@ public:
 
 	*/
 	virtual const char *GetTeamName(int Team);
-	virtual int GetAutoTeam(int NotThisId);
-	virtual bool CanJoinTeam(int Team, int NotThisId, char *pErrorReason, int ErrorReasonSize);
+	virtual int GetAutoTeam(int NotThisID);
+	virtual bool CanJoinTeam(int Team, int NotThisID, char *pErrorReason, int ErrorReasonSize);
 	int ClampTeam(int Team);
 
 	CClientMask GetMaskForPlayerWorldEvent(int Asker, int ExceptID = -1);
+	virtual void InitTeleporter();
 
-	bool IsTeamPlay() { return m_GameFlags & GAMEFLAG_TEAMS; }
 	// DDRace
 
 	float m_CurrentRecord;
+	std::map<int, std::vector<vec2>> m_TeleOuts;
+	std::map<int, std::vector<vec2>> m_TeleCheckOuts;
 	CGameTeams &Teams() { return m_Teams; }
 	std::shared_ptr<CScoreLoadBestTimeResult> m_pLoadBestTimeResult;
 };

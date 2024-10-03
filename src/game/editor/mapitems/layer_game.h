@@ -13,7 +13,7 @@ public:
 	void SetTile(int x, int y, CTile Tile) override;
 	const char *TypeName() const override;
 
-	CUi::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
+	CUI::EPopupMenuFunctionResult RenderProperties(CUIRect *pToolbox) override;
 };
 
 #endif

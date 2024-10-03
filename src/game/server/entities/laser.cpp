@@ -44,9 +44,9 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	bool pDontHitSelf = g_Config.m_SvOldLaser || (m_Bounces == 0 && !m_WasTele);
 
 	if(pOwnerChar ? (!pOwnerChar->LaserHitDisabled() && m_Type == WEAPON_LASER) || (!pOwnerChar->ShotgunHitDisabled() && m_Type == WEAPON_SHOTGUN) : g_Config.m_SvHit)
-		pHit = GameWorld()->IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner);
+		pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner);
 	else
-		pHit = GameWorld()->IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, pOwnerChar);
+		pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, pOwnerChar);
 
 	if(!pHit || (pHit == pOwnerChar && g_Config.m_SvOldLaser) || (pHit != pOwnerChar && pOwnerChar ? (pOwnerChar->LaserHitDisabled() && m_Type == WEAPON_LASER) || (pOwnerChar->ShotgunHitDisabled() && m_Type == WEAPON_SHOTGUN) : !g_Config.m_SvHit))
 		return false;
@@ -55,46 +55,48 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	m_Energy = -1;
 	if(m_Type == WEAPON_SHOTGUN)
 	{
+		vec2 Temp;
+
 		float Strength;
 		if(!m_TuneZone)
 			Strength = Tuning()->m_ShotgunStrength;
 		else
 			Strength = TuningList()[m_TuneZone].m_ShotgunStrength;
 
-		const vec2 &HitPos = pHit->Core()->m_Pos;
+		vec2 &HitPos = pHit->Core()->m_Pos;
 		if(!g_Config.m_SvOldLaser)
 		{
 			if(m_PrevPos != HitPos)
 			{
-				pHit->AddVelocity(normalize(m_PrevPos - HitPos) * Strength);
+				Temp = pHit->Core()->m_Vel + normalize(m_PrevPos - HitPos) * Strength;
+				pHit->Core()->m_Vel = ClampVel(pHit->m_MoveRestrictions, Temp);
 			}
 			else
 			{
-				pHit->SetRawVelocity(StackedLaserShotgunBugSpeed);
+				pHit->Core()->m_Vel = StackedLaserShotgunBugSpeed;
 			}
 		}
 		else if(g_Config.m_SvOldLaser && pOwnerChar)
 		{
 			if(pOwnerChar->Core()->m_Pos != HitPos)
 			{
-				pHit->AddVelocity(normalize(pOwnerChar->Core()->m_Pos - HitPos) * Strength);
+				Temp = pHit->Core()->m_Vel + normalize(pOwnerChar->Core()->m_Pos - HitPos) * Strength;
+				pHit->Core()->m_Vel = ClampVel(pHit->m_MoveRestrictions, Temp);
 			}
 			else
 			{
-				pHit->SetRawVelocity(StackedLaserShotgunBugSpeed);
+				pHit->Core()->m_Vel = StackedLaserShotgunBugSpeed;
 			}
 		}
 		else
 		{
-			// Re-apply move restrictions as a part of 'shotgun bug' reproduction
-			pHit->ApplyMoveRestrictions();
+			pHit->Core()->m_Vel = ClampVel(pHit->m_MoveRestrictions, pHit->Core()->m_Vel);
 		}
 	}
 	else if(m_Type == WEAPON_LASER)
 	{
 		pHit->UnFreeze();
 	}
-	pHit->TakeDamage(vec2(0, 0), 0, m_Owner, m_Type);
 	return true;
 }
 
@@ -165,10 +167,10 @@ void CLaser::DoBounce()
 			}
 			m_ZeroEnergyBounceInLastTick = Distance == 0.0f;
 
-			if(Res == TILE_TELEINWEAPON && !GameServer()->Collision()->TeleOuts(z - 1).empty())
+			if(Res == TILE_TELEINWEAPON && !GameServer()->m_pController->m_TeleOuts[z - 1].empty())
 			{
-				int TeleOut = GameServer()->m_World.m_Core.RandomOr0(GameServer()->Collision()->TeleOuts(z - 1).size());
-				m_TelePos = GameServer()->Collision()->TeleOuts(z - 1)[TeleOut];
+				int TeleOut = GameServer()->m_World.m_Core.RandomOr0(GameServer()->m_pController->m_TeleOuts[z - 1].size());
+				m_TelePos = GameServer()->m_pController->m_TeleOuts[z - 1][TeleOut];
 				m_WasTele = true;
 			}
 			else
@@ -315,7 +317,7 @@ void CLaser::Snap(int SnappingClient)
 	int SnappingClientVersion = GameServer()->GetClientVersion(SnappingClient);
 	int LaserType = m_Type == WEAPON_LASER ? LASERTYPE_RIFLE : m_Type == WEAPON_SHOTGUN ? LASERTYPE_SHOTGUN : -1;
 
-	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), GetId(),
+	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), GetID(),
 		m_Pos, m_From, m_EvalTick, m_Owner, LaserType, 0, m_Number);
 }
 

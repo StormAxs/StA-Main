@@ -12,67 +12,90 @@
 
 CDamageInd::CDamageInd()
 {
+	m_Lastupdate = 0;
 	m_NumItems = 0;
+}
+
+CDamageInd::CItem *CDamageInd::CreateI()
+{
+	if(m_NumItems < MAX_ITEMS)
+	{
+		CItem *p = &m_aItems[m_NumItems];
+		m_NumItems++;
+		return p;
+	}
+	return 0;
+}
+
+void CDamageInd::DestroyI(CDamageInd::CItem *pItem)
+{
+	m_NumItems--;
+	*pItem = m_aItems[m_NumItems];
+}
+
+void CDamageInd::CreateDamageInd(vec2 Pos, float Angle, float Alpha, int Amount)
+{
+	float a = 3 * pi / 2 + Angle;
+	float s = a - pi / 3;
+	float e = a + pi / 3;
+	for(int i = 0; i < Amount; i++)
+	{
+		float f = mix(s, e, (i + 1) / (float)(Amount + 2));
+		Create(Pos, direction(f), Alpha);
+	}
 }
 
 void CDamageInd::Create(vec2 Pos, vec2 Dir, float Alpha)
 {
-	if(m_NumItems >= MAX_ITEMS)
-		return;
-
-	CItem *pItem = &m_aItems[m_NumItems];
-	pItem->m_Pos = Pos;
-	pItem->m_Dir = -Dir;
-	pItem->m_RemainingLife = 0.75f;
-	pItem->m_StartAngle = -random_angle();
-	pItem->m_Color = ColorRGBA(1.0f, 1.0f, 1.0f, Alpha);
-	++m_NumItems;
+	CItem *pItem = CreateI();
+	if(pItem)
+	{
+		pItem->m_Pos = Pos;
+		pItem->m_StartTime = LocalTime();
+		pItem->m_Dir = -Dir;
+		pItem->m_StartAngle = -random_angle();
+		pItem->m_Color = ColorRGBA(1.0f, 1.0f, 1.0f, Alpha);
+		pItem->m_StartAlpha = Alpha;
+	}
 }
 
 void CDamageInd::OnRender()
 {
-	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		return;
-
-	static float s_LastLocalTime = LocalTime();
-	float LifeAdjustment;
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-		if(pInfo->m_Paused)
-			LifeAdjustment = 0.0f;
-		else
-			LifeAdjustment = (LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
-	}
-	else
-	{
-		const auto &pGameInfoObj = GameClient()->m_Snap.m_pGameInfoObj;
-		if(pGameInfoObj && pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_PAUSED)
-			LifeAdjustment = 0.0f;
-		else
-			LifeAdjustment = LocalTime() - s_LastLocalTime;
-	}
-	s_LastLocalTime = LocalTime();
-
 	Graphics()->TextureSet(GameClient()->m_GameSkin.m_aSpriteStars[0]);
+	static float s_LastLocalTime = LocalTime();
 	for(int i = 0; i < m_NumItems;)
 	{
-		m_aItems[i].m_RemainingLife -= LifeAdjustment;
-		if(m_aItems[i].m_RemainingLife < 0.0f)
+		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
 		{
-			--m_NumItems;
-			m_aItems[i] = m_aItems[m_NumItems];
+			const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
+			if(pInfo->m_Paused)
+				m_aItems[i].m_StartTime += LocalTime() - s_LastLocalTime;
+			else
+				m_aItems[i].m_StartTime += (LocalTime() - s_LastLocalTime) * (1.0f - pInfo->m_Speed);
 		}
 		else
 		{
-			vec2 Pos = mix(m_aItems[i].m_Pos + m_aItems[i].m_Dir * 75.0f, m_aItems[i].m_Pos, clamp((m_aItems[i].m_RemainingLife - 0.60f) / 0.15f, 0.0f, 1.0f));
-			const float LifeAlpha = m_aItems[i].m_RemainingLife / 0.1f;
-			Graphics()->SetColor(m_aItems[i].m_Color.WithMultipliedAlpha(LifeAlpha));
-			Graphics()->QuadsSetRotation(m_aItems[i].m_StartAngle + m_aItems[i].m_RemainingLife * 2.0f);
+			if(m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_PAUSED)
+				m_aItems[i].m_StartTime += LocalTime() - s_LastLocalTime;
+		}
+
+		float Life = 0.75f - (LocalTime() - m_aItems[i].m_StartTime);
+		if(Life < 0.0f)
+			DestroyI(&m_aItems[i]);
+		else
+		{
+			vec2 Pos = mix(m_aItems[i].m_Pos + m_aItems[i].m_Dir * 75.0f, m_aItems[i].m_Pos, clamp((Life - 0.60f) / 0.15f, 0.0f, 1.0f));
+			ColorRGBA Color = m_aItems[i].m_Color;
+
+			Color.a = m_aItems[i].m_StartAlpha * fmin(1, Life / 0.1f);
+
+			Graphics()->SetColor(Color);
+			Graphics()->QuadsSetRotation(m_aItems[i].m_StartAngle + Life * 2.0f);
 			Graphics()->RenderQuadContainerAsSprite(m_DmgIndQuadContainerIndex, 0, Pos.x, Pos.y);
 			i++;
 		}
 	}
+	s_LastLocalTime = LocalTime();
 
 	Graphics()->QuadsSetRotation(0);
 	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
@@ -91,7 +114,10 @@ void CDamageInd::OnInit()
 	Graphics()->QuadContainerUpload(m_DmgIndQuadContainerIndex);
 }
 
-void CDamageInd::OnReset()
+void CDamageInd::Reset()
 {
-	m_NumItems = 0;
+	for(int i = 0; i < m_NumItems;)
+	{
+		DestroyI(&m_aItems[i]);
+	}
 }

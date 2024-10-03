@@ -27,7 +27,12 @@ void CLayerFront::SetTile(int x, int y, CTile Tile)
 	{
 		CTile air = {TILE_AIR};
 		CLayerTiles::SetTile(x, y, air);
-		ShowPreventUnusedTilesWarning();
+		if(!m_pEditor->m_PreventUnusedTilesWasWarned)
+		{
+			m_pEditor->m_PopupEventType = CEditor::POPEVENT_PREVENTUNUSEDTILES;
+			m_pEditor->m_PopupEventActivated = true;
+			m_pEditor->m_PreventUnusedTilesWasWarned = true;
+		}
 	}
 }
 

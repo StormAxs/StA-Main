@@ -320,7 +320,7 @@ void CEditorActionDeleteQuad::Redo()
 CEditorActionEditQuadPoint::CEditorActionEditQuadPoint(CEditor *pEditor, int GroupIndex, int LayerIndex, int QuadIndex, std::vector<CPoint> const &vPreviousPoints, std::vector<CPoint> const &vCurrentPoints) :
 	CEditorActionLayerBase(pEditor, GroupIndex, LayerIndex), m_QuadIndex(QuadIndex), m_vPreviousPoints(vPreviousPoints), m_vCurrentPoints(vCurrentPoints)
 {
-	str_copy(m_aDisplayText, "Edit quad points");
+	str_format(m_aDisplayText, sizeof(m_aDisplayText), "Edit quad points");
 }
 
 void CEditorActionEditQuadPoint::Undo()
@@ -476,24 +476,24 @@ void CEditorActionBulk::Redo()
 
 // ---------
 
-CEditorActionTileChanges::CEditorActionTileChanges(CEditor *pEditor, int GroupIndex, int LayerIndex, const char *pAction, const EditorTileStateChangeHistory<STileStateChange> &Changes) :
+CEditorActionAutoMap::CEditorActionAutoMap(CEditor *pEditor, int GroupIndex, int LayerIndex, const EditorTileStateChangeHistory<STileStateChange> &Changes) :
 	CEditorActionLayerBase(pEditor, GroupIndex, LayerIndex), m_Changes(Changes)
 {
 	ComputeInfos();
-	str_format(m_aDisplayText, sizeof(m_aDisplayText), "%s (x%d)", pAction, m_TotalChanges);
+	str_format(m_aDisplayText, sizeof(m_aDisplayText), "Auto map (x%d)", m_TotalChanges);
 }
 
-void CEditorActionTileChanges::Undo()
+void CEditorActionAutoMap::Undo()
 {
 	Apply(true);
 }
 
-void CEditorActionTileChanges::Redo()
+void CEditorActionAutoMap::Redo()
 {
 	Apply(false);
 }
 
-void CEditorActionTileChanges::Apply(bool Undo)
+void CEditorActionAutoMap::Apply(bool Undo)
 {
 	auto &Map = m_pEditor->m_Map;
 	std::shared_ptr<CLayerTiles> pLayerTiles = std::static_pointer_cast<CLayerTiles>(m_pLayer);
@@ -512,7 +512,7 @@ void CEditorActionTileChanges::Apply(bool Undo)
 	Map.OnModify();
 }
 
-void CEditorActionTileChanges::ComputeInfos()
+void CEditorActionAutoMap::ComputeInfos()
 {
 	m_TotalChanges = 0;
 	for(auto &Line : m_Changes)
@@ -539,22 +539,6 @@ void CEditorActionAddLayer::Undo()
 {
 	// Undo: remove layer from vector but keep it in case we want to add it back
 	auto &vLayers = m_pEditor->m_Map.m_vpGroups[m_GroupIndex]->m_vpLayers;
-
-	if(m_pLayer->m_Type == LAYERTYPE_TILES)
-	{
-		std::shared_ptr<CLayerTiles> pLayerTiles = std::static_pointer_cast<CLayerTiles>(m_pLayer);
-		if(pLayerTiles->m_Front)
-			m_pEditor->m_Map.m_pFrontLayer = nullptr;
-		else if(pLayerTiles->m_Tele)
-			m_pEditor->m_Map.m_pTeleLayer = nullptr;
-		else if(pLayerTiles->m_Speedup)
-			m_pEditor->m_Map.m_pSpeedupLayer = nullptr;
-		else if(pLayerTiles->m_Switch)
-			m_pEditor->m_Map.m_pSwitchLayer = nullptr;
-		else if(pLayerTiles->m_Tune)
-			m_pEditor->m_Map.m_pTuneLayer = nullptr;
-	}
-
 	vLayers.erase(vLayers.begin() + m_LayerIndex);
 
 	m_pEditor->m_Map.m_vpGroups[m_GroupIndex]->m_Collapse = false;
@@ -568,22 +552,6 @@ void CEditorActionAddLayer::Redo()
 {
 	// Redo: add back the removed layer contained in this class
 	auto &vLayers = m_pEditor->m_Map.m_vpGroups[m_GroupIndex]->m_vpLayers;
-
-	if(m_pLayer->m_Type == LAYERTYPE_TILES)
-	{
-		std::shared_ptr<CLayerTiles> pLayerTiles = std::static_pointer_cast<CLayerTiles>(m_pLayer);
-		if(pLayerTiles->m_Front)
-			m_pEditor->m_Map.m_pFrontLayer = std::static_pointer_cast<CLayerFront>(m_pLayer);
-		else if(pLayerTiles->m_Tele)
-			m_pEditor->m_Map.m_pTeleLayer = std::static_pointer_cast<CLayerTele>(m_pLayer);
-		else if(pLayerTiles->m_Speedup)
-			m_pEditor->m_Map.m_pSpeedupLayer = std::static_pointer_cast<CLayerSpeedup>(m_pLayer);
-		else if(pLayerTiles->m_Switch)
-			m_pEditor->m_Map.m_pSwitchLayer = std::static_pointer_cast<CLayerSwitch>(m_pLayer);
-		else if(pLayerTiles->m_Tune)
-			m_pEditor->m_Map.m_pTuneLayer = std::static_pointer_cast<CLayerTune>(m_pLayer);
-	}
-
 	vLayers.insert(vLayers.begin() + m_LayerIndex, m_pLayer);
 
 	m_pEditor->m_Map.m_vpGroups[m_GroupIndex]->m_Collapse = false;
@@ -660,7 +628,7 @@ CEditorActionGroup::CEditorActionGroup(CEditor *pEditor, int GroupIndex, bool De
 	if(m_Delete)
 		str_format(m_aDisplayText, sizeof(m_aDisplayText), "Delete group %d", m_GroupIndex);
 	else
-		str_copy(m_aDisplayText, "New group", sizeof(m_aDisplayText));
+		str_format(m_aDisplayText, sizeof(m_aDisplayText), "New group");
 }
 
 void CEditorActionGroup::Undo()
@@ -826,14 +794,12 @@ void CEditorActionEditLayerProp::Apply(int Value)
 	if(m_Prop == ELayerProp::PROP_GROUP)
 	{
 		auto pCurrentGroup = m_pEditor->m_Map.m_vpGroups[Value == m_Previous ? m_Current : m_Previous];
-		auto pPreviousGroup = m_pEditor->m_Map.m_vpGroups[Value];
-		pCurrentGroup->m_vpLayers.erase(pCurrentGroup->m_vpLayers.begin() + pCurrentGroup->m_vpLayers.size() - 1);
-		if(Value == m_Previous)
-			pPreviousGroup->m_vpLayers.insert(pPreviousGroup->m_vpLayers.begin() + m_LayerIndex, m_pLayer);
-		else
-			pPreviousGroup->m_vpLayers.push_back(m_pLayer);
+		auto Position = std::find(pCurrentGroup->m_vpLayers.begin(), pCurrentGroup->m_vpLayers.end(), m_pLayer);
+		if(Position != pCurrentGroup->m_vpLayers.end())
+			pCurrentGroup->m_vpLayers.erase(Position);
+		m_pEditor->m_Map.m_vpGroups[Value]->m_vpLayers.push_back(m_pLayer);
 		m_pEditor->m_SelectedGroup = Value;
-		m_pEditor->SelectLayer(m_LayerIndex);
+		m_pEditor->SelectLayer(m_pEditor->m_Map.m_vpGroups[Value]->m_vpLayers.size() - 1);
 	}
 	else if(m_Prop == ELayerProp::PROP_HQ)
 	{
@@ -1230,7 +1196,7 @@ CEditorActionTileArt::CEditorActionTileArt(CEditor *pEditor, int PreviousImageCo
 	IEditorAction(pEditor), m_PreviousImageCount(PreviousImageCount), m_vImageIndexMap(vImageIndexMap)
 {
 	str_copy(m_aTileArtFile, pTileArtFile);
-	str_copy(m_aDisplayText, "Tile art");
+	str_format(m_aDisplayText, sizeof(m_aDisplayText), "Tile art");
 }
 
 void CEditorActionTileArt::Undo()
@@ -1275,7 +1241,7 @@ void CEditorActionTileArt::Undo()
 
 void CEditorActionTileArt::Redo()
 {
-	if(!m_pEditor->Graphics()->LoadPng(m_pEditor->m_TileartImageInfo, m_aTileArtFile, IStorage::TYPE_ALL))
+	if(!m_pEditor->Graphics()->LoadPNG(&m_pEditor->m_TileartImageInfo, m_aTileArtFile, IStorage::TYPE_ALL))
 	{
 		m_pEditor->ShowFileDialogError("Failed to load image from file '%s'.", m_aTileArtFile);
 		return;
@@ -1298,7 +1264,7 @@ CEditorCommandAction::CEditorCommandAction(CEditor *pEditor, EType Type, int *pS
 	switch(m_Type)
 	{
 	case EType::ADD:
-		str_copy(m_aDisplayText, "Add command");
+		str_format(m_aDisplayText, sizeof(m_aDisplayText), "Add command");
 		break;
 	case EType::EDIT:
 		str_format(m_aDisplayText, sizeof(m_aDisplayText), "Edit command %d", m_CommandIndex);
@@ -2098,24 +2064,4 @@ void CEditorActionNewQuad::Redo()
 {
 	std::shared_ptr<CLayerQuads> pLayerQuads = std::static_pointer_cast<CLayerQuads>(m_pLayer);
 	pLayerQuads->m_vQuads.emplace_back(m_Quad);
-}
-
-// --------------
-
-CEditorActionMoveSoundSource::CEditorActionMoveSoundSource(CEditor *pEditor, int GroupIndex, int LayerIndex, int SourceIndex, CPoint OriginalPosition, CPoint CurrentPosition) :
-	CEditorActionLayerBase(pEditor, GroupIndex, LayerIndex), m_SourceIndex(SourceIndex), m_OriginalPosition(OriginalPosition), m_CurrentPosition(CurrentPosition)
-{
-	str_format(m_aDisplayText, sizeof(m_aDisplayText), "Move sound source %d of layer %d in group %d", SourceIndex, LayerIndex, GroupIndex);
-}
-
-void CEditorActionMoveSoundSource::Undo()
-{
-	dbg_assert(m_pLayer->m_Type == LAYERTYPE_SOUNDS, "Layer type does not match a sound layer");
-	std::static_pointer_cast<CLayerSounds>(m_pLayer)->m_vSources[m_SourceIndex].m_Position = m_OriginalPosition;
-}
-
-void CEditorActionMoveSoundSource::Redo()
-{
-	dbg_assert(m_pLayer->m_Type == LAYERTYPE_SOUNDS, "Layer type does not match a sound layer");
-	std::static_pointer_cast<CLayerSounds>(m_pLayer)->m_vSources[m_SourceIndex].m_Position = m_CurrentPosition;
 }

@@ -3,14 +3,11 @@
 #ifndef GAME_CLIENT_RENDER_H
 #define GAME_CLIENT_RENDER_H
 
-#include <engine/client/enums.h>
-
 #include <base/color.h>
 #include <base/vmath.h>
 
 #include <game/client/skin.h>
 #include <game/client/ui_rect.h>
-#include <game/generated/protocol7.h>
 
 class CAnimState;
 class CSpeedupTile;
@@ -27,8 +24,6 @@ struct CEnvPointBezier;
 struct CEnvPointBezier_upstream;
 struct CMapItemGroup;
 struct CQuad;
-
-#include <game/generated/protocol.h>
 
 class CTeeRenderInfo
 {
@@ -51,17 +46,6 @@ public:
 		m_GotAirJump = true;
 		m_TeeRenderFlags = 0;
 		m_FeetFlipped = false;
-
-		for(auto &Sixup : m_aSixup)
-			Sixup.Reset();
-	}
-
-	void Apply(const CSkin *pSkin)
-	{
-		m_OriginalRenderSkin = pSkin->m_OriginalSkin;
-		m_ColorableRenderSkin = pSkin->m_ColorableSkin;
-		m_BloodColor = pSkin->m_BloodColor;
-		m_SkinMetrics = pSkin->m_Metrics;
 	}
 
 	CSkin::SSkinTextures m_OriginalRenderSkin;
@@ -78,44 +62,6 @@ public:
 	bool m_GotAirJump;
 	int m_TeeRenderFlags;
 	bool m_FeetFlipped;
-
-	bool Valid() const
-	{
-		return m_CustomColoredSkin ? m_ColorableRenderSkin.m_Body.IsValid() : m_OriginalRenderSkin.m_Body.IsValid();
-	}
-
-	class CSixup
-	{
-	public:
-		void Reset()
-		{
-			for(auto &Texture : m_aTextures)
-				Texture = IGraphics::CTextureHandle();
-			m_BotTexture = IGraphics::CTextureHandle();
-			for(ColorRGBA &PartColor : m_aColors)
-			{
-				PartColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-			}
-			m_HatSpriteIndex = 0;
-			m_BotColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		bool Valid() const
-		{
-			for(const auto &Texture : m_aTextures)
-				if(!Texture.IsValid())
-					return false;
-			return true;
-		}
-
-		IGraphics::CTextureHandle m_aTextures[protocol7::NUM_SKINPARTS];
-		ColorRGBA m_aColors[protocol7::NUM_SKINPARTS];
-		IGraphics::CTextureHandle m_HatTexture;
-		IGraphics::CTextureHandle m_BotTexture;
-		int m_HatSpriteIndex;
-		ColorRGBA m_BotColor;
-	};
-
-	CSixup m_aSixup[NUM_DUMMIES];
 };
 
 // Tee Render Flags
@@ -166,7 +112,7 @@ public:
 	const CEnvPointBezier *GetBezier(int Index) const override;
 };
 
-typedef void (*ENVELOPE_EVAL)(int TimeOffsetMillis, int Env, ColorRGBA &Result, size_t Channels, void *pUser);
+typedef void (*ENVELOPE_EVAL)(int TimeOffsetMillis, int Env, ColorRGBA &Channels, void *pUser);
 
 class CRenderTools
 {
@@ -175,13 +121,8 @@ class CRenderTools
 
 	int m_TeeQuadContainerIndex;
 
-	static void GetRenderTeeBodyScale(float BaseSize, float &BodyScale);
-	static void GetRenderTeeFeetScale(float BaseSize, float &FeetScaleWidth, float &FeetScaleHeight);
-
-	void SelectSprite(const CDataSprite *pSprite, int Flags) const;
-
-	void RenderTee6(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha = 1.0f) const;
-	void RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha = 1.0f) const;
+	void GetRenderTeeBodyScale(float BaseSize, float &BodyScale);
+	void GetRenderTeeFeetScale(float BaseSize, float &FeetScaleWidth, float &FeetScaleHeight);
 
 public:
 	class IGraphics *Graphics() const { return m_pGraphics; }
@@ -189,8 +130,8 @@ public:
 
 	void Init(class IGraphics *pGraphics, class ITextRender *pTextRender);
 
-	void SelectSprite(int Id, int Flags = 0) const;
-	void SelectSprite7(int Id, int Flags = 0) const;
+	void SelectSprite(CDataSprite *pSprite, int Flags = 0, int sx = 0, int sy = 0) const;
+	void SelectSprite(int Id, int Flags = 0, int sx = 0, int sy = 0) const;
 
 	void GetSpriteScale(const CDataSprite *pSprite, float &ScaleX, float &ScaleY) const;
 	void GetSpriteScale(int Id, float &ScaleX, float &ScaleY) const;
@@ -206,24 +147,24 @@ public:
 	int QuadContainerAddSprite(int QuadContainerIndex, float X, float Y, float Width, float Height) const;
 
 	// larger rendering methods
-	static void GetRenderTeeBodySize(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &BodyOffset, float &Width, float &Height);
-	static void GetRenderTeeFeetSize(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &FeetOffset, float &Width, float &Height);
-	static void GetRenderTeeAnimScaleAndBaseSize(const CTeeRenderInfo *pInfo, float &AnimScale, float &BaseSize);
+	void GetRenderTeeBodySize(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &BodyOffset, float &Width, float &Height);
+	void GetRenderTeeFeetSize(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &FeetOffset, float &Width, float &Height);
+	void GetRenderTeeAnimScaleAndBaseSize(const CTeeRenderInfo *pInfo, float &AnimScale, float &BaseSize);
 
 	// returns the offset to use, to render the tee with @see RenderTee exactly in the mid
-	static void GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &TeeOffsetToMid);
+	void GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &TeeOffsetToMid);
 	// object render methods
 	void RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha = 1.0f, bool Ext = false, int ClientID = -1, bool InAir = false);
 
 	// map render methods (render_map.cpp)
-	static void RenderEvalEnvelope(const IEnvelopePointAccess *pPoints, std::chrono::nanoseconds TimeNanos, ColorRGBA &Result, size_t Channels);
+	static void RenderEvalEnvelope(const IEnvelopePointAccess *pPoints, int Channels, std::chrono::nanoseconds TimeNanos, ColorRGBA &Result);
 	void RenderQuads(CQuad *pQuads, int NumQuads, int Flags, ENVELOPE_EVAL pfnEval, void *pUser) const;
 	void ForceRenderQuads(CQuad *pQuads, int NumQuads, int Flags, ENVELOPE_EVAL pfnEval, void *pUser, float Alpha = 1.0f) const;
-	void RenderTilemap(CTile *pTiles, int w, int h, float Scale, ColorRGBA Color, int RenderFlags) const;
+	void RenderTilemap(CTile *pTiles, int w, int h, float Scale, ColorRGBA Color, int RenderFlags, ENVELOPE_EVAL pfnEval, void *pUser, int ColorEnv, int ColorEnvOffset) const;
 
 	// render a rectangle made of IndexIn tiles, over a background made of IndexOut tiles
 	// the rectangle include all tiles in [RectX, RectX+RectW-1] x [RectY, RectY+RectH-1]
-	void RenderTileRectangle(int RectX, int RectY, int RectW, int RectH, unsigned char IndexIn, unsigned char IndexOut, float Scale, ColorRGBA Color, int RenderFlags) const;
+	void RenderTileRectangle(int RectX, int RectY, int RectW, int RectH, unsigned char IndexIn, unsigned char IndexOut, float Scale, ColorRGBA Color, int RenderFlags, ENVELOPE_EVAL pfnEval, void *pUser, int ColorEnv, int ColorEnvOffset) const;
 
 	// helpers
 	void CalcScreenParams(float Aspect, float Zoom, float *pWidth, float *pHeight);

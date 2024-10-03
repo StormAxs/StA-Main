@@ -30,7 +30,7 @@ public:
 		ACCESS_LEVEL_HELPER,
 		ACCESS_LEVEL_USER,
 
-		TEMPCMD_NAME_LENGTH = 64,
+		TEMPCMD_NAME_LENGTH = 32,
 		TEMPCMD_HELP_LENGTH = 192,
 		TEMPCMD_PARAMS_LENGTH = 96,
 
@@ -53,12 +53,12 @@ public:
 		virtual int GetInteger(unsigned Index) const = 0;
 		virtual float GetFloat(unsigned Index) const = 0;
 		virtual const char *GetString(unsigned Index) const = 0;
-		virtual std::optional<ColorHSLA> GetColor(unsigned Index, float DarkestLighting) const = 0;
+		virtual ColorHSLA GetColor(unsigned Index, bool Light) const = 0;
 
 		virtual void RemoveArgument(unsigned Index) = 0;
 
 		int NumArguments() const { return m_NumArgs; }
-		int m_ClientId;
+		int m_ClientID;
 
 		// DDRace
 
@@ -82,7 +82,7 @@ public:
 		int GetAccessLevel() const { return m_AccessLevel; }
 	};
 
-	typedef void (*FTeeHistorianCommandCallback)(int ClientId, int FlagMask, const char *pCmd, IResult *pResult, void *pUser);
+	typedef void (*FTeeHistorianCommandCallback)(int ClientID, int FlagMask, const char *pCmd, IResult *pResult, void *pUser);
 	typedef void (*FPrintCallback)(const char *pStr, void *pUser, ColorRGBA PrintColor);
 	typedef void (*FPossibleCallback)(int Index, const char *pCmd, void *pUser);
 	typedef void (*FCommandCallback)(IResult *pResult, void *pUserData);
@@ -106,10 +106,10 @@ public:
 	virtual void StoreCommands(bool Store) = 0;
 
 	virtual bool LineIsValid(const char *pStr) = 0;
-	virtual void ExecuteLine(const char *pStr, int ClientId = -1, bool InterpretSemicolons = true) = 0;
-	virtual void ExecuteLineFlag(const char *pStr, int FlasgMask, int ClientId = -1, bool InterpretSemicolons = true) = 0;
-	virtual void ExecuteLineStroked(int Stroke, const char *pStr, int ClientId = -1, bool InterpretSemicolons = true) = 0;
-	virtual bool ExecuteFile(const char *pFilename, int ClientId = -1, bool LogFailure = false, int StorageType = IStorage::TYPE_ALL) = 0;
+	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) = 0;
+	virtual void ExecuteLineFlag(const char *pStr, int FlasgMask, int ClientID = -1, bool InterpretSemicolons = true) = 0;
+	virtual void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) = 0;
+	virtual bool ExecuteFile(const char *pFilename, int ClientID = -1, bool LogFailure = false, int StorageType = IStorage::TYPE_ALL) = 0;
 
 	virtual char *Format(char *pBuf, int Size, const char *pFrom, const char *pStr) = 0;
 	virtual void Print(int Level, const char *pFrom, const char *pStr, ColorRGBA PrintColor = gs_ConsoleDefaultColor) const = 0;

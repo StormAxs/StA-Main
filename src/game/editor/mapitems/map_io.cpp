@@ -2,7 +2,6 @@
 
 #include <engine/client.h>
 #include <engine/console.h>
-#include <engine/gfx/image_manipulation.h>
 #include <engine/graphics.h>
 #include <engine/serverbrowser.h>
 #include <engine/shared/datafile.h>
@@ -34,25 +33,18 @@ struct CSoundSource_DEPRECATED
 	int m_SoundEnvOffset;
 };
 
-bool CEditorMap::Save(const char *pFileName, const std::function<void(const char *pErrorMessage)> &ErrorHandler)
+bool CEditorMap::Save(const char *pFileName)
 {
 	char aFileNameTmp[IO_MAX_PATH_LENGTH];
-	IStorage::FormatTmpPath(aFileNameTmp, sizeof(aFileNameTmp), pFileName);
-
+	str_format(aFileNameTmp, sizeof(aFileNameTmp), "%s.%d.tmp", pFileName, pid());
 	char aBuf[IO_MAX_PATH_LENGTH + 64];
 	str_format(aBuf, sizeof(aBuf), "saving to '%s'...", aFileNameTmp);
 	m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "editor", aBuf);
-
-	if(!PerformPreSaveSanityChecks(ErrorHandler))
-	{
-		return false;
-	}
-
 	CDataFileWriter Writer;
 	if(!Writer.Open(m_pEditor->Storage(), aFileNameTmp))
 	{
-		str_format(aBuf, sizeof(aBuf), "Error: Failed to open file '%s' for writing.", aFileNameTmp);
-		ErrorHandler(aBuf);
+		str_format(aBuf, sizeof(aBuf), "failed to open file '%s'...", aFileNameTmp);
+		m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "editor", aBuf);
 		return false;
 	}
 
@@ -118,8 +110,27 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 		}
 		else
 		{
-			dbg_assert(pImg->m_Format == CImageInfo::FORMAT_RGBA, "Embedded images must be in RGBA format");
-			Item.m_ImageData = Writer.AddData(pImg->DataSize(), pImg->m_pData);
+			const size_t PixelSize = CImageInfo::PixelSize(CImageInfo::FORMAT_RGBA);
+			const size_t DataSize = (size_t)Item.m_Width * Item.m_Height * PixelSize;
+			if(pImg->m_Format == CImageInfo::FORMAT_RGB)
+			{
+				// Convert to RGBA
+				unsigned char *pDataRGBA = (unsigned char *)malloc(DataSize);
+				unsigned char *pDataRGB = (unsigned char *)pImg->m_pData;
+				for(int j = 0; j < Item.m_Width * Item.m_Height; j++)
+				{
+					pDataRGBA[j * PixelSize] = pDataRGB[j * 3];
+					pDataRGBA[j * PixelSize + 1] = pDataRGB[j * 3 + 1];
+					pDataRGBA[j * PixelSize + 2] = pDataRGB[j * 3 + 2];
+					pDataRGBA[j * PixelSize + 3] = 255;
+				}
+				Item.m_ImageData = Writer.AddData(DataSize, pDataRGBA);
+				free(pDataRGBA);
+			}
+			else
+			{
+				Item.m_ImageData = Writer.AddData(DataSize, pImg->m_pData);
+			}
 		}
 		Writer.AddItem(MAPITEMTYPE_IMAGE, i, sizeof(Item), &Item);
 	}
@@ -135,7 +146,6 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 		Item.m_External = 0;
 		Item.m_SoundName = Writer.AddDataString(pSound->m_aName);
 		Item.m_SoundData = Writer.AddData(pSound->m_DataSize, pSound->m_pData);
-		// Value is not read in new versions, but we still need to write it for compatibility with old versions.
 		Item.m_SoundDataSize = pSound->m_DataSize;
 
 		Writer.AddItem(MAPITEMTYPE_SOUND, i, sizeof(Item), &Item);
@@ -162,7 +172,7 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 		GItem.m_NumLayers = 0;
 
 		// save group name
-		StrToInts(GItem.m_aName, std::size(GItem.m_aName), pGroup->m_aName);
+		StrToInts(GItem.m_aName, sizeof(GItem.m_aName) / sizeof(int), pGroup->m_aName);
 
 		for(const std::shared_ptr<CLayer> &pLayer : pGroup->m_vpLayers)
 		{
@@ -231,9 +241,8 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 					Item.m_Data = Writer.AddData((size_t)pLayerTiles->m_Width * pLayerTiles->m_Height * sizeof(CTile), pLayerTiles->m_pTiles);
 
 				// save layer name
-				StrToInts(Item.m_aName, std::size(Item.m_aName), pLayerTiles->m_aName);
+				StrToInts(Item.m_aName, sizeof(Item.m_aName) / sizeof(int), pLayerTiles->m_aName);
 
-				// save item
 				Writer.AddItem(MAPITEMTYPE_LAYER, LayerCount, sizeof(Item), &Item);
 
 				// save auto mapper of each tile layer (not physics layer)
@@ -252,75 +261,61 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 					Writer.AddItem(MAPITEMTYPE_AUTOMAPPER_CONFIG, AutomapperCount, sizeof(ItemAutomapper), &ItemAutomapper);
 					AutomapperCount++;
 				}
+
+				GItem.m_NumLayers++;
+				LayerCount++;
 			}
 			else if(pLayer->m_Type == LAYERTYPE_QUADS)
 			{
 				m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "editor", "saving quads layer");
 				std::shared_ptr<CLayerQuads> pLayerQuads = std::static_pointer_cast<CLayerQuads>(pLayer);
-				CMapItemLayerQuads Item;
-				Item.m_Version = 2;
-				Item.m_Layer.m_Version = 0; // was previously uninitialized, do not rely on it being 0
-				Item.m_Layer.m_Flags = pLayerQuads->m_Flags;
-				Item.m_Layer.m_Type = pLayerQuads->m_Type;
-				Item.m_Image = pLayerQuads->m_Image;
-
-				Item.m_NumQuads = 0;
-				Item.m_Data = -1;
 				if(!pLayerQuads->m_vQuads.empty())
 				{
+					CMapItemLayerQuads Item;
+					Item.m_Version = 2;
+					Item.m_Layer.m_Version = 0; // was previously uninitialized, do not rely on it being 0
+					Item.m_Layer.m_Flags = pLayerQuads->m_Flags;
+					Item.m_Layer.m_Type = pLayerQuads->m_Type;
+					Item.m_Image = pLayerQuads->m_Image;
+
 					// add the data
 					Item.m_NumQuads = pLayerQuads->m_vQuads.size();
 					Item.m_Data = Writer.AddDataSwapped(pLayerQuads->m_vQuads.size() * sizeof(CQuad), pLayerQuads->m_vQuads.data());
-				}
-				else
-				{
-					// add dummy data for backwards compatibility
-					// this allows the layer to be loaded with an empty array since m_NumQuads is 0 while saving
-					CQuad Dummy{};
-					Item.m_Data = Writer.AddDataSwapped(sizeof(CQuad), &Dummy);
-				}
 
-				// save layer name
-				StrToInts(Item.m_aName, std::size(Item.m_aName), pLayerQuads->m_aName);
+					// save layer name
+					StrToInts(Item.m_aName, sizeof(Item.m_aName) / sizeof(int), pLayerQuads->m_aName);
 
-				// save item
-				Writer.AddItem(MAPITEMTYPE_LAYER, LayerCount, sizeof(Item), &Item);
+					Writer.AddItem(MAPITEMTYPE_LAYER, LayerCount, sizeof(Item), &Item);
+
+					GItem.m_NumLayers++;
+					LayerCount++;
+				}
 			}
 			else if(pLayer->m_Type == LAYERTYPE_SOUNDS)
 			{
 				m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "editor", "saving sounds layer");
 				std::shared_ptr<CLayerSounds> pLayerSounds = std::static_pointer_cast<CLayerSounds>(pLayer);
-				CMapItemLayerSounds Item;
-				Item.m_Version = CMapItemLayerSounds::CURRENT_VERSION;
-				Item.m_Layer.m_Version = 0; // was previously uninitialized, do not rely on it being 0
-				Item.m_Layer.m_Flags = pLayerSounds->m_Flags;
-				Item.m_Layer.m_Type = pLayerSounds->m_Type;
-				Item.m_Sound = pLayerSounds->m_Sound;
-
-				Item.m_NumSources = 0;
 				if(!pLayerSounds->m_vSources.empty())
 				{
+					CMapItemLayerSounds Item;
+					Item.m_Version = CMapItemLayerSounds::CURRENT_VERSION;
+					Item.m_Layer.m_Version = 0; // was previously uninitialized, do not rely on it being 0
+					Item.m_Layer.m_Flags = pLayerSounds->m_Flags;
+					Item.m_Layer.m_Type = pLayerSounds->m_Type;
+					Item.m_Sound = pLayerSounds->m_Sound;
+
 					// add the data
 					Item.m_NumSources = pLayerSounds->m_vSources.size();
 					Item.m_Data = Writer.AddDataSwapped(pLayerSounds->m_vSources.size() * sizeof(CSoundSource), pLayerSounds->m_vSources.data());
-				}
-				else
-				{
-					// add dummy data for backwards compatibility
-					// this allows the layer to be loaded with an empty array since m_NumSources is 0 while saving
-					CSoundSource Dummy{};
-					Item.m_Data = Writer.AddDataSwapped(sizeof(CSoundSource), &Dummy);
-				}
 
-				// save layer name
-				StrToInts(Item.m_aName, std::size(Item.m_aName), pLayerSounds->m_aName);
+					// save layer name
+					StrToInts(Item.m_aName, sizeof(Item.m_aName) / sizeof(int), pLayerSounds->m_aName);
 
-				// save item
-				Writer.AddItem(MAPITEMTYPE_LAYER, LayerCount, sizeof(Item), &Item);
+					Writer.AddItem(MAPITEMTYPE_LAYER, LayerCount, sizeof(Item), &Item);
+					GItem.m_NumLayers++;
+					LayerCount++;
+				}
 			}
-
-			GItem.m_NumLayers++;
-			LayerCount++;
 		}
 
 		Writer.AddItem(MAPITEMTYPE_GROUP, GroupCount, sizeof(GItem), &GItem);
@@ -338,7 +333,7 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 		Item.m_StartPoint = PointCount;
 		Item.m_NumPoints = m_vpEnvelopes[e]->m_vPoints.size();
 		Item.m_Synchronized = m_vpEnvelopes[e]->m_Synchronized;
-		StrToInts(Item.m_aName, std::size(Item.m_aName), m_vpEnvelopes[e]->m_aName);
+		StrToInts(Item.m_aName, sizeof(Item.m_aName) / sizeof(int), m_vpEnvelopes[e]->m_aName);
 
 		Writer.AddItem(MAPITEMTYPE_ENVELOPE, e, sizeof(Item), &Item);
 		PointCount += Item.m_NumPoints;
@@ -408,42 +403,11 @@ bool CEditorMap::Save(const char *pFileName, const std::function<void(const char
 	return true;
 }
 
-bool CEditorMap::PerformPreSaveSanityChecks(const std::function<void(const char *pErrorMessage)> &ErrorHandler)
-{
-	bool Success = true;
-	char aErrorMessage[256];
-
-	for(const std::shared_ptr<CEditorImage> &pImage : m_vpImages)
-	{
-		if(!pImage->m_External && pImage->m_pData == nullptr)
-		{
-			str_format(aErrorMessage, sizeof(aErrorMessage), "Error: Saving is not possible because the image '%s' could not be loaded. Remove or replace this image.", pImage->m_aName);
-			ErrorHandler(aErrorMessage);
-			Success = false;
-		}
-	}
-
-	for(const std::shared_ptr<CEditorSound> &pSound : m_vpSounds)
-	{
-		if(pSound->m_pData == nullptr)
-		{
-			str_format(aErrorMessage, sizeof(aErrorMessage), "Error: Saving is not possible because the sound '%s' could not be loaded. Remove or replace this sound.", pSound->m_aName);
-			ErrorHandler(aErrorMessage);
-			Success = false;
-		}
-	}
-
-	return Success;
-}
-
 bool CEditorMap::Load(const char *pFileName, int StorageType, const std::function<void(const char *pErrorMessage)> &ErrorHandler)
 {
 	CDataFileReader DataFile;
 	if(!DataFile.Open(m_pEditor->Storage(), pFileName, StorageType))
-	{
-		ErrorHandler("Error: Failed to open map file. See local console for details.");
 		return false;
-	}
 
 	// check version
 	const CMapItemVersion *pItemVersion = static_cast<CMapItemVersion *>(DataFile.FindItem(MAPITEMTYPE_VERSION, 0));
@@ -462,9 +426,9 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 		for(int i = Start; i < Start + Num; i++)
 		{
 			int ItemSize = DataFile.GetItemSize(Start);
-			int ItemId;
-			CMapItemInfoSettings *pItem = (CMapItemInfoSettings *)DataFile.GetItem(i, nullptr, &ItemId);
-			if(!pItem || ItemId != 0)
+			int ItemID;
+			CMapItemInfoSettings *pItem = (CMapItemInfoSettings *)DataFile.GetItem(i, nullptr, &ItemID);
+			if(!pItem || ItemID != 0)
 				continue;
 
 			const auto &&ReadStringInfo = [&](int Index, char *pBuffer, size_t BufferSize, const char *pErrorContext) {
@@ -527,55 +491,43 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 			else
 				str_copy(pImg->m_aName, pName);
 
-			if(pItem->m_Version > 1 && pItem->m_MustBe1 != 1)
-			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Error: Unsupported image type of image %d '%s'.", i, pImg->m_aName);
-				ErrorHandler(aBuf);
-			}
-
-			if(pImg->m_External || (pItem->m_Version > 1 && pItem->m_MustBe1 != 1))
+			const CImageInfo::EImageFormat Format = pItem->m_Version < CMapItemImage_v2::CURRENT_VERSION ? CImageInfo::FORMAT_RGBA : CImageInfo::ImageFormatFromInt(pItem->m_Format);
+			if(pImg->m_External || (Format != CImageInfo::FORMAT_RGB && Format != CImageInfo::FORMAT_RGBA))
 			{
 				char aBuf[IO_MAX_PATH_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "mapres/%s.png", pImg->m_aName);
 
 				// load external
 				CImageInfo ImgInfo;
-				if(m_pEditor->Graphics()->LoadPng(ImgInfo, aBuf, IStorage::TYPE_ALL))
+				if(m_pEditor->Graphics()->LoadPNG(&ImgInfo, aBuf, IStorage::TYPE_ALL))
 				{
 					pImg->m_Width = ImgInfo.m_Width;
 					pImg->m_Height = ImgInfo.m_Height;
 					pImg->m_Format = ImgInfo.m_Format;
 					pImg->m_pData = ImgInfo.m_pData;
-					ConvertToRgba(*pImg);
-
 					int TextureLoadFlag = m_pEditor->Graphics()->Uses2DTextureArrays() ? IGraphics::TEXLOAD_TO_2D_ARRAY_TEXTURE : IGraphics::TEXLOAD_TO_3D_TEXTURE;
-					if(pImg->m_Width % 16 != 0 || pImg->m_Height % 16 != 0)
+					if(ImgInfo.m_Width % 16 != 0 || ImgInfo.m_Height % 16 != 0)
 						TextureLoadFlag = 0;
+					pImg->m_Texture = m_pEditor->Graphics()->LoadTextureRaw(ImgInfo.m_Width, ImgInfo.m_Height, ImgInfo.m_Format, ImgInfo.m_pData, TextureLoadFlag, aBuf);
+					ImgInfo.m_pData = nullptr;
 					pImg->m_External = 1;
-					pImg->m_Texture = m_pEditor->Graphics()->LoadTextureRaw(*pImg, TextureLoadFlag, aBuf);
-				}
-				else
-				{
-					str_format(aBuf, sizeof(aBuf), "Error: Failed to load external image '%s'.", pImg->m_aName);
-					ErrorHandler(aBuf);
 				}
 			}
 			else
 			{
 				pImg->m_Width = pItem->m_Width;
 				pImg->m_Height = pItem->m_Height;
-				pImg->m_Format = CImageInfo::FORMAT_RGBA;
+				pImg->m_Format = Format;
 
 				// copy image data
 				void *pData = DataFile.GetData(pItem->m_ImageData);
-				const size_t DataSize = pImg->DataSize();
-				pImg->m_pData = static_cast<uint8_t *>(malloc(DataSize));
+				const size_t DataSize = (size_t)pImg->m_Width * pImg->m_Height * CImageInfo::PixelSize(Format);
+				pImg->m_pData = malloc(DataSize);
 				mem_copy(pImg->m_pData, pData, DataSize);
 				int TextureLoadFlag = m_pEditor->Graphics()->Uses2DTextureArrays() ? IGraphics::TEXLOAD_TO_2D_ARRAY_TEXTURE : IGraphics::TEXLOAD_TO_3D_TEXTURE;
 				if(pImg->m_Width % 16 != 0 || pImg->m_Height % 16 != 0)
 					TextureLoadFlag = 0;
-				pImg->m_Texture = m_pEditor->Graphics()->LoadTextureRaw(*pImg, TextureLoadFlag, pImg->m_aName);
+				pImg->m_Texture = m_pEditor->Graphics()->LoadTextureRaw(pImg->m_Width, pImg->m_Height, pImg->m_Format, pImg->m_pData, TextureLoadFlag);
 			}
 
 			// load auto mapper file
@@ -618,21 +570,18 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 				// load external
 				if(m_pEditor->Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pSound->m_pData, &pSound->m_DataSize))
 				{
-					pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
-				}
-				else
-				{
-					str_format(aBuf, sizeof(aBuf), "Error: Failed to load external sound '%s'.", pSound->m_aName);
-					ErrorHandler(aBuf);
+					pSound->m_SoundID = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
 				}
 			}
 			else
 			{
-				pSound->m_DataSize = DataFile.GetDataSize(pItem->m_SoundData);
+				pSound->m_DataSize = pItem->m_SoundDataSize;
+
+				// copy sample data
 				void *pData = DataFile.GetData(pItem->m_SoundData);
 				pSound->m_pData = malloc(pSound->m_DataSize);
 				mem_copy(pSound->m_pData, pData, pSound->m_DataSize);
-				pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
+				pSound->m_SoundID = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
 			}
 
 			m_vpSounds.push_back(pSound);
@@ -675,7 +624,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 
 			// load group name
 			if(pGItem->m_Version >= 3)
-				IntsToStr(pGItem->m_aName, std::size(pGItem->m_aName), pGroup->m_aName, std::size(pGroup->m_aName));
+				IntsToStr(pGItem->m_aName, sizeof(pGroup->m_aName) / sizeof(int), pGroup->m_aName);
 
 			for(int l = 0; l < pGItem->m_NumLayers; l++)
 			{
@@ -751,7 +700,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 
 					// load layer name
 					if(pTilemapItem->m_Version >= 3)
-						IntsToStr(pTilemapItem->m_aName, std::size(pTilemapItem->m_aName), pTiles->m_aName, std::size(pTiles->m_aName));
+						IntsToStr(pTilemapItem->m_aName, sizeof(pTiles->m_aName) / sizeof(int), pTiles->m_aName);
 
 					if(pTiles->m_Tele)
 					{
@@ -877,17 +826,13 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 
 					// load layer name
 					if(pQuadsItem->m_Version >= 2)
-						IntsToStr(pQuadsItem->m_aName, std::size(pQuadsItem->m_aName), pQuads->m_aName, std::size(pQuads->m_aName));
+						IntsToStr(pQuadsItem->m_aName, sizeof(pQuads->m_aName) / sizeof(int), pQuads->m_aName);
 
-					if(pQuadsItem->m_NumQuads > 0)
-					{
-						void *pData = DataFile.GetDataSwapped(pQuadsItem->m_Data);
-						pQuads->m_vQuads.resize(pQuadsItem->m_NumQuads);
-						mem_copy(pQuads->m_vQuads.data(), pData, sizeof(CQuad) * pQuadsItem->m_NumQuads);
-						DataFile.UnloadData(pQuadsItem->m_Data);
-					}
-
+					void *pData = DataFile.GetDataSwapped(pQuadsItem->m_Data);
 					pGroup->AddLayer(pQuads);
+					pQuads->m_vQuads.resize(pQuadsItem->m_NumQuads);
+					mem_copy(pQuads->m_vQuads.data(), pData, sizeof(CQuad) * pQuadsItem->m_NumQuads);
+					DataFile.UnloadData(pQuadsItem->m_Data);
 				}
 				else if(pLayerItem->m_Type == LAYERTYPE_SOUNDS)
 				{
@@ -904,18 +849,14 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 						pSounds->m_Sound = -1;
 
 					// load layer name
-					IntsToStr(pSoundsItem->m_aName, std::size(pSoundsItem->m_aName), pSounds->m_aName, std::size(pSounds->m_aName));
+					IntsToStr(pSoundsItem->m_aName, sizeof(pSounds->m_aName) / sizeof(int), pSounds->m_aName);
 
 					// load data
-					if(pSoundsItem->m_NumSources > 0)
-					{
-						void *pData = DataFile.GetDataSwapped(pSoundsItem->m_Data);
-						pSounds->m_vSources.resize(pSoundsItem->m_NumSources);
-						mem_copy(pSounds->m_vSources.data(), pData, sizeof(CSoundSource) * pSoundsItem->m_NumSources);
-						DataFile.UnloadData(pSoundsItem->m_Data);
-					}
-
+					void *pData = DataFile.GetDataSwapped(pSoundsItem->m_Data);
 					pGroup->AddLayer(pSounds);
+					pSounds->m_vSources.resize(pSoundsItem->m_NumSources);
+					mem_copy(pSounds->m_vSources.data(), pData, sizeof(CSoundSource) * pSoundsItem->m_NumSources);
+					DataFile.UnloadData(pSoundsItem->m_Data);
 				}
 				else if(pLayerItem->m_Type == LAYERTYPE_SOUNDS_DEPRECATED)
 				{
@@ -933,7 +874,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 						pSounds->m_Sound = -1;
 
 					// load layer name
-					IntsToStr(pSoundsItem->m_aName, std::size(pSoundsItem->m_aName), pSounds->m_aName, std::size(pSounds->m_aName));
+					IntsToStr(pSoundsItem->m_aName, sizeof(pSounds->m_aName) / sizeof(int), pSounds->m_aName);
 
 					// load data
 					CSoundSource_DEPRECATED *pData = (CSoundSource_DEPRECATED *)DataFile.GetDataSwapped(pSoundsItem->m_Data);
@@ -975,20 +916,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 		for(int e = 0; e < EnvNum; e++)
 		{
 			CMapItemEnvelope *pItem = (CMapItemEnvelope *)DataFile.GetItem(EnvStart + e);
-			int Channels = pItem->m_Channels;
-			if(Channels <= 0 || Channels == 2 || Channels > CEnvPoint::MAX_CHANNELS)
-			{
-				// Fall back to showing all channels if the number of channels is unsupported
-				Channels = CEnvPoint::MAX_CHANNELS;
-			}
-			if(Channels != pItem->m_Channels)
-			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Error: Envelope %d had an invalid number of channels, %d, which was changed to %d.", e, pItem->m_Channels, Channels);
-				ErrorHandler(aBuf);
-			}
-
-			std::shared_ptr<CEnvelope> pEnv = std::make_shared<CEnvelope>(Channels);
+			std::shared_ptr<CEnvelope> pEnv = std::make_shared<CEnvelope>(pItem->m_Channels);
 			pEnv->m_vPoints.resize(pItem->m_NumPoints);
 			for(int p = 0; p < pItem->m_NumPoints; p++)
 			{
@@ -1000,7 +928,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 					mem_copy(&pEnv->m_vPoints[p].m_Bezier, pPointBezier, sizeof(CEnvPointBezier));
 			}
 			if(pItem->m_aName[0] != -1) // compatibility with old maps
-				IntsToStr(pItem->m_aName, std::size(pItem->m_aName), pEnv->m_aName, std::size(pEnv->m_aName));
+				IntsToStr(pItem->m_aName, sizeof(pItem->m_aName) / sizeof(int), pEnv->m_aName);
 			m_vpEnvelopes.push_back(pEnv);
 			if(pItem->m_Version >= CMapItemEnvelope_v2::CURRENT_VERSION)
 				pEnv->m_Synchronized = pItem->m_Synchronized;
@@ -1068,7 +996,7 @@ void CEditorMap::PerformSanityChecks(const std::function<void(const char *pError
 						{
 							pLayerTiles->m_Image = -1;
 							char aBuf[IO_MAX_PATH_LENGTH + 128];
-							str_format(aBuf, sizeof(aBuf), "Error: The image '%s' (size %" PRIzu "x%" PRIzu ") has a width or height that is not divisible by 16 and therefore cannot be used for tile layers. The image of layer #%" PRIzu " '%s' in group #%" PRIzu " '%s' has been unset.", pImage->m_aName, pImage->m_Width, pImage->m_Height, LayerIndex, pLayer->m_aName, GroupIndex, pGroup->m_aName);
+							str_format(aBuf, sizeof(aBuf), "Error: The image '%s' (size %dx%d) has a width or height that is not divisible by 16 and therefore cannot be used for tile layers. The image of layer #%" PRIzu " '%s' in group #%" PRIzu " '%s' has been unset.", pImage->m_aName, pImage->m_Width, pImage->m_Height, LayerIndex, pLayer->m_aName, GroupIndex, pGroup->m_aName);
 							ErrorHandler(aBuf);
 						}
 					}

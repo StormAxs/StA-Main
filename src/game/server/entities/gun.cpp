@@ -85,7 +85,7 @@ void CGun::Fire()
 		}
 
 		// Turrets can only shoot at a speed of sv_plasma_per_sec
-		const int &TargetClientId = pTarget->GetPlayer()->GetCid();
+		const int &TargetClientId = pTarget->GetPlayer()->GetCID();
 		const bool &TargetIsSolo = pTarget->Teams()->m_Core.GetSolo(TargetClientId);
 		if((TargetIsSolo &&
 			   m_aLastFireSolo[TargetClientId] + Server()->TickSpeed() / g_Config.m_SvPlasmaPerSec > Server()->Tick()) ||
@@ -165,8 +165,8 @@ void CGun::Snap(int SnappingClient)
 		if(SnappingClient != SERVER_DEMO_CLIENT &&
 			(GameServer()->m_apPlayers[SnappingClient]->GetTeam() == TEAM_SPECTATORS ||
 				GameServer()->m_apPlayers[SnappingClient]->IsPaused()) &&
-			GameServer()->m_apPlayers[SnappingClient]->m_SpectatorId != SPEC_FREEVIEW)
-			pChar = GameServer()->GetPlayerChar(GameServer()->m_apPlayers[SnappingClient]->m_SpectatorId);
+			GameServer()->m_apPlayers[SnappingClient]->m_SpectatorID != SPEC_FREEVIEW)
+			pChar = GameServer()->GetPlayerChar(GameServer()->m_apPlayers[SnappingClient]->m_SpectatorID);
 
 		int Tick = (Server()->Tick() % Server()->TickSpeed()) % 11;
 		if(pChar && m_Layer == LAYER_SWITCH && m_Number > 0 &&
@@ -176,6 +176,6 @@ void CGun::Snap(int SnappingClient)
 		StartTick = m_EvalTick;
 	}
 
-	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), GetId(),
+	GameServer()->SnapLaserObject(CSnapContext(SnappingClientVersion), GetID(),
 		m_Pos, m_Pos, StartTick, -1, LASERTYPE_GUN, Subtype, m_Number);
 }

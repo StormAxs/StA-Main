@@ -23,10 +23,10 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 {
 	if(m_IsLoaded)
 		return true;
+	IOHANDLE f = pStorage->OpenFile(pFile, IOFLAG_READ | IOFLAG_SKIP_BOM, IStorage::TYPE_ALL);
 
-	CLineReader LineReader;
 	std::vector<std::string> vLines;
-	if(LineReader.OpenFile(pStorage->OpenFile(pFile, IOFLAG_READ, IStorage::TYPE_ALL)))
+	if(f)
 	{
 		EBackendType BackendType = pCompiler->m_IsOpenGLES ? BACKEND_TYPE_OPENGL_ES : BACKEND_TYPE_OPENGL;
 		bool IsNewOpenGL = (BackendType == BACKEND_TYPE_OPENGL ? (pCompiler->m_OpenGLVersionMajor >= 4 || (pCompiler->m_OpenGLVersionMajor == 3 && pCompiler->m_OpenGLVersionMinor == 3)) : pCompiler->m_OpenGLVersionMajor >= 3);
@@ -81,13 +81,17 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 			vLines.emplace_back("#extension GL_EXT_texture_array : enable\r\n");
 		}
 
-		while(const char *pReadLine = LineReader.Get())
+		CLineReader LineReader;
+		LineReader.Init(f);
+		char *pReadLine = NULL;
+		while((pReadLine = LineReader.Get()))
 		{
 			std::string Line;
 			pCompiler->ParseLine(Line, pReadLine, Type == GL_FRAGMENT_SHADER ? GLSL_SHADER_COMPILER_TYPE_FRAGMENT : GLSL_SHADER_COMPILER_TYPE_VERTEX);
 			Line.append("\r\n");
 			vLines.push_back(Line);
 		}
+		io_close(f);
 
 		const char **ShaderCode = new const char *[vLines.size()];
 
@@ -122,7 +126,7 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 		m_Type = Type;
 		m_IsLoaded = true;
 
-		m_ShaderId = shader;
+		m_ShaderID = shader;
 
 		return true;
 	}
@@ -135,7 +139,7 @@ void CGLSL::DeleteShader()
 	if(!IsLoaded())
 		return;
 	m_IsLoaded = false;
-	glDeleteShader(m_ShaderId);
+	glDeleteShader(m_ShaderID);
 }
 
 bool CGLSL::IsLoaded() const
@@ -143,9 +147,9 @@ bool CGLSL::IsLoaded() const
 	return m_IsLoaded;
 }
 
-TWGLuint CGLSL::GetShaderId() const
+TWGLuint CGLSL::GetShaderID() const
 {
-	return m_ShaderId;
+	return m_ShaderID;
 }
 
 CGLSL::CGLSL()
